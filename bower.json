@@ -1,0 +1,20 @@
+{
+  "name": "dayary",
+  "version": "0.0.0",
+  "authors": [
+    "barahilia <barahilia@gmail.com>"
+  ],
+  "description": "Diary tool deployed as a local web-server",
+  "moduleType": [
+    "globals"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
