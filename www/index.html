@@ -14,7 +14,9 @@
         <div class="col-sm-3">
             <h2>Records</h2>
             <ul class="list-unstyled">
-                <li ng-repeat="record in records">
+                <li ng-repeat="record in records"
+                    ng-class="{ 'bg-success': (record == selected) }">
+
                     <a ng-click="select(record)" href="#">
                         {{record.date}}
                     </a>
