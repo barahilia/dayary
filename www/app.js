@@ -38,7 +38,11 @@ angular.module("app", [])
     };
 
     $scope.edit = function (record) {
-        record.editing = true;
+        $scope.editing = true;
+    };
+
+    $scope.view = function (record) {
+        $scope.editing = false;
     };
 })
 

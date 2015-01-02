@@ -1,6 +1,8 @@
 <html ng-app="app">
 <head>
     <link href="../bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <link href="site.css" rel="stylesheet">
+
     <script src="../bower_components/angular/angular.js"></script>
     <script src="app.js"></script>
 </head>
@@ -38,14 +40,29 @@
 
             <div>
                 <button class="btn btn-success"
+                        ng-hide="editing"
                         ng-click="edit(selected)">
                     Edit
+                </button>
+                <button class="btn btn-success"
+                        ng-show="editing"
+                        ng-click="view(selected)">
+                    View
                 </button>
             <div>
 
             <br />
 
-            <p>{{selected.text}}</p>
+            <p ng-hide="editing">
+                <!-- TODO: split by paragraphs -->
+                {{selected.text}}
+            </p>
+
+            <textarea ng-show="editing"
+                      ng-model="selected.text" ng-trim="false"
+                      rows=15 class="text-editor"
+                      placeholder="Enter text here...">
+            </textarea>
         </div>
     </div>
 <body>
