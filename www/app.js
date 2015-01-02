@@ -20,13 +20,14 @@ angular.module("app", [])
     };
 
     $scope.add = function () {
-        var record = {
-            date: "2015-01-02",
-            text: "dummy" // TODO: make it empty
-        };
-
-        $scope.selected = record;
-        $scope.records.push(record);
+        $http.post("/api/records")
+            .success(function (record) {
+                $scope.selected = record;
+                $scope.records.push(record);
+            })
+            .error(function () {
+                // TODO: report an error
+            });
     };
 
     $scope.edit = function (record) {
