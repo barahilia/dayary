@@ -26,6 +26,20 @@ angular.module("app", [])
     $scope.select = function (record) {
         $scope.selected = record;
     };
+
+    $scope.add = function () {
+        var record = {
+            date: "2015-01-02",
+            text: "dummy" // TODO: make it empty
+        };
+
+        $scope.selected = record;
+        $scope.records.push(record);
+    };
+
+    $scope.edit = function (record) {
+        record.editing = true;
+    };
 })
 
 ;
