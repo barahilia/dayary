@@ -1,0 +1,14 @@
+{
+  "name": "dayary",
+  "version": "0.0.0",
+  "description": "Diary tool deployed as a local web-server",
+  "main": "server/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "barahilis@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "express": "~4.10.6"
+  }
+}
