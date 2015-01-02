@@ -1,28 +1,20 @@
 
 angular.module("app", [])
 
-.controller("ctrl", function ($scope) {
-    $scope.records = [
-        {
-            date: "2014-09-23",
-            text: "Lorem Ipsum is simply dummy text of the printing and " +
-                "typesetting industry. Lorem Ipsum has been the industry's " +
-                "standard dummy text ever since the 1500s"
-        },
-        {
-            date: "2014-10-27",
-            text: "second"
-        },
-        {
-            date: "2014-12-31",
-            text: "third"
-        }
-    ];
-    
-    if($scope.records.length > 0) {
-        $scope.selected = $scope.records[0];
-    }
-    
+.controller("ctrl", function ($scope, $http) {
+    $http.get("/api/records")
+        .success(function (data) {
+            $scope.records = data;
+
+            if($scope.records.length > 0) {
+                $scope.selected = $scope.records[0];
+            }
+        })
+        .error(function () {
+            $scope.loadError = true;
+        });
+
+
     $scope.select = function (record) {
         $scope.selected = record;
     };

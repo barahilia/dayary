@@ -13,7 +13,13 @@
             <span class="h1">Dayary</span> - day by day
         </div>
 
-        <div class="col-sm-3">
+        <!-- TODO: introduce a state for data loading -->
+        <div ng-hide="records">
+            Data is loading...
+            <span ng-show="loadError">- error</span>
+        </div>
+
+        <div ng-show="records" class="col-sm-3">
             <h2>Records</h2>
 
             <div>
@@ -35,7 +41,7 @@
             </ul>
         </div>
 
-        <div class="col-sm-9">
+        <div ng-show="records" class="col-sm-9">
             <h2>{{selected.date}}</h2>
 
             <div>
