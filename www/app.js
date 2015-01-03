@@ -2,6 +2,14 @@
 angular.module("app", [])
 
 .controller("ctrl", function ($scope, $http, $timeout) {
+    $scope.setError = function (error) {
+        $scope.error = error;
+    };
+
+    $scope.unsetError = function () {
+        $scope.error = null;
+    };
+
     $http.get("/api/records")
         .success(function (data) {
             $scope.records = data;
@@ -11,7 +19,7 @@ angular.module("app", [])
             }
         })
         .error(function () {
-            $scope.loadError = true;
+            $scope.setError("failure while loading the data");
         });
 
 
@@ -26,7 +34,7 @@ angular.module("app", [])
                 $scope.records.push(record);
             })
             .error(function () {
-                // TODO: report an error
+                $scope.setError("can't add new record");
             });
     };
 
@@ -48,7 +56,7 @@ angular.module("app", [])
                 );
             })
             .error(function () {
-                // TODO: report an error
+                $scope.setError("failure while saving the record");
             });
     };
 })

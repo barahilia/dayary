@@ -13,10 +13,21 @@
             <span class="h1">Dayary</span> - day by day
         </div>
 
+        <br />
+        <br />
+
         <!-- TODO: introduce a state for data loading -->
         <div ng-hide="records">
             Data is loading...
-            <span ng-show="loadError">- error</span>
+        </div>
+
+        <br />
+
+        <div class="bg-danger" ng-show="error">
+            Error: {{error}}
+            <button type="button" class="close" ng-click="unsetError()">
+                <span>&times;</span>
+            </button>
         </div>
 
         <div ng-show="records" class="col-sm-3">
