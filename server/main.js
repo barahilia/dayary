@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
 var express = require('express');
+var bodyParser = require('body-parser');
 
 var app = express();
+
 var port = process.env.PORT || 3000;
 
 // TODO: load from a JSON file
@@ -26,6 +28,7 @@ var records = [
     }
 ];
 
+// TODO: attempt using router for /api/records
 app.get('/api/records', function (req, res) {
     res.send(records);
 });
@@ -37,19 +40,35 @@ app.post('/api/records', function (req, res) {
     res.send(record);
 });
 
-app.put('/api/records/1', function (req, res) {
-    res.status(204).end();
-    // TODO: save an updated record
+app.use('/api/records/:id', bodyParser.text({type: "application/json"}));
+app.put('/api/records/:id', function (req, res) {
+    var id = req.params.id;
+    var body = req.body;
+    var i;
+
+    // TODO: use underscore for this
+    for(i = 0; i < records.length; i++) {
+        if (records[i].id === id) {
+            records[i].text = body;
+            res.status(204).end();
+            return;
+        }
+    }
+
+    res.status(404).end();
 });
+
 
 // TODO: decide if to continue with __dirname
 app.use(
     '/bower_components',
     express.static(__dirname + '/../bower_components')
 );
+
 app.use(
     express.static(__dirname + '/../www')
 );
+
 
 console.log("Listening... Get to http://localhost:" + port);
 app.listen(port);

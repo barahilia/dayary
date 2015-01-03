@@ -9,6 +9,7 @@
   "author": "barahilis@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "express": "~4.10.6"
+    "express": "~4.10.6",
+    "body-parser": "~1.10.1"
   }
 }
