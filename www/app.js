@@ -1,7 +1,7 @@
 
 angular.module("app", [])
 
-.controller("ctrl", function ($scope, $http) {
+.controller("ctrl", function ($scope, $http, $timeout) {
     $http.get("/api/records")
         .success(function (data) {
             $scope.records = data;
@@ -36,6 +36,20 @@ angular.module("app", [])
 
     $scope.view = function (record) {
         $scope.editing = false;
+
+        $http.put("/api/records/" + record.id, record.text)
+            .success(function () {
+                $scope.saved = true;
+                $timeout(
+                    function () {
+                        $scope.saved = false;
+                    },
+                    3000
+                );
+            })
+            .error(function () {
+                // TODO: report an error
+            });
     };
 })
 

@@ -44,18 +44,23 @@
         <div ng-show="records" class="col-sm-9">
             <h2>{{selected.date}}</h2>
 
-            <div>
+            <div ng-hide="editing">
                 <button class="btn btn-success"
-                        ng-hide="editing"
                         ng-click="edit(selected)">
                     Edit
                 </button>
+
+                <span class="bg-success"
+                      ng-show="saved">
+                    - saved
+                </span>
+            </div>
+            <div ng-show="editing">
                 <button class="btn btn-success"
-                        ng-show="editing"
                         ng-click="view(selected)">
                     View
                 </button>
-            <div>
+            </div>
 
             <br />
 
