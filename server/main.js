@@ -42,7 +42,7 @@ app.post('/api/records', function (req, res) {
 
 app.use('/api/records/:id', bodyParser.text({type: "application/json"}));
 app.put('/api/records/:id', function (req, res) {
-    var id = req.params.id;
+    var id = +req.params.id;
     var body = req.body;
     var i;
 

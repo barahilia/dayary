@@ -40,11 +40,13 @@ angular.module("app", [])
 
     $scope.edit = function (record) {
         $scope.editing = true;
+        // TODO: run auto-save every 1 minute, notify when done/failed
     };
 
     $scope.view = function (record) {
         $scope.editing = false;
 
+        // TODO: decide if to send the entire records instead of text only
         $http.put("/api/records/" + record.id, record.text)
             .success(function () {
                 $scope.saved = true;
