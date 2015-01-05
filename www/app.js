@@ -2,6 +2,9 @@
 angular.module("app", [])
 
 .controller("ctrl", function ($scope, $http, $timeout) {
+    // TODO: get this from the user
+    var passphrase = "Very secret phrase";
+
     $scope.setError = function (error) {
         $scope.error = error;
     };
@@ -12,6 +15,20 @@ angular.module("app", [])
 
     $http.get("/api/records")
         .success(function (data) {
+            var i;
+
+            // TODO: use underscore for this
+            for(i = 0; i < data.length; i++) {
+                try {
+                data[i].text = CryptoJS.AES
+                    .decrypt(data[i].text, passphrase)
+                    .toString(CryptoJS.enc.Utf8);
+                }
+                catch (err) {
+                    // TODO: report the error
+                }
+            }
+
             $scope.records = data;
 
             if($scope.records.length > 0) {
@@ -44,10 +61,15 @@ angular.module("app", [])
     };
 
     $scope.view = function (record) {
+        var encrypted;
+
         $scope.editing = false;
 
+        encrypted = CryptoJS.AES.encrypt(record.text, passphrase);
+        encrypted = encrypted.toString();
+
         // TODO: decide if to send the entire records instead of text only
-        $http.put("/api/records/" + record.id, record.text)
+        $http.put("/api/records/" + record.id, encrypted)
             .success(function () {
                 $scope.saved = true;
                 $timeout(
