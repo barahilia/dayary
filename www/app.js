@@ -15,19 +15,22 @@ angular.module("app", [])
 
     $http.get("/api/records")
         .success(function (data) {
-            var i;
+            _.each(data, function(record) {
+                if (!record.text) {
+                    return;
+                }
 
-            // TODO: use underscore for this
-            for(i = 0; i < data.length; i++) {
-                try {
-                data[i].text = CryptoJS.AES
-                    .decrypt(data[i].text, passphrase)
+                var decrypted = CryptoJS.AES
+                    .decrypt(record.text, passphrase)
                     .toString(CryptoJS.enc.Utf8);
+
+                if (decrypted) {
+                    record.text = decrypted;
                 }
-                catch (err) {
-                    // TODO: report the error
+                else {
+                    $scope.setError("Unable to dectype [" + record.date + "]");
                 }
-            }
+            });
 
             $scope.records = data;
 

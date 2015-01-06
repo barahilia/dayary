@@ -51,7 +51,7 @@ app.put('/api/records/:id', function (req, res) {
     });
     
     if (record) {
-        records.text = body;
+        record.text = body;
         res.status(204).end();
     }
     else {
