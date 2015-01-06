@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-var express = require('express');
-var bodyParser = require('body-parser');
+var express = require('express'),
+    bodyParser = require('body-parser'),
+    _ = require('underscore');
 
 var app = express();
 
@@ -44,18 +45,18 @@ app.use('/api/records/:id', bodyParser.text({type: "application/json"}));
 app.put('/api/records/:id', function (req, res) {
     var id = +req.params.id;
     var body = req.body;
-    var i;
 
-    // TODO: use underscore for this
-    for(i = 0; i < records.length; i++) {
-        if (records[i].id === id) {
-            records[i].text = body;
-            res.status(204).end();
-            return;
-        }
+    var record = _.find(records, function (rec) {
+        return rec.id === id;
+    });
+    
+    if (record) {
+        records.text = body;
+        res.status(204).end();
     }
-
-    res.status(404).end();
+    else {
+        res.status(404).end();
+    }
 });
 
 
