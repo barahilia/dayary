@@ -9,6 +9,8 @@ var app = express();
 var port = process.env.PORT || 3000;
 
 // TODO: load from a JSON file
+// TODO: each record should have creation date and [the last] update date
+// TODO: consider other params, like metadata, GPS, ...
 var records = [
     {
         id: 1,
@@ -34,6 +36,21 @@ app.get('/api/records', function (req, res) {
     res.send(records);
 });
 
+app.get('/api/records/:id', function (req, res) {
+    var id = +req.params.id;
+
+    var record = _.find(records, function (rec) {
+        return rec.id === id;
+    });
+
+    if (record) {
+        res.send(records);
+    }
+    else {
+        res.status(404).end();
+    }
+});
+
 app.post('/api/records', function (req, res) {
     // TODO: set correct record data
     var record = { id: 4, date: "2015-01-02", text: "" };
@@ -49,7 +66,7 @@ app.put('/api/records/:id', function (req, res) {
     var record = _.find(records, function (rec) {
         return rec.id === id;
     });
-    
+
     if (record) {
         record.text = body;
         res.status(204).end();
