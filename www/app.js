@@ -2,8 +2,11 @@
 angular.module("app", [])
 
 .controller("ctrl", function ($scope, $http, $timeout) {
-    // TODO: get this from the user
-    var passphrase = "Very secret phrase";
+    // TODO: compare it against the hash saved in localStorage
+    // TODO: enter twice at the first time
+    // TODO: disable sample value at production
+    // TODO: allow to save it at localStorage, explain security/convenience
+    $scope.passphrase = "Very secret phrase";
 
     $scope.setError = function (error) {
         $scope.error = error;
@@ -21,7 +24,7 @@ angular.module("app", [])
                 }
 
                 var decrypted = CryptoJS.AES
-                    .decrypt(record.text, passphrase)
+                    .decrypt(record.text, $scope.passphrase)
                     .toString(CryptoJS.enc.Utf8);
 
                 if (decrypted) {
@@ -68,7 +71,7 @@ angular.module("app", [])
 
         $scope.editing = false;
 
-        encrypted = CryptoJS.AES.encrypt(record.text, passphrase);
+        encrypted = CryptoJS.AES.encrypt(record.text, $scope.passphrase);
         encrypted = encrypted.toString();
 
         // TODO: decide if to send the entire records instead of text only
