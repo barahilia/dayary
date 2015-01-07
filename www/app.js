@@ -1,12 +1,15 @@
 
 angular.module("app", [])
 
-.controller("ctrl", function ($scope, $http, $timeout) {
+.controller("ctrl", function ($scope, $http, $timeout, $interval) {
+    var stopAutosave;
+
     // TODO: compare it against the hash saved in localStorage
     // TODO: enter twice at the first time
     // TODO: disable sample value at production
     // TODO: allow to save it at localStorage, explain security/convenience
     $scope.passphrase = "Very secret phrase";
+    $scope.autosaveInterval = 30; // In seconds
 
     $scope.setError = function (error) {
         $scope.error = error;
@@ -31,7 +34,7 @@ angular.module("app", [])
                     record.text = decrypted;
                 }
                 else {
-                    $scope.setError("Unable to dectype [" + record.date + "]");
+                    $scope.setError("Unable to decrypt [" + record.date + "]");
                 }
             });
 
@@ -61,26 +64,18 @@ angular.module("app", [])
             });
     };
 
-    $scope.edit = function (record) {
-        $scope.editing = true;
-        // TODO: run auto-save every 1 minute, notify when done/failed
-    };
-
-    $scope.view = function (record) {
-        var encrypted;
-
-        $scope.editing = false;
-
-        encrypted = CryptoJS.AES.encrypt(record.text, $scope.passphrase);
+    var saveRecord = function (record) {
+        var encrypted = CryptoJS.AES.encrypt(record.text, $scope.passphrase);
         encrypted = encrypted.toString();
 
         // TODO: decide if to send the entire records instead of text only
         $http.put("/api/records/" + record.id, encrypted)
             .success(function () {
-                $scope.saved = true;
+                // TODO: use moment.js instead of Date
+                $scope.saved = "saved on " + (new Date());
                 $timeout(
                     function () {
-                        $scope.saved = false;
+                        $scope.saved = "";
                     },
                     3000
                 );
@@ -89,6 +84,35 @@ angular.module("app", [])
                 $scope.setError("failure while saving the record");
             });
     };
+    
+    var stopAutosaving = function () {
+        if (stopAutosave) {
+            $interval.cancel(stopAutosave);
+        }
+    };
+
+    $scope.edit = function (record) {
+        $scope.editing = true;
+
+        stopAutosave = $interval(
+            function () {
+                saveRecord(record);
+            },
+            $scope.autosaveInterval * 1000 // seconds -> milliseconds
+        );
+    };
+
+    $scope.view = function (record) {
+        $scope.editing = false;
+
+        stopAutosaving();
+        saveRecord(record);
+    };
+
+    $scope.$on('$destroy', function() {
+        // Make sure that the interval is destroyed too
+        stopAutosaving();
+    });
 })
 
 ;

@@ -62,22 +62,23 @@
              ng-class="{ 'col-sm-9' : !settingsEdit, 'col-sm-6': settingsEdit }">
             <h2>{{selected.date}}</h2>
 
-            <div ng-hide="editing">
+            <div >
                 <button class="btn btn-success"
-                        ng-click="edit(selected)">
+                        ng-click="edit(selected)"
+                        ng-hide="editing">
                     Edit
+                </button>
+
+                <button class="btn btn-success"
+                        ng-click="view(selected)"
+                        ng-show="editing">
+                    View
                 </button>
 
                 <span class="bg-success"
                       ng-show="saved">
-                    - saved
+                    - {{saved}}
                 </span>
-            </div>
-            <div ng-show="editing">
-                <button class="btn btn-success"
-                        ng-click="view(selected)">
-                    View
-                </button>
             </div>
 
             <br />
@@ -111,7 +112,7 @@
             <br />
 
             <div>Auto Save (sec):</div>
-            <input type="text" ng-model="autosaveInterval">
+            <input type="number" ng-model="autosaveInterval">
         </div>
     </div>
 <body>
