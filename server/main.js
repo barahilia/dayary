@@ -33,7 +33,14 @@ var records = [
 
 // TODO: attempt using router for /api/records
 app.get('/api/records', function (req, res) {
-    res.send(records);
+    // Diary can become quite large, so don't send text here
+    res.send(
+        _.map(records, function (record) {
+            var metadata = _.clone(record);
+            metadata.text = undefined;
+            return metadata;
+        })
+    );
 });
 
 app.get('/api/records/:id', function (req, res) {
