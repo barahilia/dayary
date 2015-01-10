@@ -92,7 +92,7 @@ app.post('/api/records', function (req, res) {
     var now = new Date();
 
     var record = {
-        id: maxId + 1,
+        id: maxId < 1 ? 1 : maxId + 1,
         date: now,
         text: ""
     };
