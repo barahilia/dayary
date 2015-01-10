@@ -39,6 +39,11 @@ angular.module("app", [])
                 // TODO: extract encryption service
                 var decrypted;
 
+                if (!record.text) {
+                    $scope.selected = record;
+                    return;
+                }
+
                 try {
                     decrypted = CryptoJS.AES
                         .decrypt(record.text, $scope.passphrase)
