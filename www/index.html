@@ -58,7 +58,12 @@
             </ul>
         </div>
 
-        <div ng-show="records"
+        <div ng-show="!selected" class="bg-success">
+            Looks like this is a fresh new diary. Start by hitting 'Add' to
+            add a new record.
+        </div>
+
+        <div ng-show="selected"
              ng-class="{ 'col-sm-9' : !settingsEdit, 'col-sm-6': settingsEdit }">
             <h2>{{selected.date | date : 'fullDate'}}</h2>
 
