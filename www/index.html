@@ -49,9 +49,9 @@
 
             <ul class="list-unstyled">
                 <li ng-repeat="record in records"
-                    ng-class="{ 'bg-success': (record == selected) }">
+                    ng-class="{ 'bg-success': (record.id == selected.id) }">
 
-                    <a ng-click="select(record)" href="#">
+                    <a ng-click="select(record.id)" href="#">
                         {{record.date}}
                     </a>
                 </li>

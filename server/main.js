@@ -44,7 +44,7 @@ app.get('/api/records/:id', function (req, res) {
     });
 
     if (record) {
-        res.send(records);
+        res.send(record);
     }
     else {
         res.status(404).end();

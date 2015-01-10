@@ -11,6 +11,7 @@ angular.module("app", [])
     $scope.passphrase = "Very secret phrase";
     $scope.autosaveInterval = 30; // In seconds
 
+    // TODO: extract to a dedicated controller (with glueing service)
     $scope.setError = function (error) {
         $scope.error = error;
     };
@@ -21,36 +22,47 @@ angular.module("app", [])
 
     $http.get("/api/records")
         .success(function (data) {
-            _.each(data, function(record) {
-                if (!record.text) {
-                    return;
-                }
+            $scope.records = data;
 
-                var decrypted = CryptoJS.AES
-                    .decrypt(record.text, $scope.passphrase)
-                    .toString(CryptoJS.enc.Utf8);
+            if($scope.records.length > 0) {
+                $scope.select($scope.records[0].id);
+            }
+        })
+        .error(function () {
+            $scope.setError("failure while loading records list");
+        });
+
+
+    $scope.select = function (recordId) {
+        $http.get("/api/records/" + recordId)
+            .success(function (record) {
+                // TODO: extract encryption service
+                var decrypted;
+
+                try {
+                    decrypted = CryptoJS.AES
+                        .decrypt(record.text, $scope.passphrase)
+                        .toString(CryptoJS.enc.Utf8);
+                }
+                catch (e) {
+                    // Nothing doing
+                }
 
                 if (decrypted) {
                     record.text = decrypted;
+
+                    // TODO: rename selected to record
+                    $scope.selected = record;
                 }
                 else {
                     $scope.setError("Unable to decrypt [" + record.date + "]");
                 }
+            })
+            .error(function () {
+                $scope.setError(
+                    "failure while loading the data for record: " + recordId
+                );
             });
-
-            $scope.records = data;
-
-            if($scope.records.length > 0) {
-                $scope.selected = $scope.records[0];
-            }
-        })
-        .error(function () {
-            $scope.setError("failure while loading the data");
-        });
-
-
-    $scope.select = function (record) {
-        $scope.selected = record;
     };
 
     $scope.add = function () {
