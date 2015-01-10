@@ -11,6 +11,7 @@
   "dependencies": {
     "express": "~4.10.6",
     "body-parser": "~1.10.1",
-    "underscore": "~1.7.0"
+    "underscore": "~1.7.0",
+    "moment": "~2.9.0"
   }
 }

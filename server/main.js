@@ -59,8 +59,19 @@ app.get('/api/records/:id', function (req, res) {
 });
 
 app.post('/api/records', function (req, res) {
-    // TODO: set correct record data
-    var record = { id: 4, date: "2015-01-02", text: "" };
+    var maxId = _.chain(records)
+        .map(function (record) { return record.id; })
+        .max()
+        .value();
+
+    var now = new Date();
+
+    var record = {
+        id: maxId + 1,
+        date: now,
+        text: ""
+    };
+
     records.push(record);
     res.send(record);
 });
