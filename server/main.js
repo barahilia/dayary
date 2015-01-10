@@ -1,17 +1,42 @@
 #!/usr/bin/env node
 
-var express = require('express'),
+var fs = require('fs'),
+    express = require('express'),
     bodyParser = require('body-parser'),
     _ = require('underscore');
 
-var app = express();
-
 var port = process.env.PORT || 3000;
+var datafile = __dirname + "/../data/records.json";
+
+var app = express();
 
 // TODO: load from a JSON file
 // TODO: each record should have creation date and [the last] update date
 // TODO: consider other params, like metadata, GPS, ...
-var records = [
+
+var loadRecords = function () {
+    var data;
+
+    try {
+        data = fs.readFileSync(datafile);
+        return JSON.parse(data);
+    }
+    catch (e) {
+        if (e.errno === 34 && e.code === 'ENOENT') {
+            // File doesn't exist yet - it's OK
+            return [];
+        }
+        else {
+            console.log("FATAL ERROR: unable to open the data file");
+            console.log(e);
+            process.exit(1);
+        }
+    }
+};
+
+var records = loadRecords();
+/*
+[
     {
         id: 1,
         date: "2014-09-23",
@@ -29,7 +54,7 @@ var records = [
         date: "2014-12-31",
         text: "third"
     }
-];
+];*/
 
 // TODO: attempt using router for /api/records
 app.get('/api/records', function (req, res) {
@@ -78,6 +103,7 @@ app.post('/api/records', function (req, res) {
 
 app.use('/api/records/:id', bodyParser.text({type: "application/json"}));
 app.put('/api/records/:id', function (req, res) {
+    // TODO: set 'updated' field here
     var id = +req.params.id;
     var body = req.body;
 
