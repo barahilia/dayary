@@ -33,7 +33,43 @@ angular.module("app", [])
         });
 
 
+    var saveRecord = function (record) {
+        var encrypted;
+
+        if (record.text) {
+            encrypted = CryptoJS.AES.encrypt(record.text, $scope.passphrase);
+            encrypted = encrypted.toString();
+        }
+        else {
+            encrypted = "";
+        }
+
+        // TODO: decide if to send the entire records instead of text only
+        $http.put("/api/records/" + record.id, encrypted)
+            .success(function () {
+                // TODO: use moment.js instead of Date
+                $scope.saved = "saved on " + (new Date());
+                $timeout(
+                    function () {
+                        $scope.saved = "";
+                    },
+                    3000
+                );
+            })
+            .error(function () {
+                $scope.setError("failure while saving the record");
+            });
+    };
+
+    var savePrevious = function () {
+        if ($scope.selected && $scope.editing) {
+            saveRecord($scope.selected);
+        }
+    };
+
     $scope.select = function (recordId) {
+        savePrevious();
+
         $http.get("/api/records/" + recordId)
             .success(function (record) {
                 // TODO: extract encryption service
@@ -58,6 +94,7 @@ angular.module("app", [])
 
                     // TODO: rename selected to record
                     $scope.selected = record;
+                    $scope.editing = false;
                 }
                 else {
                     $scope.setError("Unable to decrypt [" + record.date + "]");
@@ -71,37 +108,20 @@ angular.module("app", [])
     };
 
     $scope.add = function () {
+        savePrevious();
+
         $http.post("/api/records")
             .success(function (record) {
-                $scope.selected = record;
+                // TODO: need to push record without 'text'
                 $scope.records.push(record);
+                $scope.selected = record;
+                $scope.editing = true;
             })
             .error(function () {
                 $scope.setError("can't add new record");
             });
     };
 
-    var saveRecord = function (record) {
-        var encrypted = CryptoJS.AES.encrypt(record.text, $scope.passphrase);
-        encrypted = encrypted.toString();
-
-        // TODO: decide if to send the entire records instead of text only
-        $http.put("/api/records/" + record.id, encrypted)
-            .success(function () {
-                // TODO: use moment.js instead of Date
-                $scope.saved = "saved on " + (new Date());
-                $timeout(
-                    function () {
-                        $scope.saved = "";
-                    },
-                    3000
-                );
-            })
-            .error(function () {
-                $scope.setError("failure while saving the record");
-            });
-    };
-    
     var stopAutosaving = function () {
         if (stopAutosave) {
             $interval.cancel(stopAutosave);
