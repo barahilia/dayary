@@ -52,7 +52,7 @@
                     ng-class="{ 'bg-success': (record.id == selected.id) }">
 
                     <a ng-click="select(record.id)" href="#">
-                        {{record.date}}
+                        {{record.date | date : 'yyyy-MM-dd'}}
                     </a>
                 </li>
             </ul>
@@ -60,7 +60,7 @@
 
         <div ng-show="records"
              ng-class="{ 'col-sm-9' : !settingsEdit, 'col-sm-6': settingsEdit }">
-            <h2>{{selected.date}}</h2>
+            <h2>{{selected.date | date : 'fullDate'}}</h2>
 
             <div >
                 <button class="btn btn-success"
