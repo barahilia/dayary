@@ -10,9 +10,6 @@ var datafile = __dirname + "/../data/records.json";
 
 var app = express();
 
-// TODO: load from a JSON file
-// TODO: consider other params, like metadata, GPS, ...
-
 var loadRecords = function () {
     var data;
 
@@ -31,6 +28,11 @@ var loadRecords = function () {
             process.exit(1);
         }
     }
+};
+
+var saveRecords = function (data) {
+    // Can throw an error, to be caught at the upper level
+    fs.writeFileSync(datafile, JSON.stringify(data));
 };
 
 // TODO: currently it's [ { }, ... ]. Make it { id: { }, ... }
@@ -99,7 +101,16 @@ app.post('/api/records', function (req, res) {
     };
 
     records.push(record);
-    res.send(record);
+
+    try {
+        saveRecords(records);
+        res.send(record);
+    }
+    catch (e) {
+        console.log("ERROR: unable to save to the data file");
+        console.log(e);
+        res.status(500).end();
+    }
 });
 
 app.use('/api/records/:id', bodyParser.text({type: "application/json"}));
@@ -114,7 +125,16 @@ app.put('/api/records/:id', function (req, res) {
     if (record) {
         record.text = body;
         record.updated = new Date();
-        res.status(204).end();
+
+        try {
+            saveRecords(records);
+            res.status(204).end();
+        }
+        catch (e) {
+            console.log("ERROR: unable to save to the data file");
+            console.log(e);
+            res.status(500).end();
+        }
     }
     else {
         res.status(404).end();
