@@ -58,8 +58,9 @@ var records = loadRecords();
     }
 ];*/
 
-// TODO: attempt using router for /api/records
-app.get('/api/records', function (req, res) {
+var recordsApi = express.Router();
+
+recordsApi.get('/', function (req, res) {
     // Diary can become quite large, so don't send text here
     res.send(
         _.map(records, function (record) {
@@ -70,7 +71,7 @@ app.get('/api/records', function (req, res) {
     );
 });
 
-app.get('/api/records/:id', function (req, res) {
+recordsApi.get('/:id', function (req, res) {
     var id = +req.params.id;
 
     var record = _.find(records, function (rec) {
@@ -85,7 +86,7 @@ app.get('/api/records/:id', function (req, res) {
     }
 });
 
-app.post('/api/records', function (req, res) {
+recordsApi.post('/', function (req, res) {
     var maxId = _.chain(records)
         .map(function (record) { return record.id; })
         .max()
@@ -113,8 +114,8 @@ app.post('/api/records', function (req, res) {
     }
 });
 
-app.use('/api/records/:id', bodyParser.text({type: "application/json"}));
-app.put('/api/records/:id', function (req, res) {
+recordsApi.use('/:id', bodyParser.text({type: "application/json"}));
+recordsApi.put('/:id', function (req, res) {
     var id = +req.params.id;
     var body = req.body;
 
@@ -141,6 +142,7 @@ app.put('/api/records/:id', function (req, res) {
     }
 });
 
+app.use('/api/records', recordsApi);
 
 // TODO: decide if to continue with __dirname
 app.use(
