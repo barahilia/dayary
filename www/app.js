@@ -97,7 +97,9 @@ angular.module("app", [])
                     $scope.selected = record;
                 }
                 else {
-                    $scope.setError("Unable to decrypt [" + record.date + "]");
+                    $scope.setError(
+                        "Unable to decrypt [" + record.created + "]"
+                    );
                 }
             })
             .error(function () {
@@ -149,7 +151,7 @@ angular.module("app", [])
     };
 
     $scope.view = function (record) {
-        stopEdit(record);
+        $scope.stopEdit(record);
     };
 
     $scope.$on('$destroy', function() {

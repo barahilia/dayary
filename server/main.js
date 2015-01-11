@@ -11,7 +11,6 @@ var datafile = __dirname + "/../data/records.json";
 var app = express();
 
 // TODO: load from a JSON file
-// TODO: each record should have creation date and [the last] update date
 // TODO: consider other params, like metadata, GPS, ...
 
 var loadRecords = function () {
@@ -94,7 +93,8 @@ app.post('/api/records', function (req, res) {
 
     var record = {
         id: maxId < 1 ? 1 : maxId + 1,
-        date: now,
+        created: now,
+        updated: now,
         text: ""
     };
 
@@ -104,7 +104,6 @@ app.post('/api/records', function (req, res) {
 
 app.use('/api/records/:id', bodyParser.text({type: "application/json"}));
 app.put('/api/records/:id', function (req, res) {
-    // TODO: set 'updated' field here
     var id = +req.params.id;
     var body = req.body;
 
@@ -114,6 +113,7 @@ app.put('/api/records/:id', function (req, res) {
 
     if (record) {
         record.text = body;
+        record.updated = new Date();
         res.status(204).end();
     }
     else {

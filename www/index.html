@@ -52,7 +52,7 @@
                     ng-class="{ 'bg-success': (record.id == selected.id) }">
 
                     <a ng-click="select(record.id)" href="#">
-                        {{record.date | date : 'yyyy-MM-dd'}}
+                        {{record.created | date : 'yyyy-MM-dd'}}
                     </a>
                 </li>
             </ul>
@@ -65,18 +65,23 @@
 
         <div ng-show="selected"
              ng-class="{ 'col-sm-9' : !settingsEdit, 'col-sm-6': settingsEdit }">
-            <h2>{{selected.date | date : 'fullDate'}}</h2>
+            <h2>{{selected.created | date : 'fullDate'}}</h2>
 
-            <div >
+            <div ng-hide="editing">
                 <button class="btn btn-success"
-                        ng-click="startEdit(selected)"
-                        ng-hide="editing">
+                        ng-click="startEdit(selected)">
                     Edit
                 </button>
 
+                <span class="bg-success">
+                    - last updated on
+                    {{selected.updated | date : 'EEEE, MMMM d, y HH:mm:ss'}}
+                </span>
+            </div>
+
+            <div ng-show="editing">
                 <button class="btn btn-success"
-                        ng-click="view(selected)"
-                        ng-show="editing">
+                        ng-click="view(selected)">
                     View
                 </button>
 
