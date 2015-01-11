@@ -34,6 +34,7 @@ var loadRecords = function () {
     }
 };
 
+// TODO: currently it's [ { }, ... ]. Make it { id: { }, ... }
 var records = loadRecords();
 /*
 [

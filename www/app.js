@@ -92,9 +92,9 @@ angular.module("app", [])
                 if (decrypted) {
                     record.text = decrypted;
 
+                    $scope.stopEdit($scope.selected);
                     // TODO: rename selected to record
                     $scope.selected = record;
-                    $scope.editing = false;
                 }
                 else {
                     $scope.setError("Unable to decrypt [" + record.date + "]");
@@ -115,7 +115,7 @@ angular.module("app", [])
                 // TODO: need to push record without 'text'
                 $scope.records.push(record);
                 $scope.selected = record;
-                $scope.editing = true;
+                $scope.startEdit(record);
             })
             .error(function () {
                 $scope.setError("can't add new record");
@@ -128,7 +128,7 @@ angular.module("app", [])
         }
     };
 
-    $scope.edit = function (record) {
+    $scope.startEdit = function (record) {
         $scope.editing = true;
 
         stopAutosave = $interval(
@@ -138,12 +138,18 @@ angular.module("app", [])
             $scope.autosaveInterval * 1000 // seconds -> milliseconds
         );
     };
+    
+    $scope.stopEdit = function (record) {
+        $scope.editing = false;
+        stopAutosaving();
+
+        if (record) {
+            saveRecord(record);
+        }
+    };
 
     $scope.view = function (record) {
-        $scope.editing = false;
-
-        stopAutosaving();
-        saveRecord(record);
+        stopEdit(record);
     };
 
     $scope.$on('$destroy', function() {
