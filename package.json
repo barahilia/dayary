@@ -6,8 +6,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "barahilis@gmail.com",
+  "author": {
+    "name": "Ilia Barahovsky",
+    "email": "barahilis@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jashkenas/underscore.git"
+  },
   "license": "MIT",
+  "readme": "Please refer to the README.md",
+  "readmeFilename": "README.md",
   "dependencies": {
     "express": "~4.10.6",
     "body-parser": "~1.10.1",
