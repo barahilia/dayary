@@ -1,56 +1,14 @@
-
-var fs = require('fs')
-    express = require('express'),
+var express = require('express'),
     bodyParser = require('body-parser'),
-    _ = require('underscore');
-
-var datafile = __dirname + "/../data/records.json";
-
-var loadRecords = function () {
-    var data;
-
-    try {
-        data = fs.readFileSync(datafile);
-        return JSON.parse(data);
-    }
-    catch (e) {
-        if (e.errno === 34 && e.code === 'ENOENT') {
-            // File doesn't exist yet - it's OK
-            return [];
-        }
-        else {
-            console.log("FATAL ERROR: unable to open the data file");
-            console.log(e);
-            process.exit(1);
-        }
-    }
-};
-
-var saveRecords = function (data) {
-    try {
-        fs.writeFileSync(datafile, JSON.stringify(data));
-    }
-    catch (e) {
-        console.log("ERROR: unable to save to the data file");
-        console.log(e);
-        throw "Data file save failure";
-    }
-};
-
-var getRecord = function (id) {
-    return _.find(records, function (rec) {
-        return rec.id === id;
-    });
-};
-
-var records = loadRecords();
+    _ = require('underscore')
+    backend = require('./records-backend');
 
 var recordsApi = express.Router();
 
 recordsApi.get('/', function (req, res) {
     // Diary can become quite large, so don't send text here
     res.send(
-        _.map(records, function (record) {
+        _.map(backend.records, function (record) {
             var metadata = _.clone(record);
             metadata.text = undefined;
             return metadata;
@@ -59,7 +17,7 @@ recordsApi.get('/', function (req, res) {
 });
 
 recordsApi.get('/:id', function (req, res) {
-    var record = getRecord(+req.params.id);
+    var record = backend.getRecord(+req.params.id);
 
     if (record) {
         res.send(record);
@@ -70,7 +28,7 @@ recordsApi.get('/:id', function (req, res) {
 });
 
 recordsApi.post('/', function (req, res) {
-    var maxId = _.chain(records)
+    var maxId = _.chain(backend.records)
         .map(function (record) { return record.id; })
         .max()
         .value();
@@ -84,10 +42,10 @@ recordsApi.post('/', function (req, res) {
         text: ""
     };
 
-    records.push(record);
+    backend.records.push(record);
 
     try {
-        saveRecords(records);
+        backend.saveRecords(backend.records);
         res.send(record);
     }
     catch (e) {
@@ -97,15 +55,15 @@ recordsApi.post('/', function (req, res) {
 
 recordsApi.use('/:id', bodyParser.text({type: "application/json"}));
 recordsApi.put('/:id', function (req, res) {
-    var record = getRecord(+req.params.id);
     var body = req.body;
+    var record = backend.getRecord(+req.params.id);
 
     if (record) {
         record.text = body;
         record.updated = new Date();
 
         try {
-            saveRecords(records);
+            backend.saveRecords(backend.records);
             res.status(204).end();
         }
         catch (e) {
@@ -116,7 +74,6 @@ recordsApi.put('/:id', function (req, res) {
         res.status(404).end();
     }
 });
-
 
 exports.recordsApi = recordsApi;
 
