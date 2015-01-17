@@ -1,7 +1,10 @@
-
 angular.module("app", [])
 
-.controller("ctrl", function ($scope, $http, $timeout, $interval) {
+.factory("errorService", errorService)
+
+.controller("errorCtrl", errorCtrl)
+
+.controller("ctrl", function ($scope, $http, $timeout, $interval, errorService) {
     var stopAutosave;
 
     // TODO: compare it against the hash saved in localStorage
@@ -10,15 +13,6 @@ angular.module("app", [])
     // TODO: allow to save it at localStorage, explain security/convenience
     $scope.passphrase = "Very secret phrase";
     $scope.autosaveInterval = 30; // In seconds
-
-    // TODO: extract to a dedicated controller (with glueing service)
-    $scope.setError = function (error) {
-        $scope.error = error;
-    };
-
-    $scope.unsetError = function () {
-        $scope.error = null;
-    };
 
     $http.get("/api/records")
         .success(function (data) {
@@ -29,7 +23,7 @@ angular.module("app", [])
             }
         })
         .error(function () {
-            $scope.setError("failure while loading records list");
+            errorService.reportError("failure while loading records list");
         });
 
 
@@ -57,7 +51,7 @@ angular.module("app", [])
                 );
             })
             .error(function () {
-                $scope.setError("failure while saving the record");
+                errorService.reportError("failure while saving the record");
             });
     };
 
@@ -97,19 +91,20 @@ angular.module("app", [])
                     $scope.selected = record;
                 }
                 else {
-                    $scope.setError(
+                    errorService.reportError(
                         "Unable to decrypt [" + record.created + "]"
                     );
                 }
             })
             .error(function () {
-                $scope.setError(
+                errorService.reportError(
                     "failure while loading the data for record: " + recordId
                 );
             });
     };
 
     $scope.add = function () {
+        errorService.reportError("Hmmm...");
         savePrevious();
 
         $http.post("/api/records")
@@ -120,7 +115,7 @@ angular.module("app", [])
                 $scope.startEdit(record);
             })
             .error(function () {
-                $scope.setError("can't add new record");
+                errorService.reportError("can't add new record");
             });
     };
 
