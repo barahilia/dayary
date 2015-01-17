@@ -27,8 +27,14 @@ var loadRecords = function () {
 };
 
 var saveRecords = function (data) {
-    // Can throw an error, to be caught at the upper level
-    fs.writeFileSync(datafile, JSON.stringify(data));
+    try {
+        fs.writeFileSync(datafile, JSON.stringify(data));
+    }
+    catch (e) {
+        console.log("ERROR: unable to save to the data file");
+        console.log(e);
+        throw "Data file save failure";
+    }
 };
 
 var getRecord = function (id) {
@@ -85,8 +91,6 @@ recordsApi.post('/', function (req, res) {
         res.send(record);
     }
     catch (e) {
-        console.log("ERROR: unable to save to the data file");
-        console.log(e);
         res.status(500).end();
     }
 });
@@ -105,8 +109,6 @@ recordsApi.put('/:id', function (req, res) {
             res.status(204).end();
         }
         catch (e) {
-            console.log("ERROR: unable to save to the data file");
-            console.log(e);
             res.status(500).end();
         }
     }
