@@ -1,6 +1,6 @@
 {
   "name": "dayary",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Diary tool deployed as a local web-server",
   "main": "server/main.js",
   "scripts": {
