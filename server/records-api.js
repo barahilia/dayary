@@ -31,7 +31,12 @@ var saveRecords = function (data) {
     fs.writeFileSync(datafile, JSON.stringify(data));
 };
 
-// TODO: currently it's [ { }, ... ]. Make it { id: { }, ... }
+var getRecord = function (id) {
+    return _.find(records, function (rec) {
+        return rec.id === id;
+    });
+};
+
 var records = loadRecords();
 
 var recordsApi = express.Router();
@@ -48,11 +53,7 @@ recordsApi.get('/', function (req, res) {
 });
 
 recordsApi.get('/:id', function (req, res) {
-    var id = +req.params.id;
-
-    var record = _.find(records, function (rec) {
-        return rec.id === id;
-    });
+    var record = getRecord(+req.params.id);
 
     if (record) {
         res.send(record);
@@ -92,12 +93,8 @@ recordsApi.post('/', function (req, res) {
 
 recordsApi.use('/:id', bodyParser.text({type: "application/json"}));
 recordsApi.put('/:id', function (req, res) {
-    var id = +req.params.id;
+    var record = getRecord(+req.params.id);
     var body = req.body;
-
-    var record = _.find(records, function (rec) {
-        return rec.id === id;
-    });
 
     if (record) {
         record.text = body;
