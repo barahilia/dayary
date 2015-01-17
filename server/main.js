@@ -5,6 +5,9 @@ var express = require('express'),
     _ = require('underscore')
     recordsApi = require('./records-api').recordsApi;
 
+// TODO: describe configuration in README
+// TODO: move data file config here too
+// TODO: accept config from the command line
 var port = process.env.PORT || 3000;
 
 var app = express();
