@@ -1,19 +1,12 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
-    _ = require('underscore')
     backend = require('./records-backend');
 
 var recordsApi = express.Router();
 
 recordsApi.get('/', function (req, res) {
     // Diary can become quite large, so don't send text here
-    res.send(
-        _.map(backend.records, function (record) {
-            var metadata = _.clone(record);
-            metadata.text = undefined;
-            return metadata;
-        })
-    );
+    res.send(backend.getRecordsMetadata());
 });
 
 recordsApi.get('/:id', function (req, res) {
@@ -28,11 +21,7 @@ recordsApi.get('/:id', function (req, res) {
 });
 
 recordsApi.post('/', function (req, res) {
-    var maxId = _.chain(backend.records)
-        .map(function (record) { return record.id; })
-        .max()
-        .value();
-
+    var maxId = backend.maxId();
     var now = new Date();
 
     var record = {
@@ -42,10 +31,8 @@ recordsApi.post('/', function (req, res) {
         text: ""
     };
 
-    backend.records.push(record);
-
     try {
-        backend.saveRecords(backend.records);
+        backend.addRecord(record);
         res.send(record);
     }
     catch (e) {
@@ -63,7 +50,7 @@ recordsApi.put('/:id', function (req, res) {
         record.updated = new Date();
 
         try {
-            backend.saveRecords(backend.records);
+            backend.updateRecord(record);
             res.status(204).end();
         }
         catch (e) {
