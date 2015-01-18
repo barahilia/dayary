@@ -4,7 +4,13 @@ angular.module("app", [])
 
 .controller("errorCtrl", errorCtrl)
 
-.controller("ctrl", function ($scope, $http, $timeout, $interval, errorService) {
+.factory("recordService", recordService)
+
+.controller("recordsCtrl", recordsCtrl)
+
+.controller("ctrl", function (
+        $scope, $http, $timeout, $interval, errorService, recordService
+    ) {
     var stopAutosave;
 
     // TODO: compare it against the hash saved in localStorage
@@ -13,18 +19,6 @@ angular.module("app", [])
     // TODO: allow to save it at localStorage, explain security/convenience
     $scope.passphrase = "Very secret phrase";
     $scope.autosaveInterval = 30; // In seconds
-
-    $http.get("/api/records")
-        .success(function (data) {
-            $scope.records = data;
-
-            if($scope.records.length > 0) {
-                $scope.select($scope.records[0].id);
-            }
-        })
-        .error(function () {
-            errorService.reportError("failure while loading records list");
-        });
 
 
     var saveRecord = function (record) {
@@ -100,21 +94,6 @@ angular.module("app", [])
                 errorService.reportError(
                     "failure while loading the data for record: " + recordId
                 );
-            });
-    };
-
-    $scope.add = function () {
-        savePrevious();
-
-        $http.post("/api/records")
-            .success(function (record) {
-                // TODO: need to push record without 'text'
-                $scope.records.push(record);
-                $scope.selected = record;
-                $scope.startEdit(record);
-            })
-            .error(function () {
-                errorService.reportError("can't add new record");
             });
     };
 

@@ -9,6 +9,8 @@
 
     <script src="errorService.js"></script>
     <script src="errorCtrl.js"></script>
+    <script src="recordService.js"></script>
+    <script src="recordsCtrl.js"></script>
     <script src="app.js"></script>
 </head>
 
@@ -40,26 +42,7 @@
             </div>
         </div>
 
-        <div ng-show="records" class="col-sm-3">
-            <h2>Records</h2>
-
-            <div>
-                <button class="btn btn-success" ng-click="add()">
-                    Add
-                </button>
-            </div>
-
-            <br />
-
-            <ul class="list-unstyled">
-                <li ng-repeat="record in records"
-                    ng-class="{ 'bg-success': (record.id == selected.id) }">
-
-                    <a ng-click="select(record.id)" href="#">
-                        {{record.created | date : 'yyyy-MM-dd'}}
-                    </a>
-                </li>
-            </ul>
+        <div ng-include="'records.html'" ng-controller="recordsCtrl">
         </div>
 
         <div ng-show="!selected" class="bg-success">
