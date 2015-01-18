@@ -1,4 +1,9 @@
 
+.banner {
+    padding-top: 10px;
+    padding-bottom: 5px;
+}
+
 .text-editor {
     width: 100%;
 }
