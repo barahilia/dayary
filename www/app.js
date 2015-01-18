@@ -104,7 +104,6 @@ angular.module("app", [])
     };
 
     $scope.add = function () {
-        errorService.reportError("Hmmm...");
         savePrevious();
 
         $http.post("/api/records")
