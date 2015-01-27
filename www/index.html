@@ -15,6 +15,7 @@
     <script src="app.js"></script>
 </head>
 
+<!-- TODO: remove mainCtrl - use ui-router and a controller per state -->
 <body class="container" ng-controller="mainCtrl">
     <div class="row">
         <div class="banner bg-success col-sm-12">
@@ -35,6 +36,7 @@
             </div>
         </div>
 
+        <!-- TODO: move this to the viewer section -->
         <div ng-show="!selected" class="bg-success col-sm-12">
             Looks like this is a fresh new diary. Start by hitting 'Add' to
             add a new record.

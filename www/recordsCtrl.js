@@ -22,5 +22,9 @@ var recordsCtrl = function ($scope, $http, errorService, recordService) {
             });
     };
 
+    $scope.select = function (recordId) {
+        recordService.setRecordId(recordId);
+    };
+
 };
 

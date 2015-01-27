@@ -11,7 +11,6 @@ var mainCtrl = function (
     $scope.passphrase = "Very secret phrase";
     $scope.autosaveInterval = 30; // In seconds
 
-
     var saveRecord = function (record) {
         var encrypted;
 
@@ -46,7 +45,7 @@ var mainCtrl = function (
         }
     };
 
-    $scope.select = function (recordId) {
+    var select = function (recordId) {
         savePrevious();
 
         $http.get("/api/records/" + recordId)
@@ -87,6 +86,8 @@ var mainCtrl = function (
                 );
             });
     };
+
+    recordService.setCallback(select);
 
     var stopAutosaving = function () {
         if (stopAutosave) {
