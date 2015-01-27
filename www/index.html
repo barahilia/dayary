@@ -22,18 +22,10 @@
                 Settings
             </button>
         </div>
+    </div>
 
-        <br />
-        <br />
-
-        <!-- TODO: introduce a state for data loading -->
-        <div ng-hide="records">
-            Data is loading...
-        </div>
-
-        <br />
-
-        <div ng-controller="errorCtrl">
+    <div class="row">
+        <div ng-controller="errorCtrl" class="col-sm-12">
             <div class="bg-danger" ng-show="error">
                 Error: {{error}}
                 <button type="button" class="close" ng-click="unsetError()">
@@ -42,12 +34,12 @@
             </div>
         </div>
 
-        <div ng-include="'records.html'" ng-controller="recordsCtrl">
-        </div>
-
-        <div ng-show="!selected" class="bg-success">
+        <div ng-show="!selected" class="bg-success col-sm-12">
             Looks like this is a fresh new diary. Start by hitting 'Add' to
             add a new record.
+        </div>
+
+        <div ng-include="'records.html'" ng-controller="recordsCtrl">
         </div>
 
         <div ng-show="selected"
@@ -80,6 +72,7 @@
 
             <br />
 
+            <!-- TODO: show ajax-loader while loading -->
             <!-- Use ng-bind to ensure no spare spaces of white lines -->
             <p class="text-viewer"
                ng-hide="editing"
