@@ -80,10 +80,11 @@
 
             <br />
 
-            <p ng-hide="editing">
-                <!-- TODO: split by paragraphs -->
-                {{selected.text}}
-            </p>
+            <!-- Use ng-bind to ensure no spare spaces of white lines -->
+            <p class="text-viewer"
+               ng-hide="editing"
+               ng-bind="selected.text">
+           </p>
 
             <textarea ng-show="editing"
                       ng-model="selected.text" ng-trim="false"

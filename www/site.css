@@ -4,6 +4,10 @@
     padding-bottom: 5px;
 }
 
+.text-viewer {
+    white-space: pre-line;
+}
+
 .text-editor {
     width: 100%;
 }
