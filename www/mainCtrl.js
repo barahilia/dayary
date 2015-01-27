@@ -1,6 +1,6 @@
 var mainCtrl = function (
     $scope, $http, $timeout, $interval,
-    errorService, recordService
+    errorService, recordService, encryptionService
 ) {
     var stopAutosave;
 
@@ -11,16 +11,15 @@ var mainCtrl = function (
     $scope.passphrase = "Very secret phrase";
     $scope.autosaveInterval = 30; // In seconds
 
-    var saveRecord = function (record) {
-        var encrypted;
+    $scope.saveSettings = function () {
+        encryptionService.setPassphrase($scope.passphrase);
+        $scope.settingsEdit = false;
+    };
 
-        if (record.text) {
-            encrypted = CryptoJS.AES.encrypt(record.text, $scope.passphrase);
-            encrypted = encrypted.toString();
-        }
-        else {
-            encrypted = "";
-        }
+    $scope.saveSettings();
+
+    var saveRecord = function (record) {
+        var encrypted = encryptionService.encrypt(record.text);
 
         // TODO: decide if to send the entire records instead of text only
         $http.put("/api/records/" + record.id, encrypted)
@@ -50,35 +49,24 @@ var mainCtrl = function (
 
         $http.get("/api/records/" + recordId)
             .success(function (record) {
-                // TODO: extract encryption service
                 var decrypted;
 
-                if (!record.text) {
-                    $scope.selected = record;
-                    return;
-                }
-
                 try {
-                    decrypted = CryptoJS.AES
-                        .decrypt(record.text, $scope.passphrase)
-                        .toString(CryptoJS.enc.Utf8);
+                    decrypted = encryptionService.decrypt(record.text);
                 }
                 catch (e) {
-                    // Nothing doing
-                }
-
-                if (decrypted) {
-                    record.text = decrypted;
-
-                    $scope.stopEdit($scope.selected);
-                    // TODO: rename selected to record
-                    $scope.selected = record;
-                }
-                else {
                     errorService.reportError(
                         "Unable to decrypt [" + record.created + "]"
                     );
+
+                    return;
                 }
+
+                record.text = decrypted;
+
+                $scope.stopEdit($scope.selected);
+                // TODO: rename selected to record
+                $scope.selected = record;
             })
             .error(function () {
                 errorService.reportError(

@@ -15,7 +15,7 @@ var recordsCtrl = function ($scope, $http, errorService, recordService) {
         $http.post("/api/records")
             .success(function (record) {
                 $scope.records.push(_.omit(record, 'text'));
-                recordService.setRecordId(records.id);
+                recordService.setRecordId(record.id);
             })
             .error(function () {
                 errorService.reportError("can't add new record");
