@@ -49,10 +49,12 @@ var mainCtrl = function (
 
         $http.get("/api/records/" + recordId)
             .success(function (record) {
-                var decrypted;
-
                 try {
-                    decrypted = encryptionService.decrypt(record.text);
+                    record.text = encryptionService.decrypt(record.text);
+
+                    $scope.stopEdit($scope.selected);
+                    // TODO: rename selected to record
+                    $scope.selected = record;
                 }
                 catch (e) {
                     errorService.reportError(
@@ -61,12 +63,6 @@ var mainCtrl = function (
 
                     return;
                 }
-
-                record.text = decrypted;
-
-                $scope.stopEdit($scope.selected);
-                // TODO: rename selected to record
-                $scope.selected = record;
             })
             .error(function () {
                 errorService.reportError(
