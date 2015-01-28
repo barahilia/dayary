@@ -1,6 +1,9 @@
 var recordsCtrl = function ($scope, $http, errorService, recordService) {
     $http.get("/api/records")
         .success(function (data) {
+            data = _.sortBy(data, 'created');
+            data = data.reverse();
+
             $scope.records = data;
 
             if($scope.records.length > 0) {
@@ -14,7 +17,7 @@ var recordsCtrl = function ($scope, $http, errorService, recordService) {
     $scope.add = function () {
         $http.post("/api/records")
             .success(function (record) {
-                $scope.records.push(_.omit(record, 'text'));
+                $scope.records.unshift(_.omit(record, 'text'));
                 recordService.setRecordId(record.id);
             })
             .error(function () {
