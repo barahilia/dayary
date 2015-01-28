@@ -25,6 +25,16 @@ var recordsCtrl = function ($scope, $http, errorService, recordService) {
             });
     };
 
+    $scope.remove = function (record) {
+        $http.delete("/api/records/" + record.id)
+            .success(function () {
+                $scope.records = _.without($scope.records, record);
+            })
+            .error(function () {
+                errorService.reportError("can't remove this record");
+            });
+    };
+
     $scope.select = function (recordId) {
         recordService.setRecordId(recordId);
     };

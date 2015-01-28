@@ -18,6 +18,13 @@
             <a ng-click="select(record.id)" href="#">
                 {{record.created | date : 'yyyy-MM-dd'}}
             </a>
+            <!-- TODO: confirm deletion -->
+            <!-- TODO: use fa-remove, not mere 'x' -->
+            <!-- TODO: show this only for selected/hovered items -->
+            <a href='#' class="pull-right"
+               ng-click="remove(record)">
+                x
+            </a>
         </li>
     </ul>
 </div>
