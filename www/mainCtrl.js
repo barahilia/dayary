@@ -18,10 +18,29 @@ var mainCtrl = function (
 
     $scope.saveSettings();
 
+    // TODO: think it through - how exactly the workflow works
+    // First scenario: old version or new dairy; no hash; user should set pass phrase;
+    //                 server should store it
+    // Second scenario: dev mode; hash should match default pass phrase
+    // Third scenario: user mode; user should set pass phrase matching the hash
+    // Forth scenario: user mode; change pass phrase.
+    $http.get("/api/passphrase/hash")
+        .success(function (hash) {
+            // TODO: dummy code - replace with a real logic
+            if (hash) {
+                encryptionService.setPassphrase($scope.passphrase, hash);
+            }
+            else {
+                encryptionService.setPassphrase($scope.passphrase);
+            }
+        })
+        .error(function () {
+            errorService.reportError("failure getting pass phrase hash");
+        });
+
     var saveRecord = function (record) {
         var encrypted = encryptionService.encrypt(record.text);
 
-        // TODO: decide if to send the entire records instead of text only
         $http.put("/api/records/" + record.id, encrypted)
             .success(function () {
                 // TODO: use moment.js instead of Date

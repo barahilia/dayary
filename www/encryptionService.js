@@ -2,8 +2,15 @@ var encryptionService = function () {
     var service = {};
     var passphrase;
     
-    service.setPassphrase = function (p) {
-        passphrase = p;
+    service.setPassphrase = function (phrase, hash) {
+        var computed = CryptoJS.SHA256(phrase);
+
+        if (hash && hash !== computed) {
+            throw "pass phrase set: phrase and hash don not match";
+        }
+
+        passphrase = phrase;
+        return computed;
     };
 
     service.encrypt = function (s) {
