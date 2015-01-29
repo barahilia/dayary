@@ -4,6 +4,24 @@ var express = require('express'),
 
 var recordsApi = express.Router();
 
+var processRecord = function (req, res, processor) {
+    try {
+        var record = backend.getRecord(+req.params.id);
+
+        if (record) {
+            processor(record);
+        }
+        else {
+            res.status(404).end();
+        }
+    }
+    catch (e) {
+        console.log("ERROR: " + e);
+        res.status(500).end();
+    }
+};
+
+
 recordsApi.get('/', function (req, res) {
     // Diary can become quite large, so don't send text here
     res.send(backend.getRecordsMetadata());
@@ -36,47 +54,27 @@ recordsApi.post('/', function (req, res) {
         res.send(record);
     }
     catch (e) {
+        console.log("ERROR: " + e);
         res.status(500).end();
     }
 });
 
 recordsApi.use('/:id', bodyParser.text({type: "application/json"}));
 recordsApi.put('/:id', function (req, res) {
-    var body = req.body;
-    var record = backend.getRecord(+req.params.id);
-
-    if (record) {
-        record.text = body;
+    processRecord(req, res, function (record) {
+        record.text = req.body;
         record.updated = new Date();
 
-        try {
-            backend.updateRecord(record);
-            res.status(204).end();
-        }
-        catch (e) {
-            res.status(500).end();
-        }
-    }
-    else {
-        res.status(404).end();
-    }
+        backend.updateRecord(record);
+        res.status(204).end();
+    });
 });
 
 recordsApi.delete('/:id', function (req, res) {
-    var record = backend.getRecord(+req.params.id);
-
-    if (record) {
-        try {
-            backend.deleteRecord(record);
-            res.status(200).end();
-        }
-        catch (e) {
-            res.status(500).end();
-        }
-    }
-    else {
-        res.status(404).end();
-    }
+    processRecord(req, res, function (record) {
+        backend.deleteRecord(record);
+        res.status(200).end();
+    });
 });
 
 exports.recordsApi = recordsApi;
