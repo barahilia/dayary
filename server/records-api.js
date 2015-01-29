@@ -62,5 +62,22 @@ recordsApi.put('/:id', function (req, res) {
     }
 });
 
+recordsApi.delete('/:id', function (req, res) {
+    var record = backend.getRecord(+req.params.id);
+
+    if (record) {
+        try {
+            backend.deleteRecord(record);
+            res.status(200).end();
+        }
+        catch (e) {
+            res.status(500).end();
+        }
+    }
+    else {
+        res.status(404).end();
+    }
+});
+
 exports.recordsApi = recordsApi;
 
