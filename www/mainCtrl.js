@@ -27,7 +27,12 @@ var mainCtrl = function (
     };
 
     $scope.saveSettings = function () {
-        computed = encryptionService.setPassphrase($scope.passphrase);
+        computed = encryptionService.computeHash($scope.passphrase);
+
+        if (computed === $scope.hash) {
+            encryptionService.setPassphrase($scope.passphrase);
+            return;
+        }
 
         $http.put("/api/hash", computed)
             .success(function () {
@@ -42,10 +47,10 @@ var mainCtrl = function (
 
     $http.get("/api/hash")
         .success(function (hash) {
-            var currentHash = encryptionService.computeHash(devPassphrase);
+            var devHash = encryptionService.computeHash(devPassphrase);
             $scope.hash = hash;
 
-            if (hash && hash === currentHash) {
+            if (hash && hash === devHash) {
                 // Dev mode - development pass phrase to be used
                 $scope.passphrase = devPassphrase;
                 $scope.saveSettings();
