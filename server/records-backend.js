@@ -1,21 +1,41 @@
 var fs = require('fs')
     _ = require('underscore');
 
+// TODO: get this as a parameter and return a backend object
 var datafile = __dirname + "/../data/records.json";
 
-var records = [];
+// TODO: not tested
+var dataContent = {
+    hash: "",
+    records: []
+};
+var records = dataContent.records;
 
 var loadRecords = function () {
     var data;
 
     try {
         data = fs.readFileSync(datafile);
-        records = JSON.parse(data);
+        // TODO: not tested
+        data = JSON.parse(data);
+
+        if (_.isArray(data)) {
+            // Up to version 0.1.1
+            records = dataContent.records = data;
+        }
+        else if (_.isObject(data) && 'hash' in data && 'records' in data) {
+            // Latest versions
+            dataContent = data;
+            records = dataContent.records;
+        }
+        else {
+            console.log("FATAL ERROR: unable to parse the data file");
+            process.exit(1);
+        }
     }
     catch (e) {
         if (e.errno === 34 && e.code === 'ENOENT') {
             // File doesn't exist yet - it's OK
-            return [];
         }
         else {
             console.log("FATAL ERROR: unable to open the data file");
@@ -27,18 +47,38 @@ var loadRecords = function () {
 
 var saveRecords = function () {
     try {
-        fs.writeFileSync(datafile, JSON.stringify(records));
+        fs.writeFileSync(datafile, JSON.stringify(dataContent));
     }
     catch (e) {
         console.log("ERROR: unable to save to the data file");
         console.log(e);
-        throw "Data file save failure";
+        throw "data file: save failure";
     }
 };
 
 // Initialization
 loadRecords();
 
+
+exports.getHash = function () {
+    return dataContent.hash;
+};
+
+exports.setHash = function (hash) {
+    if (dataContent.hash) {
+        if (dataContent.records.length === 0) {
+            dataContent.hash = hash;
+        }
+        else {
+            throw "set hash: cannot change hash in diary with existing records";
+        }
+    }
+    else {
+        dataContent.hash = hash;
+    }
+
+    saveRecords();
+};
 
 exports.maxId = function () {
     return _.chain(records)
