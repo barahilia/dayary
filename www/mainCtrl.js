@@ -31,6 +31,7 @@ var mainCtrl = function (
 
         if (computed === $scope.hash) {
             encryptionService.setPassphrase($scope.passphrase);
+            $scope.settingsEdit = false;
             return;
         }
 
