@@ -4,34 +4,54 @@ var mainCtrl = function (
 ) {
     var stopAutosave;
 
-    // TODO: compare it against the hash saved in localStorage
+    // TODO: extract settings controller (service) and view
     // TODO: enter twice at the first time
     // TODO: disable sample value at production
-    // TODO: allow to save it at localStorage, explain security/convenience
-    $scope.passphrase = "Very secret phrase";
+    var devPassphrase = "Very secret phrase";
     $scope.autosaveInterval = 30; // In seconds
 
-    $scope.saveSettings = function () {
-        encryptionService.setPassphrase($scope.passphrase);
-        $scope.settingsEdit = false;
-    };
+    $scope.invalidPassphrase = function () {
+        var computed = encryptionService.computeHash($scope.passphrase);
 
-    $scope.saveSettings();
-
-    // TODO: think it through - how exactly the workflow works
-    // First scenario: old version or new dairy; no hash; user should set pass phrase;
-    //                 server should store it
-    // Second scenario: dev mode; hash should match default pass phrase
-    // Third scenario: user mode; user should set pass phrase matching the hash
-    // Forth scenario: user mode; change pass phrase.
-    $http.get("/api/passphrase/hash")
-        .success(function (hash) {
-            // TODO: dummy code - replace with a real logic
-            if (hash) {
-                encryptionService.setPassphrase($scope.passphrase, hash);
+        if ($scope.passphrase) {
+            if ($scope.hash) {
+                return $scope.hash !== computed;
             }
             else {
+                return false;
+            }
+        }
+        else {
+            return true;
+        }
+    };
+
+    $scope.saveSettings = function () {
+        computed = encryptionService.setPassphrase($scope.passphrase);
+
+        $http.put("/api/hash", computed)
+            .success(function () {
                 encryptionService.setPassphrase($scope.passphrase);
+                $scope.settingsEdit = false;
+            })
+            .error(function () {
+                var msg = "failure setting hash for the pass phrase";
+                errorService.reportError(msg);
+            });
+    };
+
+    $http.get("/api/hash")
+        .success(function (hash) {
+            var currentHash = encryptionService.computeHash(devPassphrase);
+            $scope.hash = hash;
+
+            if (hash && hash === currentHash) {
+                // Dev mode - development pass phrase to be used
+                $scope.passphrase = devPassphrase;
+                $scope.saveSettings();
+            }
+            else {
+                $scope.settingsEdit = true;
             }
         })
         .error(function () {

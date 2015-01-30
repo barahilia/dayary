@@ -22,13 +22,15 @@
     <div class="row">
         <div class="banner bg-success col-sm-12">
             <span class="h1">Dayary</span> - day by day
-            <button class="btn btn-success pull-right" ng-click="settingsEdit = true">
+            <button class="btn btn-success pull-right"
+                    ng-click="settingsEdit = true">
                 Settings
             </button>
         </div>
     </div>
 
     <div class="row">
+        <!-- TODO: raise errorCtrl to notification/alert control -->
         <div ng-controller="errorCtrl" class="col-sm-12">
             <div class="bg-danger" ng-show="error">
                 Error: {{error}}
@@ -38,7 +40,7 @@
             </div>
         </div>
 
-        <!-- TODO: move this to the viewer section -->
+        <!-- TODO: move this to the viewer section or merge into alertCtrl -->
         <div ng-show="!selected" class="bg-success col-sm-12">
             Looks like this is a fresh new diary. Start by hitting 'Add' to
             add a new record.
@@ -94,7 +96,9 @@
         <div ng-show="settingsEdit" class="col-sm-3">
             <h2>Settings</h2>
             <div>
-                <button class="btn btn-success" ng-click="saveSettings()">
+                <button class="btn btn-success"
+                        ng-click="saveSettings()"
+                        ng-disabled="invalidPassphrase()">
                     Done
                 </button>
             </div>
@@ -103,6 +107,9 @@
 
             <div>Pass Phrase:</div>
             <input type="text" ng-model="passphrase" ng-trim="false">
+            <div class="bg-danger" ng-show="invalidPassphrase()">
+                Invalid Pass Phrase
+            </div>
 
             <br />
             <br />

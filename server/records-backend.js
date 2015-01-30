@@ -4,7 +4,6 @@ var fs = require('fs')
 // TODO: get this as a parameter and return a backend object
 var datafile = __dirname + "/../data/records.json";
 
-// TODO: not tested
 var dataContent = {
     hash: "",
     records: []
@@ -16,7 +15,6 @@ var loadRecords = function () {
 
     try {
         data = fs.readFileSync(datafile);
-        // TODO: not tested
         data = JSON.parse(data);
 
         if (_.isArray(data)) {
