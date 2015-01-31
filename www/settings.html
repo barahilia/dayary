@@ -1,0 +1,23 @@
+<h2>Settings</h2>
+<div>
+    <button class="btn btn-success"
+            ng-click="saveSettings()"
+            ng-disabled="invalidPassphrase()">
+        Done
+    </button>
+</div>
+
+<br />
+
+<div>Pass Phrase:</div>
+<input type="text" ng-model="passphrase" ng-trim="false">
+<div class="bg-danger" ng-show="invalidPassphrase()">
+    Invalid Pass Phrase
+</div>
+
+<br />
+<br />
+
+<div>Auto Save (sec):</div>
+<input type="number" ng-model="autosaveInterval.seconds">
+

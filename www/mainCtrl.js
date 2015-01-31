@@ -4,65 +4,7 @@ var mainCtrl = function (
 ) {
     var stopAutosave;
 
-    // TODO: extract settings controller (service) and view
-    // TODO: enter twice at the first time
-    // TODO: disable sample value at production
-    var devPassphrase = "Very secret phrase";
-    $scope.autosaveInterval = 30; // In seconds
-
-    $scope.invalidPassphrase = function () {
-        var computed = encryptionService.computeHash($scope.passphrase);
-
-        if ($scope.passphrase) {
-            if ($scope.hash) {
-                return $scope.hash !== computed;
-            }
-            else {
-                return false;
-            }
-        }
-        else {
-            return true;
-        }
-    };
-
-    $scope.saveSettings = function () {
-        computed = encryptionService.computeHash($scope.passphrase);
-
-        if (computed === $scope.hash) {
-            encryptionService.setPassphrase($scope.passphrase);
-            $scope.settingsEdit = false;
-            return;
-        }
-
-        $http.put("/api/hash", computed)
-            .success(function () {
-                encryptionService.setPassphrase($scope.passphrase);
-                $scope.settingsEdit = false;
-            })
-            .error(function () {
-                var msg = "failure setting hash for the pass phrase";
-                errorService.reportError(msg);
-            });
-    };
-
-    $http.get("/api/hash")
-        .success(function (hash) {
-            var devHash = encryptionService.computeHash(devPassphrase);
-            $scope.hash = hash;
-
-            if (hash && hash === devHash) {
-                // Dev mode - development pass phrase to be used
-                $scope.passphrase = devPassphrase;
-                $scope.saveSettings();
-            }
-            else {
-                $scope.settingsEdit = true;
-            }
-        })
-        .error(function () {
-            errorService.reportError("failure getting pass phrase hash");
-        });
+    $scope.settingsEdit = { show: false };
 
     var saveRecord = function (record) {
         var encrypted = encryptionService.encrypt(record.text);
@@ -131,7 +73,7 @@ var mainCtrl = function (
             function () {
                 saveRecord(record);
             },
-            $scope.autosaveInterval * 1000 // seconds -> milliseconds
+            recordService.autosaveInterval.seconds * 1000
         );
     };
     

@@ -13,7 +13,9 @@ var recordService = function () {
             callback(recordId);
         }
     };
-    
+
+    service.autosaveInterval = { seconds: 30 };
+
     return service;
 };
 

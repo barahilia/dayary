@@ -11,6 +11,7 @@
     <script src="encryptionService.js"></script>
     <script src="errorService.js"></script>
     <script src="errorCtrl.js"></script>
+    <script src="settingsCtrl.js"></script>
     <script src="recordService.js"></script>
     <script src="recordsCtrl.js"></script>
     <script src="mainCtrl.js"></script>
@@ -23,7 +24,7 @@
         <div class="banner bg-success col-sm-12">
             <span class="h1">Dayary</span> - day by day
             <button class="btn btn-success pull-right"
-                    ng-click="settingsEdit = true">
+                    ng-click="settingsEdit.show = true">
                 Settings
             </button>
         </div>
@@ -50,7 +51,7 @@
         </div>
 
         <div ng-show="selected"
-             ng-class="{ 'col-sm-9' : !settingsEdit, 'col-sm-6': settingsEdit }">
+             ng-class="{ 'col-sm-9' : !settingsEdit.show, 'col-sm-6': settingsEdit.show }">
             <h2>{{selected.created | date : 'fullDate'}}</h2>
 
             <div ng-hide="editing">
@@ -93,29 +94,10 @@
             </textarea>
         </div>
 
-        <div ng-show="settingsEdit" class="col-sm-3">
-            <h2>Settings</h2>
-            <div>
-                <button class="btn btn-success"
-                        ng-click="saveSettings()"
-                        ng-disabled="invalidPassphrase()">
-                    Done
-                </button>
+        <div ng-show="settingsEdit.show" class="col-sm-3">
+            <div ng-include="'settings.html'"
+                 ng-controller="settingsCtrl">
             </div>
-
-            <br />
-
-            <div>Pass Phrase:</div>
-            <input type="text" ng-model="passphrase" ng-trim="false">
-            <div class="bg-danger" ng-show="invalidPassphrase()">
-                Invalid Pass Phrase
-            </div>
-
-            <br />
-            <br />
-
-            <div>Auto Save (sec):</div>
-            <input type="number" ng-model="autosaveInterval">
         </div>
     </div>
 <body>
