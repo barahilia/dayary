@@ -22,9 +22,17 @@
             <!-- TODO: use fa-remove, not mere 'x' -->
             <!-- TODO: show this only for selected/hovered items -->
             <a href='#' class="pull-right"
-               ng-click="remove(record)">
+               ng-click="removing = true">
                 x
             </a>
+            <div ng-show="removing">
+                <button class="btn btn-success" ng-click="remove(record)">
+                    Confirm
+                </button>
+                <button class="btn btn-success" ng-click="removing = false">
+                    Oh, no
+                </button>
+            </div>
         </li>
     </ul>
 </div>
