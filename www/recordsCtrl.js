@@ -28,6 +28,7 @@ var recordsCtrl = function ($scope, $http, errorService, recordService) {
     $scope.remove = function (record) {
         $http.delete("/api/records/" + record.id)
             .success(function () {
+                // TODO: make sure of no attempt to save the removed record
                 $scope.records = _.without($scope.records, record);
             })
             .error(function () {
