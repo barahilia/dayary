@@ -5,6 +5,8 @@ angular.module("app", [])
     .controller("settingsCtrl", settingsCtrl)
     .factory("recordService", recordService)
     .controller("recordsCtrl", recordsCtrl)
+    .controller("viewerCtrl", viewerCtrl)
+    .controller("editorCtrl", editorCtrl)
     .controller("mainCtrl", mainCtrl)
     ;
 

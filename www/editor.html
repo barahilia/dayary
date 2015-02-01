@@ -1,0 +1,19 @@
+<div>
+    <button class="btn btn-success"
+            ng-click="view(selected)">
+        View
+    </button>
+
+    <span class="bg-success"
+          ng-show="saved">
+        - {{saved | date : 'hh:mm:ss'}}
+    </span>
+</div>
+
+<br />
+
+<textarea ng-model="selected.text" ng-trim="false"
+          rows=15 class="text-editor"
+          placeholder="Enter text here...">
+</textarea>
+

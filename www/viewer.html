@@ -1,0 +1,20 @@
+<h2>{{record.created | date : 'fullDate'}}</h2>
+
+<div>
+    <button class="btn btn-success" ng-click="startEdit()">
+        Edit
+    </button>
+
+    <span class="bg-success">
+        - last updated on
+        {{record.updated | date : 'EEEE, MMMM d, y HH:mm:ss'}}
+    </span>
+</div>
+
+<br />
+
+<!-- TODO: show ajax-loader while loading -->
+<!-- Use ng-bind to ensure no spare spaces of white lines -->
+<p class="text-viewer" ng-bind="record.text">
+</p>
+

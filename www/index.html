@@ -14,6 +14,8 @@
     <script src="settingsCtrl.js"></script>
     <script src="recordService.js"></script>
     <script src="recordsCtrl.js"></script>
+    <script src="viewerCtrl.js"></script>
+    <script src="editorCtrl.js"></script>
     <script src="mainCtrl.js"></script>
     <script src="app.js"></script>
 </head>
@@ -50,48 +52,19 @@
         <div ng-include="'records.html'" ng-controller="recordsCtrl">
         </div>
 
-        <div ng-show="selected"
+        <div ng-show="states.viewing || states.editing"
              ng-class="{ 'col-sm-9' : !settingsEdit.show, 'col-sm-6': settingsEdit.show }">
-            <h2>{{selected.created | date : 'fullDate'}}</h2>
-
-            <div ng-hide="editing">
-                <button class="btn btn-success"
-                        ng-click="startEdit(selected)">
-                    Edit
-                </button>
-
-                <span class="bg-success">
-                    - last updated on
-                    {{selected.updated | date : 'EEEE, MMMM d, y HH:mm:ss'}}
-                </span>
+            <div ng-if="states.viewing">
+                <div ng-include="'viewer.html'"
+                     ng-controller="viewerCtrl">
+                </div>
             </div>
 
-            <div ng-show="editing">
-                <button class="btn btn-success"
-                        ng-click="view(selected)">
-                    View
-                </button>
-
-                <span class="bg-success"
-                      ng-show="saved">
-                    - {{saved}}
-                </span>
+            <div ng-if="states.editing">
+                <div ng-include="'editor.html'"
+                     ng-controller="editorCtrl">
+                </div>
             </div>
-
-            <br />
-
-            <!-- TODO: show ajax-loader while loading -->
-            <!-- Use ng-bind to ensure no spare spaces of white lines -->
-            <p class="text-viewer"
-               ng-hide="editing"
-               ng-bind="selected.text">
-           </p>
-
-            <textarea ng-show="editing"
-                      ng-model="selected.text" ng-trim="false"
-                      rows=15 class="text-editor"
-                      placeholder="Enter text here...">
-            </textarea>
         </div>
 
         <div ng-show="settingsEdit.show" class="col-sm-3">
