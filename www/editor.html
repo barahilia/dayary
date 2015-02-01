@@ -1,3 +1,5 @@
+<h2>{{record.created | date : 'fullDate'}}</h2>
+
 <div>
     <button class="btn btn-success"
             ng-click="view(selected)">
@@ -12,7 +14,7 @@
 
 <br />
 
-<textarea ng-model="selected.text" ng-trim="false"
+<textarea ng-model="record.text" ng-trim="false"
           rows=15 class="text-editor"
           placeholder="Enter text here...">
 </textarea>

@@ -6,9 +6,6 @@ var viewerCtrl = function (
             .success(function (record) {
                 try {
                     record.text = encryptionService.decrypt(record.text);
-
-                    $scope.states.editing = false;
-                    $scope.states.viewing = true;
                     $scope.record = recordService.current = record;
                 }
                 catch (e) {
@@ -24,8 +21,10 @@ var viewerCtrl = function (
             });
     };
 
+    $scope.record = recordService.current;
+    $scope.states.editing = false;
+
     recordService.setCallback(select);
-    //select(recordService.id);
 
     $scope.startEdit = function () {
         $scope.states.editing = true;

@@ -1,4 +1,7 @@
-var editorCtrl = function () {
+var editorCtrl = function (
+    $scope, $http, $timeout, $interval,
+    encryptionService, errorService, recordService
+) {
     var stopAutosave;
 
     var saveRecord = function (record) {
@@ -8,6 +11,7 @@ var editorCtrl = function () {
             .success(function () {
                 // TODO: use moment.js instead of Date
                 $scope.saved = "saved on " + (new Date());
+
                 $timeout(
                     function () {
                         $scope.saved = "";
@@ -20,44 +24,33 @@ var editorCtrl = function () {
             });
     };
 
-    var savePrevious = function () {
-        if ($scope.selected && $scope.states.editing) {
-            saveRecord($scope.selected);
-        }
-    };
-
     var stopAutosaving = function () {
         if (stopAutosave) {
             $interval.cancel(stopAutosave);
+            stopAutosave = undefined;
         }
     };
 
     // TODO: rename to autosaving; leave here
     stopAutosave = $interval(
         function () {
-            saveRecord($scope.selected);
+            saveRecord($scope.record);
         },
         recordService.autosaveInterval.seconds * 1000
     );
 
-    $scope.stopEdit = function (record) {
-        $scope.states.editing = false;
-        stopAutosaving();
+    $scope.record = recordService.current;
+    $scope.states.viewing = false;
 
-        if (record) {
-            saveRecord(record);
-        }
-    };
-
-    $scope.view = function (record) {
-        $scope.stopEdit(record);
+    $scope.view = function () {
+        $scope.states.viewing = true;
     };
 
     $scope.$on('$destroy', function() {
         // Make sure that the interval is destroyed too
         stopAutosaving();
 
-        saveRecord($scope.selected);
+        saveRecord($scope.record);
     });
 };
 
