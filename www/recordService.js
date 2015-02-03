@@ -9,11 +9,14 @@ var recordService = function () {
     };
     
     service.setRecordId = function (recordId) {
+        service.records.empty = false;
+
         if (callback) {
             callback(recordId);
         }
     };
 
+    service.records = { empty: true };
     service.current;
     service.autosaveInterval = { seconds: 30 };
 

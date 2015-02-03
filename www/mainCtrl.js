@@ -10,5 +10,7 @@ var mainCtrl = function (
         editing: false//,
         //settings: false
     };
-}
+
+    $scope.records = recordService.records;
+};
 
