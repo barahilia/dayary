@@ -2,7 +2,7 @@ var editorCtrl = function (
     $scope, $http, $timeout, $interval,
     encryptionService, errorService, recordService
 ) {
-    var stopAutosave;
+    var autosaving;
 
     var saveRecord = function (record) {
         var encrypted = encryptionService.encrypt(record.text);
@@ -25,14 +25,13 @@ var editorCtrl = function (
     };
 
     var stopAutosaving = function () {
-        if (stopAutosave) {
-            $interval.cancel(stopAutosave);
-            stopAutosave = undefined;
+        if (autosaving) {
+            $interval.cancel(autosaving);
+            autosaving = undefined;
         }
     };
 
-    // TODO: rename to autosaving; leave here
-    stopAutosave = $interval(
+    autosaving = $interval(
         function () {
             saveRecord($scope.record);
         },
