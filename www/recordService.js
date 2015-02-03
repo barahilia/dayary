@@ -16,8 +16,10 @@ var recordService = function () {
         }
     };
 
-    service.records = { empty: true };
-    service.current;
+    service.records = {
+        empty: true,
+        current: null
+    };
     service.autosaveInterval = { seconds: 30 };
 
     return service;

@@ -38,7 +38,7 @@ var editorCtrl = function (
         recordService.autosaveInterval.seconds * 1000
     );
 
-    $scope.record = recordService.current;
+    $scope.record = recordService.records.current;
     $scope.states.viewing = false;
 
     $scope.view = function () {
