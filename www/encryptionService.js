@@ -1,9 +1,16 @@
 var encryptionService = function () {
     var service = {};
+    var locked = true;
     var passphrase;
 
     service.setPassphrase = function (phrase) {
         passphrase = phrase;
+        locked = false;
+    };
+
+    service.lock = function () {
+        locked = true;
+        passphrase = undefined;
     };
 
     service.computeHash = function (phrase) {
@@ -12,6 +19,10 @@ var encryptionService = function () {
 
     service.encrypt = function (s) {
         var temp;
+
+        if (locked) {
+            throw "encryption error: locked";
+        }
 
         if (s) {
             temp = CryptoJS.AES.encrypt(s, passphrase);

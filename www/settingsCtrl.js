@@ -1,8 +1,11 @@
 var settingsCtrl = function (
-    $scope, $http, encryptionService, recordService
+    $scope, $http,
+    $timeout, $window,
+    encryptionService, recordService
 ) {
     var devPassphrase = "Very secret phrase";
     $scope.autosaveInterval = recordService.autosaveInterval;
+    $scope.lockTimeout = { minutes: 5 };
 
     $scope.invalidPassphrase = function () {
         var computed = encryptionService.computeHash($scope.passphrase);
@@ -39,6 +42,19 @@ var settingsCtrl = function (
                 errorService.reportError(msg);
             });
     };
+
+    var lock = function () {
+        console.log("locking");
+        $scope.settingsEdit.show = true;
+        encryptionService.lock();
+    };
+
+    $timeout(
+        lock,
+        $scope.lockTimeout.minutes * 60 * 1000
+    );
+
+    $window.onblur = lock;
 
     $http.get("/api/hash")
         .success(function (hash) {
