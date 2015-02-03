@@ -43,8 +43,8 @@ var settingsCtrl = function (
             });
     };
 
+    // TODO: consider moving this to recordsCtrl
     var lock = function () {
-        console.log("locking");
         $scope.settingsEdit.show = true;
         encryptionService.lock();
     };

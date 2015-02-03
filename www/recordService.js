@@ -14,10 +14,7 @@ var recordService = function () {
         }
     };
 
-    service.id;
-
     service.current;
-
     service.autosaveInterval = { seconds: 30 };
 
     return service;
