@@ -1,7 +1,13 @@
 var viewerCtrl = function (
-    $scope, $http, recordService, encryptionService, errorService
+    $scope, $http,
+    $state, $stateParams,
+    recordService, encryptionService, errorService
 ) {
-    var select = function (recordId) {
+    var recordId = $stateParams.id;
+
+    if (recordService.records.current === null ||
+        recordId !== recordService.records.current.id) {
+
         $http.get("/api/records/" + recordId)
             .success(function (record) {
                 try {
@@ -22,12 +28,9 @@ var viewerCtrl = function (
     };
 
     $scope.record = recordService.records.current;
-    $scope.states.editing = false;
-
-    recordService.setCallback(select);
 
     $scope.startEdit = function () {
-        $scope.states.editing = true;
+        $state.go('.editor', $stateParams);
     };
 };
 

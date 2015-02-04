@@ -35,10 +35,5 @@ var recordsCtrl = function ($scope, $http, errorService, recordService) {
                 errorService.reportError("can't remove this record");
             });
     };
-
-    $scope.select = function (recordId) {
-        recordService.setRecordId(recordId);
-    };
-
 };
 

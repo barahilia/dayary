@@ -15,10 +15,9 @@
         <li ng-repeat="record in records"
             ng-class="{ 'bg-success': (record.id == selected.id) }">
 
-            <a ng-click="select(record.id)" href="#">
+            <a ui-sref="records.viewer({ id: record.id })">
                 {{record.created | date : 'yyyy-MM-dd'}}
             </a>
-            <!-- TODO: confirm deletion -->
             <!-- TODO: use fa-remove, not mere 'x' -->
             <!-- TODO: show this only for selected/hovered items -->
             <a href='#' class="pull-right"
@@ -35,5 +34,9 @@
             </div>
         </li>
     </ul>
+</div>
+
+<div class="col-sm-9">
+    <div ui-view></div>
 </div>
 

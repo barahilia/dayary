@@ -51,21 +51,6 @@
         </div>
 
         <div ui-view></div>
-
-        <div ng-show="states.viewing || states.editing"
-             ng-class="{ 'col-sm-9' : !settingsEdit.show, 'col-sm-6': settingsEdit.show }">
-            <div ng-if="states.viewing">
-                <div ng-include="'viewer.html'"
-                     ng-controller="viewerCtrl">
-                </div>
-            </div>
-
-            <div ng-if="states.editing">
-                <div ng-include="'editor.html'"
-                     ng-controller="editorCtrl">
-                </div>
-            </div>
-        </div>
     </div>
 <body>
 </html>
