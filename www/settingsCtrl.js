@@ -1,6 +1,6 @@
 var settingsCtrl = function (
-    $scope, $http,
-    $timeout, $window,
+    $scope, $http, $timeout, $window,
+    $state,
     encryptionService, recordService
 ) {
     var devPassphrase = "Very secret phrase";
@@ -23,20 +23,21 @@ var settingsCtrl = function (
         }
     };
 
-    $scope.saveSettings = function () {
+    var saveSettings = function () {
+        encryptionService.setPassphrase($scope.passphrase);
+        $state.go("records");
+    };
+
+    $scope.done = function () {
         computed = encryptionService.computeHash($scope.passphrase);
 
         if (computed === $scope.hash) {
-            encryptionService.setPassphrase($scope.passphrase);
-            $scope.settingsEdit.show = false;
+            saveSettings();
             return;
         }
 
         $http.put("/api/hash", computed)
-            .success(function () {
-                encryptionService.setPassphrase($scope.passphrase);
-                $scope.settingsEdit.show = false;
-            })
+            .success(saveSettings)
             .error(function () {
                 var msg = "failure setting hash for the pass phrase";
                 errorService.reportError(msg);
@@ -64,7 +65,7 @@ var settingsCtrl = function (
             if (hash && hash === devHash) {
                 // Dev mode - development pass phrase to be used
                 $scope.passphrase = devPassphrase;
-                $scope.saveSettings();
+                $scope.done();
             }
             else {
                 $scope.settingsEdit.show = true;
