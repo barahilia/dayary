@@ -5,9 +5,11 @@
 
     <script src="bower_components/underscore/underscore.js"></script>
     <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/ui-router/release/angular-ui-router.js"></script>
     <script src="bower_components/cryptojslib/rollups/aes.js"></script>
     <script src="bower_components/cryptojslib/rollups/sha256.js"></script>
 
+    <script src="configApp.js"></script>
     <script src="encryptionService.js"></script>
     <script src="errorService.js"></script>
     <script src="errorCtrl.js"></script>
@@ -20,15 +22,15 @@
     <script src="app.js"></script>
 </head>
 
-<!-- TODO: remove mainCtrl - use ui-router and a controller per state -->
-<body class="container" ng-controller="mainCtrl">
+<body class="container">
     <div class="row">
         <div class="banner bg-success col-sm-12">
             <span class="h1">Dayary</span> - day by day
-            <button class="btn btn-success pull-right"
-                    ng-click="settingsEdit.show = true">
+            <a class="btn btn-success pull-right"
+               ui-sref="settings">
+                <!-- TODO: check if need to align text vertically -->
                 Settings
-            </button>
+            </a>
         </div>
     </div>
 
@@ -49,8 +51,7 @@
             add a new record.
         </div>
 
-        <div ng-include="'records.html'" ng-controller="recordsCtrl">
-        </div>
+        <div ui-view></div>
 
         <div ng-show="states.viewing || states.editing"
              ng-class="{ 'col-sm-9' : !settingsEdit.show, 'col-sm-6': settingsEdit.show }">
@@ -64,12 +65,6 @@
                 <div ng-include="'editor.html'"
                      ng-controller="editorCtrl">
                 </div>
-            </div>
-        </div>
-
-        <div ng-show="settingsEdit.show" class="col-sm-3">
-            <div ng-include="'settings.html'"
-                 ng-controller="settingsCtrl">
             </div>
         </div>
     </div>

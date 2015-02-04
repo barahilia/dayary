@@ -1,4 +1,5 @@
-angular.module("app", [])
+angular.module("app", ['ui.router']) // TODO: make sure no need in ng-animate
+    .config(configApp)
     .factory("encryptionService", encryptionService)
     .factory("errorService", errorService)
     .controller("errorCtrl", errorCtrl)
