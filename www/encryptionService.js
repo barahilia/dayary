@@ -3,6 +3,10 @@ var encryptionService = function () {
     var locked = true;
     var passphrase;
 
+    service.getPassphrase = function () {
+        return passphrase;
+    };
+
     service.setPassphrase = function (phrase) {
         passphrase = phrase;
         locked = false;
@@ -12,6 +16,8 @@ var encryptionService = function () {
         locked = true;
         passphrase = undefined;
     };
+
+    service.hash = null;
 
     service.computeHash = function (phrase) {
         return CryptoJS.SHA256(phrase).toString();

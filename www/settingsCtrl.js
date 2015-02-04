@@ -4,6 +4,8 @@ var settingsCtrl = function (
     encryptionService, recordService
 ) {
     var devPassphrase = "Very secret phrase";
+
+    $scope.passphrase = encryptionService.getPassphrase();
     $scope.autosaveInterval = recordService.autosaveInterval;
     $scope.lockTimeout = { minutes: 5 };
 
@@ -11,8 +13,8 @@ var settingsCtrl = function (
         var computed = encryptionService.computeHash($scope.passphrase);
 
         if ($scope.passphrase) {
-            if ($scope.hash) {
-                return $scope.hash !== computed;
+            if (encryptionService.hash) {
+                return encryptionService.hash !== computed;
             }
             else {
                 return false;
@@ -31,7 +33,7 @@ var settingsCtrl = function (
     $scope.done = function () {
         computed = encryptionService.computeHash($scope.passphrase);
 
-        if (computed === $scope.hash) {
+        if (computed === encryptionService.hash) {
             saveSettings();
             return;
         }
@@ -57,22 +59,26 @@ var settingsCtrl = function (
 
     $window.onblur = lock;
 
-    $http.get("/api/hash")
-        .success(function (hash) {
-            var devHash = encryptionService.computeHash(devPassphrase);
-            $scope.hash = hash;
+    var processServerHash = function (hash) {
+        var devHash = encryptionService.computeHash(devPassphrase);
+        encryptionService.hash = hash;
 
-            if (hash && hash === devHash) {
-                // Dev mode - development pass phrase to be used
-                $scope.passphrase = devPassphrase;
-                $scope.done();
-            }
-            else {
-                $scope.settingsEdit.show = true;
-            }
-        })
-        .error(function () {
-            errorService.reportError("failure getting pass phrase hash");
-        });
+        if (hash && hash === devHash) {
+            // Dev mode - development pass phrase to be used
+            $scope.passphrase = devPassphrase;
+            $scope.done();
+        }
+        else {
+            $scope.settingsEdit.show = true;
+        }
+    };
+
+    if (encryptionService.hash === null) {
+        $http.get("/api/hash")
+            .success(processServerHash)
+            .error(function () {
+                errorService.reportError("failure getting pass phrase hash");
+            });
+    }
 };
 
