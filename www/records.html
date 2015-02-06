@@ -15,7 +15,7 @@
         <li ng-repeat="record in records"
             ng-class="{ 'bg-success': (record.id == selected.id) }">
 
-            <a ui-sref="records.viewer({ id: record.id })">
+            <a ui-sref="records.item({ id: record.id })">
                 {{record.created | date : 'yyyy-MM-dd'}}
             </a>
             <!-- TODO: use fa-remove, not mere 'x' -->

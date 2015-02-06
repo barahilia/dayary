@@ -48,8 +48,9 @@ var settingsCtrl = function (
 
     // TODO: consider moving this to recordsCtrl
     var lock = function () {
-        $scope.settingsEdit.show = true;
-        encryptionService.lock();
+        // TODO: make it work again; option similar to hash in metadata
+        //encryptionService.lock();
+        //$state.go("settings");
     };
 
     $timeout(

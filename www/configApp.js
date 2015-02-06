@@ -19,12 +19,12 @@ var configApp = function ($stateProvider, $urlRouterProvider) {
             templateUrl: "records.html",
             controller: "recordsCtrl"
         })
-        .state("records.viewer", {
+        .state("records.item", {
             url: "/:id",
             templateUrl: "viewer.html",
             controller: "viewerCtrl"
         })
-        .state("records.editor", {
+        .state("records.item.edit", {
             url: "/:id/edit",
             templateUrl: "editor.html",
             controller: "editorCtrl"
