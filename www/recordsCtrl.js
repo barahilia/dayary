@@ -1,4 +1,11 @@
-var recordsCtrl = function ($scope, $http, errorService, recordService) {
+var recordsCtrl = function (
+    $scope, $http, $state,
+    errorService, recordService
+) {
+    var viewRecord = function (record) {
+        $state.go("records.item", { id: record.id });
+    };
+
     $http.get("/api/records")
         .success(function (data) {
             data = _.sortBy(data, 'created');
@@ -7,7 +14,7 @@ var recordsCtrl = function ($scope, $http, errorService, recordService) {
             $scope.records = data;
 
             if($scope.records.length > 0) {
-                recordService.setRecordId($scope.records[0].id);
+                viewRecord($scope.records[0]);
             }
         })
         .error(function () {
@@ -18,7 +25,7 @@ var recordsCtrl = function ($scope, $http, errorService, recordService) {
         $http.post("/api/records")
             .success(function (record) {
                 $scope.records.unshift(_.omit(record, 'text'));
-                recordService.setRecordId(record.id);
+                viewRecord(record);
             })
             .error(function () {
                 errorService.reportError("can't add new record");
