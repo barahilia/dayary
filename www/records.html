@@ -12,25 +12,26 @@
     <ul class="list-unstyled">
         <!-- TODO: show ajax-loader while loading -->
 
+        <!-- http://stackoverflow.com/questions/28154304/list-and-pull-left-makes-stair -->
         <li ng-repeat="record in records"
+            class="clearfix"
             ui-sref-active="bg-success">
 
             <a ui-sref="records.item({ id: record.id })">
                 {{record.created | date : 'yyyy-MM-dd'}}
             </a>
 
-            <!-- TODO: use fa-remove, not mere 'x' -->
             <!-- TODO: show this only for selected/hovered items -->
-            <a href='#' class="pull-right"
-               ng-click="removing = true">
-                x
-            </a>
+            <button type="button" class="close pull-right"
+                    ng-click="removing = true">
+                <span>&times;</span>
+            </button>
             <div ng-show="removing">
                 <button class="btn btn-success" ng-click="remove(record)">
                     Confirm
                 </button>
                 <button class="btn btn-success" ng-click="removing = false">
-                    Oh, no
+                    Stop
                 </button>
             </div>
         </li>
