@@ -1,5 +1,6 @@
 var editorCtrl = function (
     $scope, $http, $timeout, $interval,
+    $state,
     encryptionService, errorService, recordService
 ) {
     var autosaving;
@@ -39,7 +40,7 @@ var editorCtrl = function (
     );
 
     $scope.view = function () {
-        $scope.states.viewing = true;
+        $state.go('^');
     };
 
     $scope.$on('$destroy', function() {

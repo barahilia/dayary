@@ -4,6 +4,7 @@ var viewerCtrl = function (
     encryptionService, errorService
 ) {
     var recordId = $stateParams.id;
+    $scope.$state = $state;
 
     $http.get("/api/records/" + recordId)
         .success(function (record) {

@@ -25,7 +25,7 @@ var configApp = function ($stateProvider, $urlRouterProvider) {
             controller: "viewerCtrl"
         })
         .state("records.item.edit", {
-            url: "/:id/edit",
+            url: "/edit",
             templateUrl: "editor.html",
             controller: "editorCtrl"
         })

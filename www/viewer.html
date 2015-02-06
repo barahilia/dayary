@@ -1,23 +1,28 @@
 <h2>{{record.created | date : 'fullDate'}}</h2>
 
-<div>
-    <button class="btn btn-success" ng-click="startEdit()">
-        Edit
-    </button>
+<!-- TODO: not sure this is the best way to show/hide parts -->
+<div ng-show="$state.current.name === 'records.item'">
+    <div>
+        <button class="btn btn-success" ng-click="startEdit()">
+            Edit
+        </button>
 
-    <span class="bg-success">
-        - last updated on
-        {{record.updated | date : 'EEEE, MMMM d, y HH:mm:ss'}}
-    </span>
+        <span class="bg-success">
+            - last updated on
+            {{record.updated | date : 'EEEE, MMMM d, y HH:mm:ss'}}
+        </span>
+    </div>
+
+    <br />
+
+    <!-- TODO: show ajax-loader while loading -->
+
+    <!-- Use ng-bind to ensure no spare spaces of white lines -->
+    <p class="text-viewer" ng-bind="record.text">
+    </p>
 </div>
 
-<br />
-
-<!-- TODO: show ajax-loader while loading -->
-
-<!-- Use ng-bind to ensure no spare spaces of white lines -->
-<p class="text-viewer" ng-bind="record.text">
-</p>
-
-<div ui-view></div>
+<div ng-hide="$state.current.name === 'records.item'">
+    <div ui-view></div>
+</div>
 
