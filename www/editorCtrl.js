@@ -34,6 +34,7 @@ var editorCtrl = function (
 
     autosaving = $interval(
         function () {
+            // TODO: check if any change was done
             saveRecord($scope.record);
         },
         recordService.autosaveInterval.seconds * 1000
@@ -47,6 +48,7 @@ var editorCtrl = function (
         // Make sure that the interval is destroyed too
         stopAutosaving();
 
+        // TODO: check if defined
         saveRecord($scope.record);
     });
 };

@@ -27,6 +27,11 @@ var encryptionService = function (
     $interval(
         function () {
             var now = new Date();
+
+            if (locked) {
+                return;
+            }
+
             //if ((now - lastUserAction) > 15 * 60 * 1000) { // 15 min
             if ((now - lastUserAction) > 15 * 1000) { // 15 sec
                 lock();
@@ -46,6 +51,7 @@ var encryptionService = function (
     };
 
     service.lock = function () {
+        // TODO: duplicates function above
         locked = true;
         passphrase = undefined;
     };
