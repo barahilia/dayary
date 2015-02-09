@@ -3,6 +3,9 @@ var settingsCtrl = function (
     $state,
     encryptionService, recordService
 ) {
+    // TODO: make sure this is loaded even from other URLs
+    // TODO: bring back lock functionality
+
     var devPassphrase = "Very secret phrase";
 
     $scope.passphrase = encryptionService.getPassphrase();
