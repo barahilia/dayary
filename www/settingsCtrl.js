@@ -1,16 +1,12 @@
 var settingsCtrl = function (
-    $scope, $http, $timeout, $window,
-    $state,
-    encryptionService, recordService
+    $scope, $http, $state,
+    encryptionService, lockService, recordService
 ) {
-    // TODO: make sure this is loaded even from other URLs
-    // TODO: bring back lock functionality
-
     var devPassphrase = "Very secret phrase";
 
     $scope.passphrase = encryptionService.getPassphrase();
     $scope.autosaveInterval = recordService.autosaveInterval;
-    $scope.lockTimeout = { minutes: 5 };
+    $scope.lockTimeoutMin = 5;
 
     $scope.invalidPassphrase = function () {
         var computed = encryptionService.computeHash($scope.passphrase);
@@ -30,6 +26,7 @@ var settingsCtrl = function (
 
     var saveSettings = function () {
         encryptionService.setPassphrase($scope.passphrase);
+        lockService.setLockTimeout($scope.lockTimeoutMin);
         $state.go("records");
     };
 
@@ -48,20 +45,6 @@ var settingsCtrl = function (
                 errorService.reportError(msg);
             });
     };
-
-    // TODO: consider moving this to recordsCtrl
-    var lock = function () {
-        // TODO: make it work again; option similar to hash in metadata
-        //encryptionService.lock();
-        //$state.go("settings");
-    };
-
-    $timeout(
-        lock,
-        $scope.lockTimeout.minutes * 60 * 1000
-    );
-
-    $window.onblur = lock;
 
     var processServerHash = function (hash) {
         var devHash = encryptionService.computeHash(devPassphrase);

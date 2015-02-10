@@ -1,6 +1,4 @@
-var encryptionService = function (
-    $window, $interval, $state
-) {
+var encryptionService = function () {
     var service = {};
 
     var passphrase;

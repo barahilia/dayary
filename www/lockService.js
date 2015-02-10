@@ -1,9 +1,8 @@
 var lockService = function (
     $window, $interval, $state, encryptionService
 ) {
-    var service = {};
-
     var locked = true;
+    var lockTimeoutMin = 1;
     var lastUserAction = new Date();
 
     var lock = function () {
@@ -24,6 +23,9 @@ var lockService = function (
     $window.onclick = updateUserAction;
     $window.onkeypress = updateUserAction;
 
+    $window.onblur = lock;
+
+
     $interval(
         function () {
             var now = new Date();
@@ -32,13 +34,19 @@ var lockService = function (
                 return;
             }
 
-            //if ((now - lastUserAction) > 15 * 60 * 1000) { // 15 min
-            if ((now - lastUserAction) > 15 * 1000) { // 15 sec
+            if ((now - lastUserAction) > lockTimeoutMin * 60 * 1000) {
                 lock();
             }
         },
         5 * 1000 // 5 sec
     );
+
+
+    var service = {};
+
+    service.setLockTimeout = function (timeoutMin) {
+        lockTimeoutMin = timeoutMin;
+    };
 
     return service;
 };
