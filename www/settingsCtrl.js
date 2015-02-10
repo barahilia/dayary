@@ -27,6 +27,7 @@ var settingsCtrl = function (
     var saveSettings = function () {
         encryptionService.setPassphrase($scope.passphrase);
         lockService.setLockTimeout($scope.lockTimeoutMin);
+        lockService.setUnlocked();
         $state.go("records");
     };
 

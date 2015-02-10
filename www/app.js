@@ -13,4 +13,3 @@ angular.module("app", ['ui.router'])
     .controller("mainCtrl", mainCtrl)
     ;
 
-

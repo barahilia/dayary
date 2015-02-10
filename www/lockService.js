@@ -48,6 +48,10 @@ var lockService = function (
         lockTimeoutMin = timeoutMin;
     };
 
+    service.setUnlocked = function () {
+        locked = false;
+    };
+
     return service;
 };
 
