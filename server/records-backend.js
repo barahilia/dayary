@@ -1,8 +1,11 @@
-var fs = require('fs')
+var fs = require('fs'),
+    path = require('path'),
     _ = require('underscore');
 
 // TODO: get this as a parameter and return a backend object
 var datafile = __dirname + "/../data/records.json";
+
+var dataFolderExists = false;
 
 var dataContent = {
     hash: "",
@@ -44,7 +47,18 @@ var loadRecords = function () {
 };
 
 var saveRecords = function () {
+    var folder;
+
     try {
+        if (!dataFolderExists) {
+            folder = path.dirname(datafile);
+
+            if (!fs.existsSync(folder)) {
+                fs.mkdirSync(folder);
+                dataFolderExists = true;
+            }
+        }
+
         fs.writeFileSync(datafile, JSON.stringify(dataContent));
     }
     catch (e) {
@@ -115,4 +129,3 @@ exports.deleteRecord = function (record) {
     dataContent.records = _.without(records, record);
     saveRecords();
 };
-
