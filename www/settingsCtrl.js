@@ -56,9 +56,6 @@ var settingsCtrl = function (
             $scope.passphrase = devPassphrase;
             $scope.done();
         }
-        else {
-            $scope.settingsEdit.show = true;
-        }
     };
 
     if (encryptionService.hash === null) {
@@ -69,4 +66,3 @@ var settingsCtrl = function (
             });
     }
 };
-
