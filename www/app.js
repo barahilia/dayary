@@ -10,6 +10,4 @@ angular.module("app", ['ui.router'])
     .controller("recordsCtrl", recordsCtrl)
     .controller("viewerCtrl", viewerCtrl)
     .controller("editorCtrl", editorCtrl)
-    .controller("mainCtrl", mainCtrl)
     ;
-

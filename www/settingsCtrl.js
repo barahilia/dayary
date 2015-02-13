@@ -1,6 +1,6 @@
 var settingsCtrl = function (
     $scope, $http, $state,
-    encryptionService, lockService, recordService
+    errorService, encryptionService, lockService, recordService
 ) {
     var devPassphrase = "Very secret phrase";
 

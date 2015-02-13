@@ -11,12 +11,10 @@ var lockService = function (
         $state.go("settings");
     };
 
-    // TODO: move $window.onblur here too
     var updateUserAction = function () {
         lastUserAction = new Date();
     };
 
-    // TODO: extract to the lock service
     // TODO: use moment.js for all date operations
     // TODO: choose $window.onclick vs angular.element($window).bind vs
     //       angular.element($window).on("click") vs ...
@@ -54,4 +52,3 @@ var lockService = function (
 
     return service;
 };
-

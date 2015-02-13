@@ -5,11 +5,16 @@ var editorCtrl = function (
 ) {
     var autosaving;
 
-    var saveRecord = function (record) {
+    var saveRecord = function () {
+        if (!$scope.textChanged) {
+            return;
+        }
+
         var encrypted = encryptionService.encrypt(record.text);
 
         $http.put("/api/records/" + record.id, encrypted)
             .success(function () {
+                $scope.textChanged = false;
                 // TODO: use moment.js instead of Date
                 $scope.saved = "saved on " + (new Date());
 
@@ -48,8 +53,6 @@ var editorCtrl = function (
         // Make sure that the interval is destroyed too
         stopAutosaving();
 
-        if ($scope.record) {
-            saveRecord($scope.record);
-        }
+        saveRecord($scope.record);
     });
 };
