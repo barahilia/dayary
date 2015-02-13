@@ -126,6 +126,6 @@ exports.updateRecord = function (record) {
 };
 
 exports.deleteRecord = function (record) {
-    dataContent.records = _.without(records, record);
+    dataContent.records = records = _.without(records, record);
     saveRecords();
 };
