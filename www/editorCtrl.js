@@ -48,8 +48,8 @@ var editorCtrl = function (
         // Make sure that the interval is destroyed too
         stopAutosaving();
 
-        // TODO: check if defined
-        saveRecord($scope.record);
+        if ($scope.record) {
+            saveRecord($scope.record);
+        }
     });
 };
-
