@@ -54,7 +54,7 @@ var settingsCtrl = function (
         if (hash && hash === devHash) {
             // Dev mode - development pass phrase to be used
             $scope.passphrase = devPassphrase;
-            $scope.done();
+            saveSettings();
         }
     };
 

@@ -10,9 +10,9 @@ var editorCtrl = function (
             return;
         }
 
-        var encrypted = encryptionService.encrypt(record.text);
+        var encrypted = encryptionService.encrypt($scope.record.text);
 
-        $http.put("/api/records/" + record.id, encrypted)
+        $http.put("/api/records/" + $scope.record.id, encrypted)
             .success(function () {
                 $scope.textChanged = false;
                 // TODO: use moment.js instead of Date
@@ -40,7 +40,7 @@ var editorCtrl = function (
     autosaving = $interval(
         function () {
             // TODO: check if any change was done
-            saveRecord($scope.record);
+            saveRecord();
         },
         recordService.autosaveInterval.seconds * 1000
     );
@@ -50,9 +50,7 @@ var editorCtrl = function (
     };
 
     $scope.$on('$destroy', function() {
-        // Make sure that the interval is destroyed too
         stopAutosaving();
-
-        saveRecord($scope.record);
+        saveRecord();
     });
 };
