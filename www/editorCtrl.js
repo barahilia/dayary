@@ -15,8 +15,7 @@ var editorCtrl = function (
         $http.put("/api/records/" + $scope.record.id, encrypted)
             .success(function () {
                 $scope.textChanged = false;
-                // TODO: use moment.js instead of Date
-                $scope.saved = "saved on " + (new Date());
+                $scope.saved = "saved on " + moment().format('mm:ss');
 
                 $timeout(
                     function () {
