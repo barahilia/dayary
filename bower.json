@@ -23,6 +23,7 @@
     "ui-router": "~0.2.13",
     "cryptojslib": "~3.1.2",
     "underscore": "~1.7.0",
-    "moment": "~2.9.0"
+    "moment": "~2.9.0",
+    "font-awesome": "~4.3.0"
   }
 }
