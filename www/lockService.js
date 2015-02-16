@@ -15,7 +15,6 @@ var lockService = function (
         lastUserAction = moment();
     };
 
-    // TODO: use moment.js for all date operations
     // TODO: choose $window.onclick vs angular.element($window).bind vs
     //       angular.element($window).on("click") vs ...
     $window.onclick = updateUserAction;
