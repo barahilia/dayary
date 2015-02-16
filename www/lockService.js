@@ -2,7 +2,7 @@ var lockService = function (
     $window, $interval, $state, encryptionService
 ) {
     var locked = true;
-    var lockTimeoutMin = 1;
+    var lockTimeout = moment.duration(1, 'minutes');
     var lastUserAction = new Date();
 
     var lock = function () {
@@ -12,7 +12,7 @@ var lockService = function (
     };
 
     var updateUserAction = function () {
-        lastUserAction = new Date();
+        lastUserAction = moment();
     };
 
     // TODO: use moment.js for all date operations
@@ -26,24 +26,22 @@ var lockService = function (
 
     $interval(
         function () {
-            var now = new Date();
-
             if (locked) {
                 return;
             }
 
-            if ((now - lastUserAction) > lockTimeoutMin * 60 * 1000) {
+            if (moment().subtract(lockTimeout) > lastUserAction) {
                 lock();
             }
         },
-        5 * 1000 // 5 sec
+        moment.duration(5, 'seconds').asMilliseconds()
     );
 
 
     var service = {};
 
-    service.setLockTimeout = function (timeoutMin) {
-        lockTimeoutMin = timeoutMin;
+    service.setLockTimeout = function (timeout) {
+        lockTimeout = moment.duration(timeout, 'minutes');
     };
 
     service.setUnlocked = function () {
