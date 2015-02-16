@@ -6,8 +6,12 @@ var viewerCtrl = function (
     var recordId = $stateParams.id;
     $scope.$state = $state;
 
+    $scope.loadingRecord = true;
+
     $http.get("/api/records/" + recordId)
         .success(function (record) {
+            $scope.loadingRecord = false;
+
             try {
                 record.text = encryptionService.decrypt(record.text);
                 $scope.record = record;
@@ -19,6 +23,7 @@ var viewerCtrl = function (
             }
         })
         .error(function () {
+            $scope.loadingRecord = false;
             errorService.reportError(
                 "failure while loading the data for record: " + recordId
             );
@@ -28,4 +33,3 @@ var viewerCtrl = function (
         $state.go('.edit', $stateParams);
     };
 };
-

@@ -2,8 +2,12 @@ var recordsCtrl = function (
     $scope, $http, $state,
     errorService, recordService
 ) {
+    $scope.loadingRecordsList = true;
+
     $http.get("/api/records")
         .success(function (data) {
+            $scope.loadingRecordsList = false;
+
             data = _.sortBy(data, 'created');
             data = data.reverse();
 
@@ -14,6 +18,7 @@ var recordsCtrl = function (
             }
         })
         .error(function () {
+            $scope.loadingRecordsList = false;
             errorService.reportError("failure while loading records list");
         });
 
@@ -39,4 +44,3 @@ var recordsCtrl = function (
             });
     };
 };
-

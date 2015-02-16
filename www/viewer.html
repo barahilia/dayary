@@ -16,14 +16,17 @@
 
     <br />
 
-    <!-- TODO: show ajax-loader while loading -->
+    <div ng-show="loadingRecord">
+        <span class="fa fa-spinner fa-spin"></span>
+    </div>
 
     <!-- Use ng-bind to ensure no spare spaces of white lines -->
-    <p class="text-viewer" ng-bind="record.text">
+    <p  ng-hide="loadingRecord"
+        class="text-viewer"
+        ng-bind="record.text">
     </p>
 </div>
 
 <div ng-hide="$state.current.name === 'records.item'">
     <div ui-view></div>
 </div>
-

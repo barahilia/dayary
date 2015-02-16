@@ -9,8 +9,11 @@
 
     <br />
 
-    <ul class="list-unstyled">
-        <!-- TODO: show ajax-loader while loading -->
+    <div ng-show="loadingRecordsList">
+        <span class="fa fa-spinner fa-spin"></span>
+    </div>
+
+    <ul ng-hide="loadingRecordsList" class="list-unstyled">
 
         <!-- http://stackoverflow.com/questions/28154304/list-and-pull-left-makes-stair -->
         <li ng-repeat="record in records"
@@ -46,4 +49,3 @@
         add a new record.
     </div>
 </div>
-
