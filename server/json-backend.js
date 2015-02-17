@@ -72,6 +72,10 @@ var saveRecords = function () {
 loadRecords();
 
 
+exports.getAllData = function () {
+    return dataContent;
+};
+
 exports.getHash = function () {
     return dataContent.hash;
 };
