@@ -18,9 +18,10 @@
   "readme": "Please refer to the README.md",
   "readmeFilename": "README.md",
   "dependencies": {
-    "express": "~4.10.6",
     "body-parser": "~1.10.1",
-    "underscore": "~1.7.0",
-    "moment": "~2.9.0"
+    "express": "~4.10.6",
+    "moment": "~2.9.0",
+    "sqlite3": "^3.0.5",
+    "underscore": "~1.7.0"
   }
 }
