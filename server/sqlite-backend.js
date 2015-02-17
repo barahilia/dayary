@@ -12,35 +12,35 @@ var loadRecords = function () {
     }
 }
 
-export.getSettings = function () {
+exports.getSettings = function () {
     throw "not implemented";
 };
 
 // Object of all the settings excluding hash
-export.setSettings = function (settings) {
+exports.setSettings = function (settings) {
     throw "not implemented";
 };
 
-export.setHash = function (hash) {
+exports.setHash = function (hash) {
     throw "not implemented";
 };
 
-export.getRecordsMetadata = function () {
+exports.getRecordsMetadata = function () {
     throw "not implemented";
 };
 
-export.getRecord = function (id) {
+exports.getRecord = function (id) {
     throw "not implemented";
 };
 
-export.addRecord = function (record) {
+exports.addRecord = function (record) {
     throw "not implemented";
 };
 
-export.updateRecord = function (record) {
+exports.updateRecord = function (record) {
     throw "not implemented";
 };
 
-export.deleteRecord = function (record) {
+exports.deleteRecord = function (record) {
     throw "not implemented";
 };
