@@ -1,6 +1,6 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
-    backend = require('./records-backend');
+    backend = require('./json-backend');
 
 var recordsApi = express.Router();
 
@@ -78,4 +78,3 @@ recordsApi.delete('/:id', function (req, res) {
 });
 
 exports.recordsApi = recordsApi;
-

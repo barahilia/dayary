@@ -1,10 +1,10 @@
-#!/usr/bin/env node
+z#!/usr/bin/env node
 
 var express = require('express'),
     bodyParser = require('body-parser'),
     _ = require('underscore'),
     recordsApi = require('./records-api').recordsApi,
-    backend = require('./records-backend');
+    backend = require('./json-backend');
 
 // TODO: describe configuration in README
 // TODO: move data file config here too
@@ -41,5 +41,3 @@ app.use(
 
 console.log("Listening... Get to http://localhost:" + port);
 app.listen(port);
-
-
