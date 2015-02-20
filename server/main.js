@@ -33,10 +33,10 @@ app.put('/api/hash', function (req, res) {
 
 app.use(
     '/bower_components',
-    express['static'](__dirname + '/../bower_components')
+    express.static(__dirname + '/../bower_components')
 );
 app.use(
-    express['static'](__dirname + '/../www')
+    express.static(__dirname + '/../www')
 );
 
 console.log("Listening... Get to http://localhost:" + port);

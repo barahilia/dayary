@@ -47,6 +47,7 @@ exports.getSettings = function (callback) {
 };
 
 // Object of all the settings excluding hash
+// TODO: make sure hash isn't sent this way
 exports.setSettings = function (settings, callback) {
     db.serialize(function () {
         var sql = "INSERT OR REPLACE " +
