@@ -4,7 +4,7 @@
   "description": "Diary tool deployed as a local web-server",
   "main": "server/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node node_modules\\jasmine-node\\lib\\jasmine-node\\cli.js test"
   },
   "author": {
     "name": "Ilia Barahovsky",
@@ -23,5 +23,8 @@
     "moment": "~2.9.0",
     "sqlite3": "^3.0.5",
     "underscore": "~1.7.0"
+  },
+  "devDependencies": {
+    "jasmine-node": "^1.14.5"
   }
 }
