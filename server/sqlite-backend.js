@@ -52,6 +52,7 @@ exports.getSettings = function (callback) {
 exports.setSettings = function (settings, callback) {
     if ('hash' in settings) {
         callback("set settings: cannot accept hash");
+        return;
     }
 
     db.serialize(function () {

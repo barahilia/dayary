@@ -38,7 +38,7 @@ describe("sqlite backend", function () {
 
     it("should get one setting now", function (done) {
         backend.getSettings(function (settings) {
-            expect(settings).toEqual({ a: 42 });
+            expect(settings).toEqual({ a: "42" });
             done();
         });
     });
