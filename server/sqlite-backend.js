@@ -39,12 +39,17 @@ exports.openDb = function (dbFile) {
 
 exports.getSettings = function (callback) {
     db.all("SELECT key, value FROM Settings", function (err, rows) {
+        if (err) {
+            callback(err);
+            return;
+        }
+
         var settings = {};
         _.each(rows, function(row) {
             settings[row.key] = row.value;
         });
 
-        callback(settings);
+        callback(null, settings);
     });
 };
 

@@ -16,7 +16,8 @@ backend.openDb(db);
 describe("sqlite backend", function () {
 
     it("should have no settings at the beginning", function (done) {
-        backend.getSettings(function (settings) {
+        backend.getSettings(function (err, settings) {
+            expect(err).toBe(null);
             expect(settings).toEqual({});
             done();
         });
@@ -37,8 +38,31 @@ describe("sqlite backend", function () {
     });
 
     it("should get one setting now", function (done) {
-        backend.getSettings(function (settings) {
+        backend.getSettings(function (err, settings) {
+            expect(err).toBe(null);
             expect(settings).toEqual({ a: "42" });
+            done();
+        });
+    });
+
+    it("should succeed setting hash", function (done) {
+        backend.setHash("aba", function (err) {
+            expect(err).toBe(null);
+            done();
+        });
+    });
+
+    it("should fail resetting hash", function (done) {
+        backend.setHash("bcb", function (err) {
+            expect(err).toBe("set hash: cannot replace existing hash");
+            done();
+        });
+    });
+
+    it("should get have 'a' and 'hash' settings now", function (done) {
+        backend.getSettings(function (err, settings) {
+            expect(err).toBe(null);
+            expect(settings).toEqual({ a: "42", hash: "aba" });
             done();
         });
     });
