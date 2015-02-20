@@ -22,15 +22,15 @@ var db = new sqlite.Database(dbFile);
 if ( ! dbExists) {
     db.serialize(function () {
         db.run("CREATE TABLE Settings (" +
-            "key varchar PRIMARY KEY," +
-            "value varchar" +
+            "key VARCHAR PRIMARY KEY," +
+            "value VARCHAR" +
         ")");
 
         db.run("CREATE TABLE Records (" +
-            "id int PRIMARY KEY," +
-            "created date," +
-            "updated date," +
-            "text text" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "created TEXT," +
+            "updated TEXT," +
+            "text TEXT" +
         ")");
     });
 }
@@ -47,8 +47,11 @@ exports.getSettings = function (callback) {
 };
 
 // Object of all the settings excluding hash
-// TODO: make sure hash isn't sent this way
 exports.setSettings = function (settings, callback) {
+    if ('hash' in settings) {
+        callback("set settings: can't accept hash");
+    }
+
     db.serialize(function () {
         var sql = "INSERT OR REPLACE " +
             "INTO Settings (key, value) " +
@@ -63,26 +66,66 @@ exports.setSettings = function (settings, callback) {
     });
 };
 
-exports.setHash = function (hash) {
-    throw "not implemented";
+exports.setHash = function (hash, callback) {
+    db.get(
+        "SELECT value FROM Settings WHERE key = 'hash'",
+        function (err, row) {
+            if (row) {
+                callback("set hash: cannot replace existing hash");
+            }
+            else {
+                db.run(
+                    "INSERT INTO Settings (key, value) VALUES ('hash', ?)",
+                    hash,
+                    callback
+                );
+            }
+        }
+    );
 };
 
-exports.getRecordsMetadata = function () {
-    throw "not implemented";
+exports.getRecordsMetadata = function (callback) {
+    db.all(
+        "SELECT id, created, updated FROM Records",
+        callback
+    );
 };
 
-exports.getRecord = function (id) {
-    throw "not implemented";
+exports.getRecord = function (id, callback) {
+    db.get(
+        "SELECT * FROM Records WHERE id = ?",
+        id,
+        callback
+    );
 };
 
-exports.addRecord = function (record) {
-    throw "not implemented";
+exports.addRecord = function (record, callback) {
+    db.run(
+        "INSERT INTO Records (created, updated, text) VALUES (?, ?, ?)"
+        [records.created, record.updated, record.text],
+        function (error) {
+            if (error) {
+                callback(error);
+            }
+            else {
+                exports.getRecord(lastID, callback);
+            }
+        }
+    );
 };
 
-exports.updateRecord = function (record) {
-    throw "not implemented";
+exports.updateRecord = function (record, callback) {
+    db.run(
+        "UPDATE Records SET text = ?, updated = ? WHERE id = ?",
+        [record.text, record.updated, record.id],
+        callback
+    );
 };
 
-exports.deleteRecord = function (record) {
-    throw "not implemented";
+exports.deleteRecord = function (record, callback) {
+    db.run(
+        "DELETE FROM Records WHERE id = ?",
+        record.id,
+        callback
+    );
 };
