@@ -66,4 +66,26 @@ describe("sqlite backend", function () {
             done();
         });
     });
+
+
+    it("should have no records at the beginning", function (done) {
+        backend.getRecordsMetadata(function (err, records) {
+            expect(err).toBe(null);
+            expect(records).toEqual([]);
+            done();
+        });
+    });
+
+    it("should add a record", function (done) {
+        backend.addRecord(
+            {text: 'aa', created: 1, updated: 2 },
+            function (err, record) {
+                expect(err).toBe(null);
+                expect(record).toEqual(
+                    { id: 1, text: 'aa', created: '1', updated: '2' }
+                );
+                done();
+            }
+        );
+    });
 });

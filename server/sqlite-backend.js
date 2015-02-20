@@ -109,14 +109,14 @@ exports.getRecord = function (id, callback) {
 
 exports.addRecord = function (record, callback) {
     db.run(
-        "INSERT INTO Records (created, updated, text) VALUES (?, ?, ?)"
-        [records.created, record.updated, record.text],
+        "INSERT INTO Records (created, updated, text) VALUES (?, ?, ?)",
+        [record.created, record.updated, record.text],
         function (error) {
             if (error) {
                 callback(error);
             }
             else {
-                exports.getRecord(lastID, callback);
+                exports.getRecord(this.lastID, callback);
             }
         }
     );
