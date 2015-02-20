@@ -6,6 +6,7 @@ var fs = require('fs'),
 var jsonFile = __dirname + "/../data/records.json";
 
 var data;
+var db;
 
 var loadRecords = function () {
     if (fs.existsSync(jsonFile)) {
@@ -14,26 +15,27 @@ var loadRecords = function () {
     }
 };
 
-var dbFile = __dirname + "/../data/records.sqlite";
-var dbExists = fs.existsSync(dbFile);
+exports.openDb = function (dbFile) {
+    var dbExists = fs.existsSync(dbFile);
 
-var db = new sqlite.Database(dbFile);
+    db = new sqlite.Database(dbFile);
 
-if ( ! dbExists) {
-    db.serialize(function () {
-        db.run("CREATE TABLE Settings (" +
-            "key VARCHAR PRIMARY KEY," +
-            "value VARCHAR" +
-        ")");
+    if ( ! dbExists) {
+        db.serialize(function () {
+            db.run("CREATE TABLE Settings (" +
+                "key VARCHAR PRIMARY KEY," +
+                "value VARCHAR" +
+            ")");
 
-        db.run("CREATE TABLE Records (" +
-            "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-            "created TEXT," +
-            "updated TEXT," +
-            "text TEXT" +
-        ")");
-    });
-}
+            db.run("CREATE TABLE Records (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "created TEXT," +
+                "updated TEXT," +
+                "text TEXT" +
+            ")");
+        });
+    }
+};
 
 exports.getSettings = function (callback) {
     db.all("SELECT key, value FROM Settings", function (err, rows) {
@@ -49,7 +51,7 @@ exports.getSettings = function (callback) {
 // Object of all the settings excluding hash
 exports.setSettings = function (settings, callback) {
     if ('hash' in settings) {
-        callback("set settings: can't accept hash");
+        callback("set settings: cannot accept hash");
     }
 
     db.serialize(function () {

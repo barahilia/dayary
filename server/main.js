@@ -10,6 +10,7 @@ var express = require('express'),
 // TODO: move data file config here too
 // TODO: accept config from the command line
 var port = process.env.PORT || 3000;
+var dbFile = __dirname + "/../data/records.sqlite";
 
 var app = express();
 
