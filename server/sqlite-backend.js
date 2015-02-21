@@ -143,10 +143,10 @@ exports.updateRecord = function (record, callback) {
 };
 
 // TODO: think if return an error if record doesn't exist
-exports.deleteRecord = function (record, callback) {
+exports.deleteRecord = function (id, callback) {
     db.run(
         "DELETE FROM Records WHERE id = ?",
-        record.id,
+        id,
         callback
     );
 };

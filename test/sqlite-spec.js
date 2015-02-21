@@ -134,7 +134,7 @@ describe("sqlite backend", function () {
     });
 
     it("should delete a record", function (done) {
-        backend.deleteRecord({ id: 1 }, function (err) {
+        backend.deleteRecord(1, function (err) {
             expect(err).toBe(null);
             done();
         });

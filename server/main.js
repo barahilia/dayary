@@ -3,7 +3,7 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
     _ = require('underscore'),
-    recordsApi = require('./records-api').recordsApi,
+    recordsApi = require('./records-api'),
     backend = require('./json-backend');
 
 // TODO: describe configuration in README
@@ -14,7 +14,8 @@ var dbFile = __dirname + "/../data/records.sqlite";
 
 var app = express();
 
-app.use('/api/records', recordsApi);
+recordsApi.init(dbFile);
+app.use('/api/records', recordsApi.recordsApi);
 
 app.get('/api/hash', function (req, res) {
     res.send(backend.getHash());
