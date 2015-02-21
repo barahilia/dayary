@@ -21,6 +21,8 @@ exports.openDb = function (dbFile) {
     db = new sqlite.Database(dbFile);
 
     if ( ! dbExists) {
+        // TODO: if json.records exists, import them
+
         db.serialize(function () {
             db.run("CREATE TABLE Settings (" +
                 "key VARCHAR PRIMARY KEY," +
