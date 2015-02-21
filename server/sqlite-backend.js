@@ -126,10 +126,21 @@ exports.updateRecord = function (record, callback) {
     db.run(
         "UPDATE Records SET text = ?, updated = ? WHERE id = ?",
         [record.text, record.updated, record.id],
-        callback
+        function (err) {
+            if (err) {
+                callback(err);
+            }
+            else if (this.lastID === record.id && this.changes === 1) {
+                callback(null);
+            }
+            else {
+                callback("update record: failure updating");
+            }
+        }
     );
 };
 
+// TODO: think if return an error if record doesn't exist
 exports.deleteRecord = function (record, callback) {
     db.run(
         "DELETE FROM Records WHERE id = ?",

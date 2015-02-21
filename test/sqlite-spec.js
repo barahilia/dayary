@@ -88,4 +88,65 @@ describe("sqlite backend", function () {
             }
         );
     });
+
+    it("should update a record", function (done) {
+        backend.updateRecord(
+            { id: 1, text: 'bbb', updated: '15' },
+            function (err) {
+                expect(err).toBe(null);
+                done();
+            }
+        )
+    });
+
+    it("should fail updating non-existing record", function (done) {
+        backend.updateRecord(
+            { id: 17, text: 'bbb', updated: '15' },
+            function (err) {
+                expect(err).toBe('update record: failure updating');
+                done();
+            }
+        )
+    });
+
+    it("should add another record", function (done) {
+        backend.addRecord(
+            {text: 'bb', created: 3, updated: 4 },
+            function (err, record) {
+                expect(err).toBe(null);
+                expect(record).toEqual(
+                    { id: 2, text: 'bb', created: '3', updated: '4' }
+                );
+                done();
+            }
+        );
+    });
+
+    it("should have two records by now", function (done) {
+        backend.getRecordsMetadata(function (err, records) {
+            expect(err).toBe(null);
+            expect(records).toEqual([
+                { id : 1, created : '1', updated : '15' },
+                { id : 2, created : '3', updated : '4' }
+            ]);
+            done();
+        });
+    });
+
+    it("should delete a record", function (done) {
+        backend.deleteRecord({ id: 1 }, function (err) {
+            expect(err).toBe(null);
+            done();
+        });
+    });
+
+    it("should have one record after deletion", function (done) {
+        backend.getRecordsMetadata(function (err, records) {
+            expect(err).toBe(null);
+            expect(records).toEqual([
+                { id : 2, created : '3', updated : '4' }
+            ]);
+            done();
+        });
+    });
 });
