@@ -11,12 +11,18 @@ var editorCtrl = function (
         }
 
         var encrypted = encryptionService.encrypt($scope.record.text);
+        var record = {
+            id: $scope.record.id,
+            text: encrypted,
+            updated: moment().format()
+        };
 
-        $http.put("/api/records/" + $scope.record.id, encrypted)
+        $http.put("/api/records/" + record.id, record)
             .success(function () {
                 $scope.textChanged = false;
                 $scope.saved = "saved on " + moment().format('mm:ss');
 
+                // TODO: move to alert service
                 $timeout(
                     function () {
                         $scope.saved = "";
