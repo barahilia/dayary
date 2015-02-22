@@ -55,6 +55,8 @@ var settingsCtrl = function (
             // Dev mode - development pass phrase to be used
             $scope.passphrase = devPassphrase;
             saveSettings();
+            // TODO: set this from scope and from backend settings
+            lockService.setLockOnBlur(false);
         }
     };
 

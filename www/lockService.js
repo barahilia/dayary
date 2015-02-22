@@ -2,6 +2,7 @@ var lockService = function (
     $window, $interval, $state, encryptionService
 ) {
     var locked = true;
+    var lockOnBlur = true;
     var lockTimeout = moment.duration(1, 'minutes');
     var lastUserAction = new Date();
 
@@ -20,7 +21,11 @@ var lockService = function (
     $window.onclick = updateUserAction;
     $window.onkeypress = updateUserAction;
 
-    $window.onblur = lock;
+    $window.onblur = function () {
+        if (lockOnBlur) {
+            lock();
+        }
+    };
 
 
     $interval(
@@ -38,6 +43,10 @@ var lockService = function (
 
 
     var service = {};
+
+    service.setLockOnBlur = function (flag) {
+        lockOnBlur = flag;
+    };
 
     service.setLockTimeout = function (timeout) {
         lockTimeout = moment.duration(timeout, 'minutes');
