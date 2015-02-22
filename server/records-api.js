@@ -2,23 +2,6 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     backend = require('./sqlite-backend');
 
-// TODO: check if this function is still needed
-var processRecord = function (req, res, processor) {
-    backend.getRecord(+req.params.id, function (err, record) {
-        if (err) {
-            console.log("ERROR: " + err);
-            res.status(500).end();
-            return;
-        }
-
-        if (record) {
-            processor(record);
-        }
-        else {
-            res.status(404).end();
-        }
-    });
-};
 
 
 var recordsApi = express.Router();
@@ -38,8 +21,19 @@ recordsApi.get('/', function (req, res) {
 });
 
 recordsApi.get('/:id', function (req, res) {
-    processRecord(req, res, function (record) {
-        res.send(record);
+    backend.getRecord(+req.params.id, function (err, record) {
+        if (err) {
+            console.log("ERROR: " + err);
+            res.status(500).end();
+            return;
+        }
+
+        if (record) {
+            res.send(record);
+        }
+        else {
+            res.status(404).end();
+        }
     });
 });
 
