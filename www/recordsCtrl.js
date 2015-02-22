@@ -23,9 +23,14 @@ var recordsCtrl = function (
         });
 
     $scope.add = function () {
-        $http.post("/api/records")
+        var addition = {
+            created: moment().format(),
+            updated: moment().format()
+        };
+
+        $http.post("/api/records", addition)
             .success(function (record) {
-                $scope.records.unshift(_.omit(record, 'text'));
+                $scope.records.unshift(record);
                 $state.go("records.item.edit", { id: record.id });
             })
             .error(function () {

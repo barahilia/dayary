@@ -2,8 +2,6 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     backend = require('./sqlite-backend');
 
-var recordsApi = express.Router();
-
 // TODO: check if this function is still needed
 var processRecord = function (req, res, processor) {
     backend.getRecord(+req.params.id, function (err, record) {
@@ -22,6 +20,10 @@ var processRecord = function (req, res, processor) {
     });
 };
 
+
+var recordsApi = express.Router();
+
+recordsApi.use(bodyParser.json());
 
 recordsApi.get('/', function (req, res) {
     backend.getRecordsMetadata(function (err, records) {
@@ -42,14 +44,7 @@ recordsApi.get('/:id', function (req, res) {
 });
 
 recordsApi.post('/', function (req, res) {
-    // TODO: replace 'new Date()' with moment
-    var now = new Date();
-
-    var record = {
-        created: now,
-        updated: now,
-        text: ""
-    };
+    var record = req.body;
 
     backend.addRecord(record, function (err, added) {
         if (err) {
@@ -62,7 +57,6 @@ recordsApi.post('/', function (req, res) {
     });
 });
 
-recordsApi.use(bodyParser.json());
 recordsApi.put('/:id', function (req, res) {
     var record = req.body;
 
@@ -70,8 +64,7 @@ recordsApi.put('/:id', function (req, res) {
         res.status(404).end();
     }
 
-    // TODO: update the client side to send entire record with set updated field
-    backend.updateRecord(req.body, function (err) {
+    backend.updateRecord(record, function (err) {
         // TODO: handle the case of non-existing id - it's 404, not 500
         if (err) {
             console.log("ERROR: " + err);

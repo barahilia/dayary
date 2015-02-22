@@ -111,13 +111,15 @@ exports.getRecord = function (id, callback) {
 
 exports.addRecord = function (record, callback) {
     db.run(
-        "INSERT INTO Records (created, updated, text) VALUES (?, ?, ?)",
-        [record.created, record.updated, record.text],
+        "INSERT INTO Records (created, updated) VALUES (?, ?)",
+        [record.created, record.updated],
         function (error) {
             if (error) {
                 callback(error);
             }
             else {
+                // TODO: return only this.lastID; the client side should make
+                // another request in any occassion and this is REST
                 exports.getRecord(this.lastID, callback);
             }
         }
