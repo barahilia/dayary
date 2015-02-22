@@ -20,7 +20,7 @@ var editorCtrl = function (
         $http.put("/api/records/" + record.id, record)
             .success(function () {
                 $scope.textChanged = false;
-                $scope.saved = "saved on " + moment().format('mm:ss');
+                $scope.saved = "saved on " + moment().format('hh:mm');
 
                 // TODO: move to alert service
                 $timeout(
