@@ -62,7 +62,7 @@ recordsApi.post('/', function (req, res) {
     });
 });
 
-//recordsApi.use('/:id', bodyParser.text( { type: "application/json" } ));
+recordsApi.use(bodyParser.json());
 recordsApi.put('/:id', function (req, res) {
     var record = req.body;
 

@@ -132,7 +132,7 @@ exports.updateRecord = function (record, callback) {
             if (err) {
                 callback(err);
             }
-            else if (this.lastID === record.id && this.changes === 1) {
+            else if (this.changes === 1) {
                 callback(null);
             }
             else {
