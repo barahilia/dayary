@@ -1,37 +1,21 @@
 #!/usr/bin/env node
 
 var express = require('express'),
-    bodyParser = require('body-parser'),
-    _ = require('underscore'),
+    backend = require('./sqlite-backend'),
     recordsApi = require('./records-api'),
-    backend = require('./json-backend');
+    settingsApi = require('./settings-api');
 
 // TODO: describe configuration in README
-// TODO: move data file config here too
 // TODO: accept config from the command line
 var port = process.env.PORT || 3000;
-var dbFile = __dirname + "/../data/records.sqlite";
+var dbFile = process.env.DBFILE || __dirname + "/../data/records.sqlite";
 
 var app = express();
 
-recordsApi.init(dbFile);
-app.use('/api/records', recordsApi.recordsApi);
+backend.openDb(dbFile);
 
-app.get('/api/hash', function (req, res) {
-    res.send(backend.getHash());
-});
-
-app.use('/api/hash', bodyParser.text({type: "application/json"}));
-app.put('/api/hash', function (req, res) {
-    try {
-        backend.setHash(req.body);
-        res.status(204).end();
-    }
-    catch (e) {
-        console.log("ERROR: " + e);
-        res.status(500).end();
-    }
-});
+app.use('/api/records', recordsApi);
+app.use('/api/settings', settingsApi);
 
 app.use(
     '/bower_components',

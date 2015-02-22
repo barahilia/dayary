@@ -2,10 +2,7 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     backend = require('./sqlite-backend');
 
-
-
 var recordsApi = express.Router();
-
 recordsApi.use(bodyParser.json());
 
 recordsApi.get('/', function (req, res) {
@@ -83,8 +80,4 @@ recordsApi.delete('/:id', function (req, res) {
     });
 });
 
-exports.recordsApi = recordsApi;
-
-exports.init = function (dbFile) {
-    backend.openDb(dbFile);
-};
+module.exports = recordsApi;
