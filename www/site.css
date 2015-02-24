@@ -1,16 +1,16 @@
 
-.banner {
+#banner {
     padding-top: 10px;
     padding-bottom: 5px;
     margin-bottom: 10px;
 }
 
-.text-viewer {
+#text-viewer {
     white-space: pre-line;
     margin-bottom: 50px;
 }
 
-.text-editor {
+#text-editor {
     width: 100%;
     height: 350px;
 }
