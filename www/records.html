@@ -13,7 +13,7 @@
         <span class="fa fa-spinner fa-spin"></span>
     </div>
 
-    <ul ng-hide="loadingRecordsList" class="list-unstyled">
+    <ul id="records-list" ng-hide="loadingRecordsList" class="list-unstyled">
 
         <!-- http://stackoverflow.com/questions/28154304/list-and-pull-left-makes-stair -->
         <li ng-repeat="record in records"

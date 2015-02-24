@@ -12,5 +12,11 @@
 
 .text-editor {
     width: 100%;
+    height: 350px;
 }
 
+#records-list {
+    height: 350px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
