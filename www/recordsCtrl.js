@@ -1,6 +1,5 @@
 var recordsCtrl = function (
-    $scope, $http, $state,
-    errorService, recordService
+    $scope, $http, $state, errorService
 ) {
     $scope.loadingRecordsList = true;
 
