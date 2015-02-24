@@ -1,7 +1,7 @@
 var editorCtrl = function (
     $scope, $http, $timeout, $interval,
     $state,
-    encryptionService, errorService, recordService
+    encryptionService, errorService, settingsService
 ) {
     var autosaving;
 
@@ -44,10 +44,9 @@ var editorCtrl = function (
 
     autosaving = $interval(
         function () {
-            // TODO: check if any change was done
             saveRecord();
         },
-        recordService.autosaveInterval.seconds * 1000
+        settingsService.autosaveIntervalSec * 1000
     );
 
     $scope.view = function () {

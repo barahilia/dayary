@@ -1,11 +1,11 @@
 var settingsCtrl = function (
     $scope, $http, $state,
-    errorService, encryptionService, lockService, recordService
+    errorService, settingsService, encryptionService, lockService
 ) {
     var devPassphrase = "Very secret phrase";
 
     $scope.passphrase = encryptionService.getPassphrase();
-    $scope.autosaveInterval = recordService.autosaveInterval;
+    $scope.autosaveInterval = settingsService.autosaveIntervalSec;
     $scope.lockTimeoutMin = 5;
 
     $scope.invalidPassphrase = function () {

@@ -43,7 +43,7 @@ var encryptionService = function () {
             // This can throw - user should catch and take care
             temp = CryptoJS.AES.decrypt(s, passphrase)
             temp = temp.toString(CryptoJS.enc.Utf8);
-            
+
             if (temp) {
                 return temp;
             }
@@ -58,4 +58,3 @@ var encryptionService = function () {
 
     return service;
 };
-
