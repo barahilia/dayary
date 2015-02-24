@@ -52,7 +52,7 @@ var lockService = function (
         lockTimeout = moment.duration(timeout, 'minutes');
     };
 
-    service.setUnlocked = function () {
+    service.unlock = function () {
         locked = false;
     };
 
