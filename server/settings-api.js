@@ -20,15 +20,30 @@ settingsApi.get('/', function (req, res) {
 
 settingsApi.put('/', function (req, res) {
     var settings = req.body;
-    //backend.setSettings();
-    throw "Not implemented";
+
+    backend.setSettings(function (err) {
+        if (err) {
+            console.log("ERROR: " + err);
+            res.status(500).end();
+        }
+        else {
+            res.status(204).end();
+        }
+    });
 });
 
-// TODO: use here bodyParser.text()
-//app.use('/api/hash', bodyParser.text({type: "application/json"}));
+settingsApi.use('/hash', bodyParser.text({type: "application/json"}));
 settingsApi.put('/hash', function (req, res) {
     var hash = req.body;
-    //backend.setHash();
+    backend.setHash(function (err) {
+        if (err) {
+            console.log("ERROR: " + err);
+            res.status(500).end();
+        }
+        else {
+            res.status(204).end();
+        }
+    });
     throw "Not implemented";
 });
 
