@@ -46,7 +46,7 @@ var editorCtrl = function (
         function () {
             saveRecord();
         },
-        settingsService.autosaveIntervalSec * 1000
+        settingsService.settings.autosaveIntervalSec * 1000
     );
 
     $scope.view = function () {
