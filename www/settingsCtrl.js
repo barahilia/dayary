@@ -35,9 +35,14 @@ var settingsCtrl = function (
     else {
         $http.get("/api/settings")
             .success(function (settings) {
-                _.extend($scope.settings, settings);
-                processServerHash(settings.hash);
+                // TODO: extract a function; possibly in settingsService
+                $scope.settings.hash = settings.hash;
+                $scope.settings.autosaveIntervalSec = +settings.autosaveIntervalSec;
+                $scope.settings.lockTimeoutMin = +settings.lockTimeoutMin;
+                $scope.settings.lockOnBlur = !!(+settings.lockOnBlur);
+
                 settingsService.initialized = true;
+                processServerHash(settings.hash);
             })
             .error(function () {
                 errorService.reportError("failure requesting settings");
