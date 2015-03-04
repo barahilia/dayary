@@ -4,14 +4,54 @@ var settingsCtrl = function (
 ) {
     var devPassphrase = "Very secret phrase";
 
-    $scope.passphrase = encryptionService.getPassphrase();
-    $scope.autosaveInterval = settingsService.autosaveIntervalSec;
-    $scope.lockTimeoutMin = 5;
+    var saveSettings = function () {
+        // TODO: consider moving this to settingsService
+        encryptionService.setPassphrase($scope.settings.passphrase);
+        lockService.setLockTimeout($scope.settings.lockTimeoutMin);
+        lockService.setLockOnBlur($scope.settings.lockOnBlur);
+
+        lockService.unlock();
+
+
+
+        $state.go("records");
+    };
+
+    var processServerHash = function (hash) {
+        var devHash = encryptionService.computeHash(devPassphrase);
+        // TODO: possibly not needed any more - settingsService.settings.hash
+        encryptionService.hash = hash;
+
+        if (hash && hash === devHash) {
+            // Dev mode - development pass phrase to be used
+            settingsService.settings.passphrase = devPassphrase;
+            saveSettings();
+        }
+    };
+
+    $scope.settings = settingsService.settings;
+
+    if (settingsService.initialized) {
+        // Do nothing
+    }
+    else {
+        $http.get("/api/settings")
+            .success(function (settings) {
+                _.extend($scope.settings, settings);
+                processServerHash(settings.hash);
+                settingsService.initialized = true;
+            })
+            .error(function () {
+                errorService.reportError("failure requesting settings");
+            });
+    }
 
     $scope.invalidPassphrase = function () {
-        var computed = encryptionService.computeHash($scope.passphrase);
+        var computed = encryptionService.computeHash(
+            $scope.settings.passphrase
+        );
 
-        if ($scope.passphrase) {
+        if ($scope.settings.passphrase) {
             if (encryptionService.hash) {
                 return encryptionService.hash !== computed;
             }
@@ -24,50 +64,31 @@ var settingsCtrl = function (
         }
     };
 
-    var saveSettings = function () {
-        encryptionService.setPassphrase($scope.passphrase);
-        lockService.setLockTimeout($scope.lockTimeoutMin);
-        lockService.setLockOnBlur($scope.lockOnBlur);
-
-        lockService.unlock();
-
-        $state.go("records");
-    };
-
     $scope.done = function () {
-        computed = encryptionService.computeHash($scope.passphrase);
+        // TODO: return immediately if nothing has changed
 
-        if (computed === encryptionService.hash) {
-            saveSettings();
-            return;
-        }
+        var computed = encryptionService.computeHash(
+            $scope.settings.passphrase
+        );
 
-        $http.put("/api/hash", computed)
-            .success(saveSettings)
+        // TODO: consider running simply $q.all() instead
+        $http.put("/api/settings/hash", computed)
+            .success(function () {
+                var settingsNoHash = _.omit($scope.settings, 'hash');
+
+                $http.put("/api/settings", settingsNoHash)
+                    .success(function () {
+                        // TODO: call saveSettings() - ?
+                        $state.go("records");
+                    })
+                    .error(function () {
+                        var msg = "failure saving settings";
+                        errorService.reportError(msg);
+                    });
+            })
             .error(function () {
                 var msg = "failure setting hash for the pass phrase";
                 errorService.reportError(msg);
-            });
+            })
     };
-
-    var processServerHash = function (hash) {
-        var devHash = encryptionService.computeHash(devPassphrase);
-        encryptionService.hash = hash;
-
-        if (hash && hash === devHash) {
-            // Dev mode - development pass phrase to be used
-            $scope.passphrase = devPassphrase;
-            saveSettings();
-            // TODO: set this from scope and from backend settings
-            lockService.setLockOnBlur(false);
-        }
-    };
-
-    if (encryptionService.hash === null) {
-        $http.get("/api/hash")
-            .success(processServerHash)
-            .error(function () {
-                errorService.reportError("failure getting pass phrase hash");
-            });
-    }
 };

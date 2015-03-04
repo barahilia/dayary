@@ -4,7 +4,6 @@ var express = require('express'),
     backend = require('./sqlite-backend');
 
 var settingsApi = express.Router();
-settingsApi.use(bodyParser.json());
 
 settingsApi.get('/', function (req, res) {
     backend.getSettings(function (err, settings) {
@@ -18,10 +17,11 @@ settingsApi.get('/', function (req, res) {
     });
 });
 
-settingsApi.put('/', function (req, res) {
-    var settings = req.body;
+settingsApi.use('/hash', bodyParser.text({type: "application/json"}));
+settingsApi.put('/hash', function (req, res) {
+    var hash = req.body;
 
-    backend.setSettings(function (err) {
+    backend.setHash(hash, function (err) {
         if (err) {
             console.log("ERROR: " + err);
             res.status(500).end();
@@ -32,10 +32,12 @@ settingsApi.put('/', function (req, res) {
     });
 });
 
-settingsApi.use('/hash', bodyParser.text({type: "application/json"}));
-settingsApi.put('/hash', function (req, res) {
-    var hash = req.body;
-    backend.setHash(function (err) {
+// Must be defined after use('/hash')
+settingsApi.use('/', bodyParser.json());
+settingsApi.put('/', function (req, res) {
+    var settings = req.body;
+
+    backend.setSettings(settings, function (err) {
         if (err) {
             console.log("ERROR: " + err);
             res.status(500).end();
@@ -44,7 +46,6 @@ settingsApi.put('/hash', function (req, res) {
             res.status(204).end();
         }
     });
-    throw "Not implemented";
 });
 
 module.exports = settingsApi;

@@ -81,7 +81,12 @@ exports.setHash = function (hash, callback) {
         "SELECT value FROM Settings WHERE key = 'hash'",
         function (err, row) {
             if (row) {
-                callback("set hash: cannot replace existing hash");
+                if (row.value && row.value === hash) {
+                    callback(null);
+                }
+                else {
+                    callback("set hash: cannot replace existing hash");
+                }
             }
             else {
                 db.run(
