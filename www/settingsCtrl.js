@@ -12,8 +12,6 @@ var settingsCtrl = function (
 
         lockService.unlock();
 
-
-
         $state.go("records");
     };
 
@@ -79,8 +77,7 @@ var settingsCtrl = function (
 
                 $http.put("/api/settings", settings)
                     .success(function () {
-                        // TODO: call saveSettings() - ?
-                        $state.go("records");
+                        saveSettings();
                     })
                     .error(function () {
                         var msg = "failure saving settings";
