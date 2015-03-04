@@ -67,16 +67,17 @@ var settingsCtrl = function (
     $scope.done = function () {
         // TODO: return immediately if nothing has changed
 
-        var computed = encryptionService.computeHash(
+        var hash = encryptionService.computeHash(
             $scope.settings.passphrase
         );
 
-        // TODO: consider running simply $q.all() instead
-        $http.put("/api/settings/hash", computed)
-            .success(function () {
-                var settingsNoHash = _.omit($scope.settings, 'hash');
+        var settings = _.omit($scope.settings, 'hash', 'passphrase');
 
-                $http.put("/api/settings", settingsNoHash)
+        // TODO: consider running simply $q.all() instead
+        $http.put("/api/settings/hash", hash)
+            .success(function () {
+
+                $http.put("/api/settings", settings)
                     .success(function () {
                         // TODO: call saveSettings() - ?
                         $state.go("records");
