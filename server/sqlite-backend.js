@@ -5,9 +5,9 @@ var fs = require('fs'),
 
 var jsonFile = __dirname + "/../data/records.json";
 
-var data;
 var db;
 
+// TODO: implement upgrade from 0.3.0
 var loadRecords = function () {
     if (fs.existsSync(jsonFile)) {
         // File from version < 0.4
