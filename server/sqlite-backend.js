@@ -15,30 +15,6 @@ var loadRecords = function () {
     }
 };
 
-exports.openDb = function (dbFile) {
-    var dbExists = fs.existsSync(dbFile);
-
-    db = new sqlite.Database(dbFile);
-
-    if ( ! dbExists) {
-        // TODO: if json.records exists, import them
-
-        db.serialize(function () {
-            db.run("CREATE TABLE Settings (" +
-                "key VARCHAR PRIMARY KEY," +
-                "value VARCHAR" +
-            ")");
-
-            db.run("CREATE TABLE Records (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "created TEXT," +
-                "updated TEXT," +
-                "text TEXT" +
-            ")");
-        });
-    }
-};
-
 exports.getSettings = function (callback) {
     db.all("SELECT key, value FROM Settings", function (err, rows) {
         if (err) {
@@ -159,4 +135,28 @@ exports.deleteRecord = function (id, callback) {
         id,
         callback
     );
+};
+
+exports.openDb = function (dbFile) {
+    var dbExists = fs.existsSync(dbFile);
+
+    db = new sqlite.Database(dbFile);
+
+    if ( ! dbExists) {
+        // TODO: if json.records exists, import them
+
+        db.serialize(function () {
+            db.run("CREATE TABLE Settings (" +
+                "key VARCHAR PRIMARY KEY," +
+                "value VARCHAR" +
+            ")");
+
+            db.run("CREATE TABLE Records (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "created TEXT," +
+                "updated TEXT," +
+                "text TEXT" +
+            ")");
+        });
+    }
 };
