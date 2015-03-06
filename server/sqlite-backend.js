@@ -69,6 +69,9 @@ exports.setSettings = function (settings, callback) {
         var stmt = db.prepare(sql);
 
         _.each(settings, function (value, key) {
+            // TODO: consider using here JSON.stringify(). This will allow to
+            // preserve the value type and later to use JSON.parse() in
+            // getSettings()
             stmt.run(key, value);
         });
 
