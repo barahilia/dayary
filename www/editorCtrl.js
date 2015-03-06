@@ -6,15 +6,19 @@ var editorCtrl = function (
     var autosaving;
 
     var saveRecord = function () {
+        var encrypted, record;
+
         if (!$scope.textChanged) {
             return;
         }
 
-        var encrypted = encryptionService.encrypt($scope.record.text);
-        var record = {
+        $scope.record.updated = moment().format();
+
+        encrypted = encryptionService.encrypt($scope.record.text);
+        record = {
             id: $scope.record.id,
             text: encrypted,
-            updated: moment().format()
+            updated: $scope.record.updated
         };
 
         $http.put("/api/records/" + record.id, record)
