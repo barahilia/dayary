@@ -7,14 +7,6 @@ var jsonFile = __dirname + "/../data/records.json";
 
 var db;
 
-// TODO: implement upgrade from 0.3.0
-var loadRecords = function () {
-    if (fs.existsSync(jsonFile)) {
-        // File from version < 0.4
-        data = jsonBackend.getAllData();
-    }
-};
-
 exports.getSettings = function (callback) {
     db.all("SELECT key, value FROM Settings", function (err, rows) {
         if (err) {
@@ -137,13 +129,45 @@ exports.deleteRecord = function (id, callback) {
     );
 };
 
+var convertFromJson = function () {
+    var data;
+    var errorCallback = function (message) {
+        if (message) {
+            console.log("FATAL ERROR - cannot upgrade from " + jsonFile);
+            console.log(message);
+            process.exit(1);
+        }
+    }
+
+    if (fs.existsSync(jsonFile)) {
+        console.log("Converting data from " + jsonFile);
+
+        // File from version 0.3
+        data = jsonBackend.getAllData();
+
+        exports.setHash(data.hash, errorCallback);
+
+        _.each(data.records, function (record) {
+            exports.addRecord(record, function (message, added) {
+                if (message) {
+                    errorCallback(message);
+                }
+                else {
+                    record.id = added.id;
+                    exports.updateRecord(record, errorCallback);
+                }
+            });
+        });
+    }
+};
+
 exports.openDb = function (dbFile) {
     var dbExists = fs.existsSync(dbFile);
 
     db = new sqlite.Database(dbFile);
 
     if ( ! dbExists) {
-        // TODO: if json.records exists, import them
+        console.log("Creating new database at " + dbFile);
 
         db.serialize(function () {
             db.run("CREATE TABLE Settings (" +
@@ -157,6 +181,8 @@ exports.openDb = function (dbFile) {
                 "updated TEXT," +
                 "text TEXT" +
             ")");
+
+            convertFromJson();
         });
     }
 };
