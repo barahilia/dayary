@@ -1,6 +1,7 @@
 var fs = require('fs'),
     _ = require('underscore'),
     sqlite = require('sqlite3').verbose(),
+    // TODO: remove json-backend and everything related
     jsonBackend = require('./json-backend');
 
 var jsonFile = __dirname + "/../data/records.json";
@@ -129,6 +130,7 @@ exports.deleteRecord = function (id, callback) {
     );
 };
 
+// TODO: remove this function and its usage
 var convertFromJson = function () {
     var data;
     var errorCallback = function (message) {

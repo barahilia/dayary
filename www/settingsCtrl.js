@@ -37,6 +37,8 @@ var settingsCtrl = function (
             .success(function (settings) {
                 // TODO: extract a function; possibly in settingsService
                 $scope.settings.hash = settings.hash;
+                // TODO: save serialized values in backend, not string - then
+                // no need to parse here
                 $scope.settings.autosaveIntervalSec = +settings.autosaveIntervalSec;
                 $scope.settings.lockTimeoutMin = +settings.lockTimeoutMin;
                 $scope.settings.lockOnBlur = !!(+settings.lockOnBlur);
