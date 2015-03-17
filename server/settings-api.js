@@ -1,5 +1,4 @@
 var express = require('express'),
-    // TODO: move usage in bodyParser to main.js; also from records-api.js
     bodyParser = require('body-parser'),
     backend = require('./sqlite-backend');
 
