@@ -1,4 +1,5 @@
 var fs = require('fs'),
+    path = require('path'),
     _ = require('underscore'),
     sqlite = require('sqlite3').verbose();
 
@@ -128,7 +129,13 @@ exports.deleteRecord = function (id, callback) {
 
 // TODO: get a callback, to run after the db is opened
 exports.openDb = function (dbFile) {
+    var folder = path.dirname(dbFile);
     var dbExists = fs.existsSync(dbFile);
+
+    if (!fs.existsSync(folder)) {
+        console.log("Creating folder " + folder);
+        fs.mkdirSync(folder);
+    }
 
     db = new sqlite.Database(dbFile);
 
