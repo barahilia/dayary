@@ -1,10 +1,6 @@
 var fs = require('fs'),
     _ = require('underscore'),
-    sqlite = require('sqlite3').verbose(),
-    // TODO: remove json-backend and everything related
-    jsonBackend = require('./json-backend');
-
-var jsonFile = __dirname + "/../data/records.json";
+    sqlite = require('sqlite3').verbose();
 
 var db;
 
@@ -130,39 +126,7 @@ exports.deleteRecord = function (id, callback) {
     );
 };
 
-// TODO: remove this function and its usage
-var convertFromJson = function () {
-    var data;
-    var errorCallback = function (message) {
-        if (message) {
-            console.log("FATAL ERROR - cannot upgrade from " + jsonFile);
-            console.log(message);
-            process.exit(1);
-        }
-    }
-
-    if (fs.existsSync(jsonFile)) {
-        console.log("Converting data from " + jsonFile);
-
-        // File from version 0.3
-        data = jsonBackend.getAllData();
-
-        exports.setHash(data.hash, errorCallback);
-
-        _.each(data.records, function (record) {
-            exports.addRecord(record, function (message, added) {
-                if (message) {
-                    errorCallback(message);
-                }
-                else {
-                    record.id = added.id;
-                    exports.updateRecord(record, errorCallback);
-                }
-            });
-        });
-    }
-};
-
+// TODO: get a callback, to run after the db is opened
 exports.openDb = function (dbFile) {
     var dbExists = fs.existsSync(dbFile);
 
@@ -183,8 +147,7 @@ exports.openDb = function (dbFile) {
                 "updated TEXT," +
                 "text TEXT" +
             ")");
-
-            convertFromJson();
         });
     }
 };
+
