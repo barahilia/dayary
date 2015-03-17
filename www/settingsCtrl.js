@@ -6,7 +6,9 @@ var settingsCtrl = function (
 
     var saveSettings = function () {
         // TODO: consider moving this to settingsService
-        encryptionService.setPassphrase($scope.settings.passphrase);
+        encryptionService.setPassphrase($scope.passphrase);
+        $scope.passphrase = null;
+
         lockService.setLockTimeout($scope.settings.lockTimeoutMin);
         lockService.setLockOnBlur($scope.settings.lockOnBlur);
 
@@ -22,7 +24,7 @@ var settingsCtrl = function (
 
         if (hash && hash === devHash) {
             // Dev mode - development pass phrase to be used
-            settingsService.settings.passphrase = devPassphrase;
+            $scope.passphrase = devPassphrase;
             saveSettings();
         }
     };
@@ -53,10 +55,10 @@ var settingsCtrl = function (
 
     $scope.invalidPassphrase = function () {
         var computed = encryptionService.computeHash(
-            $scope.settings.passphrase
+            $scope.passphrase
         );
 
-        if ($scope.settings.passphrase) {
+        if ($scope.passphrase) {
             if (encryptionService.hash) {
                 return encryptionService.hash !== computed;
             }
@@ -73,10 +75,10 @@ var settingsCtrl = function (
         // TODO: return immediately if nothing has changed
 
         var hash = encryptionService.computeHash(
-            $scope.settings.passphrase
+            $scope.passphrase
         );
 
-        var settings = _.omit($scope.settings, 'hash', 'passphrase');
+        var settings = _.omit($scope.settings, 'hash');
 
         // TODO: consider running simply $q.all() instead
         $http.put("/api/settings/hash", hash)
@@ -97,3 +99,4 @@ var settingsCtrl = function (
             })
     };
 };
+
