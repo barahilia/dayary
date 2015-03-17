@@ -3,18 +3,9 @@ var encryptionService = function () {
 
     var passphrase;
 
-    service.getPassphrase = function () {
-        return passphrase;
-    };
-
     service.setPassphrase = function (phrase) {
         passphrase = phrase;
-        locked = false;
     };
-
-    // TODO: make it private; no reason to use this directly outside
-    // TODO: consider replacing with setHash() and phraseMatches()
-    service.hash = null;
 
     service.computeHash = function (phrase) {
         return CryptoJS.SHA256(phrase).toString();
@@ -22,10 +13,6 @@ var encryptionService = function () {
 
     service.encrypt = function (s) {
         var temp;
-
-        if (locked) {
-            throw "encryption error: locked";
-        }
 
         if (s) {
             temp = CryptoJS.AES.encrypt(s, passphrase);

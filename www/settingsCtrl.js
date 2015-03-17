@@ -19,8 +19,8 @@ var settingsCtrl = function (
 
     var processServerHash = function (hash) {
         var devHash = encryptionService.computeHash(devPassphrase);
-        // TODO: possibly not needed any more - settingsService.settings.hash
-        encryptionService.hash = hash;
+
+        settingsService.hash = hash;
 
         if (hash && hash === devHash) {
             // Dev mode - development pass phrase to be used
@@ -38,7 +38,6 @@ var settingsCtrl = function (
         $http.get("/api/settings")
             .success(function (settings) {
                 // TODO: extract a function; possibly in settingsService
-                $scope.settings.hash = settings.hash;
                 // TODO: save serialized values in backend, not string - then
                 // no need to parse here
                 $scope.settings.autosaveIntervalSec = +settings.autosaveIntervalSec;
@@ -54,13 +53,11 @@ var settingsCtrl = function (
     }
 
     $scope.invalidPassphrase = function () {
-        var computed = encryptionService.computeHash(
-            $scope.passphrase
-        );
+        var computed = encryptionService.computeHash($scope.passphrase);
 
         if ($scope.passphrase) {
-            if (encryptionService.hash) {
-                return encryptionService.hash !== computed;
+            if (settingsService.hash) {
+                return settingsService.hash !== computed;
             }
             else {
                 return false;
@@ -74,17 +71,13 @@ var settingsCtrl = function (
     $scope.done = function () {
         // TODO: return immediately if nothing has changed
 
-        var hash = encryptionService.computeHash(
-            $scope.passphrase
-        );
-
-        var settings = _.omit($scope.settings, 'hash');
+        var hash = encryptionService.computeHash($scope.passphrase);
 
         // TODO: consider running simply $q.all() instead
         $http.put("/api/settings/hash", hash)
             .success(function () {
 
-                $http.put("/api/settings", settings)
+                $http.put("/api/settings", $scope.settings)
                     .success(function () {
                         saveSettings();
                     })
