@@ -1,4 +1,4 @@
-<h2>{{record.created | date : 'fullDate'}}</h2>
+<h2>{{record.created | date : 'EEEE, dd.MM.y, HH:mm'}}</h2>
 
 <!-- TODO: not sure this is the best way to show/hide parts -->
 <div ng-show="$state.current.name === 'records.item'">
@@ -6,11 +6,6 @@
         <button class="btn btn-success" ng-click="startEdit()">
             Edit
         </button>
-
-        <span class="bg-success">
-            - updated on
-            {{record.updated | date : 'EEEE, MMMM d, y, HH:mm'}}
-        </span>
 
         <span class="bg-success pull-right">
             {{record.text.length}} chars
@@ -28,6 +23,11 @@
        ng-hide="loadingRecord"
        ng-bind="record.text">
     </p>
+
+    <span class="pull-right">
+        last updated on
+        {{record.updated | date : 'EEEE, dd.MM.y, HH:mm'}}
+    </span>
 </div>
 
 <div ng-hide="$state.current.name === 'records.item'">
