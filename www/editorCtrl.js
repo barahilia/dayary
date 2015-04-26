@@ -15,10 +15,12 @@ var editorCtrl = function (
         $scope.record.updated = moment().format();
 
         encrypted = encryptionService.encrypt($scope.record.text);
+        // TODO: use clone
         record = {
             id: $scope.record.id,
-            text: encrypted,
-            updated: $scope.record.updated
+            created: $scope.record.created,
+            updated: $scope.record.updated,
+            text: encrypted
         };
 
         $http.put("/api/records/" + record.id, record)
@@ -55,6 +57,16 @@ var editorCtrl = function (
 
     $scope.view = function () {
         $state.go('^');
+    };
+
+    $scope.setCreated = function () {
+        if ($scope.settingCreated) {
+            $scope.settingCreated = false;
+            saveRecord();
+        }
+        else {
+            $scope.settingCreated = true;
+        }
     };
 
     $scope.$on('$destroy', function() {

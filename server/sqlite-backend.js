@@ -102,8 +102,8 @@ exports.addRecord = function (record, callback) {
 
 exports.updateRecord = function (record, callback) {
     db.run(
-        "UPDATE Records SET text = ?, updated = ? WHERE id = ?",
-        [record.text, record.updated, record.id],
+        "UPDATE Records SET created = ?, updated = ?, text = ? WHERE id = ?",
+        [record.created, record.updated, record.text, record.id],
         function (err) {
             if (err) {
                 callback(err);

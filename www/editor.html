@@ -4,6 +4,17 @@
         View
     </button>
 
+    <button class="btn btn-success" ng-click="setCreated()">
+        <span ng-show="settingCreated">
+            Set
+        </span>
+        <span ng-hide="settingCreated">
+            Created
+        </span>
+    </button>
+
+    <input type="text" ng-show="settingCreated" ng-model="record.created" />
+
     <span class="bg-success"
           ng-show="saved">
         - {{saved | date : 'hh:mm:ss'}}
