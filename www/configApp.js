@@ -14,6 +14,11 @@ var configApp = function ($stateProvider, $urlRouterProvider) {
             templateUrl: "settings.html",
             controller: "settingsCtrl"
         })
+        .state("years", {
+            url: "/years",
+            templateUrl: "years.html",
+            controller: "yearsCtrl"
+        })
         .state("records", {
             url: "/records",
             templateUrl: "records.html",

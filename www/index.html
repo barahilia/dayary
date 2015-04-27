@@ -20,6 +20,7 @@
     <script src="errorCtrl.js"></script>
     <script src="settingsService.js"></script>
     <script src="settingsCtrl.js"></script>
+    <script src="yearsCtrl.js"></script>
     <script src="recordsCtrl.js"></script>
     <script src="viewerCtrl.js"></script>
     <script src="editorCtrl.js"></script>
@@ -30,10 +31,16 @@
     <div class="row">
         <div id="banner" class="bg-success col-sm-12">
             <span class="h1">Dayary</span> - day by day
-            <a class="btn btn-success pull-right"
-               ui-sref="settings">
-                Settings
-            </a>
+
+            <div class="pull-right">
+                <a class="btn btn-success" ui-sref="years">
+                    Years
+                </a>
+
+                <a class="btn btn-success" ui-sref="settings">
+                    Settings
+                </a>
+            </div>
         </div>
     </div>
 

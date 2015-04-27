@@ -8,6 +8,10 @@ body {
     margin-bottom: 10px;
 }
 
+#banner a.btn {
+    margin-left: 10px;
+}
+
 #text-viewer {
     white-space: pre-line;
     margin-bottom: 50px;
