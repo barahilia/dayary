@@ -2,8 +2,12 @@
     <h2>Years</h2>
 
     <ul class="list-unstyled">
-        <li ng-repeat="(year, count) in years">
-            {{year}}
+        <li ng-repeat="(year, count) in years"
+            ng-class="{ 'bg-success' : selectedYear == year }">
+
+            <a href="" ng-click="selectYear(year)">
+                {{year}}
+            </a>
             <span class="pull-right">
                 {{count}}
             </span>
