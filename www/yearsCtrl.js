@@ -1,49 +1,56 @@
 var yearsCtrl = function ($scope, $http, errorService) {
 
-    var records;
+    var initiateYear = function () {
+        var months = {};
 
-    $scope.selectMonth = function (month) {
-        // Find all its days
-        // Present them
+        _.each(_.range(12), function (n) {
+            res[n] = [];
+        });
+
+        return { count: 0, months: months };
     };
+
+    // { year: { count: n, months: { month: [ record ] } } }
+    var organizeRecords = function (records) {
+        $scope.records = {};
+
+        _.each(
+            records,
+            function (record) {
+                var created = moment(record.created),
+                    year = created.year(),
+                    month = created.month();
+
+                var yearRecords = $scope.records[year] =
+                    $scope.records[year] || initiateYear();
+                var monthRecords = yearRecords.months[month];
+
+                yearRecords.count ++;
+                monthRecords.push(record);
+            }
+        );
+    };
+
+    $scope.months = moment.months();
 
     $scope.selectYear = function (year) {
         $scope.selectedYear = year;
-        console.log(year);
-        // Generate all months for this year
-        $scope.months = _.map(
-            moment.months(),
-            function (month, index) {
-                return {
-                    name: month,
-                    index: index,
-                    count: _.filter(
-                        records,
-                        function (record) {
-                            var date = moment(record.created);
-                            return date.year() == year && date,month() == index;
-                        }
-                    )
-                };
+
+        $scope.selectMonth(_.find(
+            _.range(12),
+            function (month) {
+                return _.some($scope.records[year].months[month]);
             }
         );
+    };
 
-        // Count days in each
-        // Select first non-empty month
+    $scope.selectMonth = function (month) {
+        $scope.selectedMonth = month;
     };
 
     $http.get("/api/records")
-        .success(function (data) {
-            records = data;
-
-            var years = _.map(
-                records,
-                function (record) {
-                    return moment(record.created).year();
-                }
-            );
-
-            $scope.years = _.countBy(years);
+        .success(function (records) {
+            organizeRecords(records);
 
             if (_.some(years)) {
                 $scope.selectYear(_.min(years));

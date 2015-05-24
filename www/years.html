@@ -2,14 +2,14 @@
     <h2>Years</h2>
 
     <ul class="list-unstyled">
-        <li ng-repeat="(year, count) in years"
+        <li ng-repeat="(year, data) in records"
             ng-class="{ 'bg-success' : selectedYear == year }">
 
             <a href="" ng-click="selectYear(year)">
                 {{year}}
             </a>
             <span class="pull-right">
-                {{count}}
+                {{data.count}}
             </span>
         </li>
     </ul>
@@ -19,10 +19,16 @@
     <h2>Months</h2>
 
     <ul class="list-unstyled">
-        <li>Jan</li>
-        <li>Feb</li>
-        <li>Mar</li>
-        <li>Apr</li>
+        <li ng-repeat="(month, data) in records[selectedYear].months"
+            ng-class="{ 'bg-success' : selectedMonth == month }">
+
+            <a href="" ng-click="selectMonth(month)">
+                {{months[month]}}
+            </a>
+            <span class="pull-right">
+                {{data.length}}
+            </span>
+        </li>
     </ul>
 </div>
 
@@ -30,9 +36,12 @@
     <h2>Days</h2>
 
     <ul class="list-unstyled">
-        <li>2010-01-01</li>
-        <li>2010-01-02</li>
-        <li>2010-01-15</li>
+        <li ng-repeat="record in records[selectedYear].months[selectedMonth]">
+
+            <a ui-sref="records.item({ id: record.id })">
+                {{record.created | date : 'yyyy-MM-dd'}}
+            </a>
+        </li>
     </ul>
 </div>
 
