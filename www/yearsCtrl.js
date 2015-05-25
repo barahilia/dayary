@@ -10,7 +10,7 @@ var yearsCtrl = function ($scope, $http, errorService) {
         return { count: 0, months: months };
     };
 
-    // { year: { count: n, months: [ [ record ], ..., [ record ] ] } }
+    // { year: { count: n, months: [ 12 x [ record ] ] } }
     var organizeRecords = function (records) {
         $scope.records = {};
 
