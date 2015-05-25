@@ -4,7 +4,7 @@ var yearsCtrl = function ($scope, $http, errorService) {
         var months = {};
 
         _.each(_.range(12), function (n) {
-            res[n] = [];
+            months[n] = [];
         });
 
         return { count: 0, months: months };
@@ -41,7 +41,7 @@ var yearsCtrl = function ($scope, $http, errorService) {
             function (month) {
                 return _.some($scope.records[year].months[month]);
             }
-        );
+        ));
     };
 
     $scope.selectMonth = function (month) {
@@ -52,8 +52,8 @@ var yearsCtrl = function ($scope, $http, errorService) {
         .success(function (records) {
             organizeRecords(records);
 
-            if (_.some(years)) {
-                $scope.selectYear(_.min(years));
+            if (_.some($scope.records)) {
+                $scope.selectYear(_.min(_.keys($scope.records)));
             }
         })
         .error(function () {
