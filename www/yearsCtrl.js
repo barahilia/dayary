@@ -1,7 +1,7 @@
 var yearsCtrl = function ($scope, $http, errorService) {
 
     var initiateYear = function () {
-        var months = {};
+        var months = [];
 
         _.each(_.range(12), function (n) {
             months[n] = [];
@@ -10,7 +10,7 @@ var yearsCtrl = function ($scope, $http, errorService) {
         return { count: 0, months: months };
     };
 
-    // { year: { count: n, months: { month: [ record ] } } }
+    // { year: { count: n, months: [ [ record ], ..., [ record ] ] } }
     var organizeRecords = function (records) {
         $scope.records = {};
 

@@ -22,9 +22,14 @@
         <li ng-repeat="(month, data) in records[selectedYear].months"
             ng-class="{ 'bg-success' : selectedMonth == month }">
 
-            <a href="" ng-click="selectMonth(month)">
+            <span ng-show="data.length > 0">
+                <a href="" ng-click="selectMonth(month)">
+                    {{months[month]}}
+                </a>
+            </span>
+            <span ng-show="data.length === 0">
                 {{months[month]}}
-            </a>
+            </span>
             <span class="pull-right">
                 {{data.length}}
             </span>
