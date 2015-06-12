@@ -8,10 +8,6 @@ var editorCtrl = function (
     var saveRecord = function () {
         var encrypted, record;
 
-        if (!$scope.textChanged) {
-            return;
-        }
-
         $scope.record.updated = moment().format();
 
         encrypted = encryptionService.encrypt($scope.record.text);
@@ -50,7 +46,9 @@ var editorCtrl = function (
 
     autosaving = $interval(
         function () {
-            saveRecord();
+            if ($scope.textChanged) {
+                saveRecord();
+            }
         },
         settingsService.settings.autosaveIntervalSec * 1000
     );
@@ -71,6 +69,8 @@ var editorCtrl = function (
 
     $scope.$on('$destroy', function() {
         stopAutosaving();
-        saveRecord();
+        if ($scope.textChanged) {
+            saveRecord();
+        }
     });
 };
