@@ -12,8 +12,13 @@ var recordsCtrl = function (
 
             $scope.records = data;
 
-            if($scope.records.length > 0) {
-                $state.go("records.item", { id: $scope.records[0].id });
+            if($state.params.id) {
+                // Do nothing - we are heading to some specific record
+            }
+            else {
+                if($scope.records.length > 0) {
+                    $state.go("records.item", { id: $scope.records[0].id });
+                }
             }
         })
         .error(function () {
