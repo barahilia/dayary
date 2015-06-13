@@ -1,4 +1,4 @@
-var yearsCtrl = function ($scope, $http, errorService) {
+var yearsCtrl = function ($scope, recordsService, errorService) {
 
     var initiateYear = function () {
         var months = [];
@@ -48,9 +48,9 @@ var yearsCtrl = function ($scope, $http, errorService) {
         $scope.selectedMonth = month;
     };
 
-    $http.get("/api/records")
-        .success(function (records) {
-            organizeRecords(records);
+    recordsService.getAll()
+        .success(function () {
+            organizeRecords(recordsService.records);
 
             if (_.some($scope.records)) {
                 $scope.selectYear(_.min(_.keys($scope.records)));

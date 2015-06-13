@@ -1,16 +1,14 @@
 var recordsCtrl = function (
-    $scope, $http, $state, errorService
+    $scope, $http, $state,
+    recordsService, errorService
 ) {
     $scope.loadingRecordsList = true;
 
-    $http.get("/api/records")
-        .success(function (data) {
+    recordsService.getAll()
+        .success(function () {
             $scope.loadingRecordsList = false;
 
-            data = _.sortBy(data, 'created');
-            data = data.reverse();
-
-            $scope.records = data;
+            $scope.records = recordsService.records;
 
             if($state.params.id) {
                 // Do nothing - we are heading to some specific record
