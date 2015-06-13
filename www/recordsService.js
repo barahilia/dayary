@@ -23,6 +23,8 @@ var recordsService = function ($http, errorService) {
             callback(null, records);
         }
         else {
+            // TODO: call this once automatically at service init or call
+            // from app.run
             $http.get("/api/records")
                 .success(function (data) {
                     data = _.sortBy(data, 'created');
@@ -38,10 +40,35 @@ var recordsService = function ($http, errorService) {
         }
     };
 
-    // Create
-    // Read
-    // Update
-    // Delete
+    service.addRecord = function (record, callback) {
+        $http.post("/api/records", record)
+            .success(function (newRecord) {
+                records.unshift(newRecord);
+                callback(null, newRecord);
+            })
+            .error(function () {
+                errorService.reportError("can't add new record");
+                callback(true);
+            });
+    };
+
+    service.getRecord = function (id, callback) {
+    };
+
+    service.updateRecord = function (record, callback) {
+    };
+
+    service.deleteRecord = function (id, callback) {
+        $http.delete("/api/records/" + record.id)
+            .success(function () {
+                records = _.without(records, record);
+                callback(null);
+            })
+            .error(function () {
+                errorService.reportError("can't remove this record");
+                callback(true);
+            });
+    };
 
     return service;
 };

@@ -1,7 +1,7 @@
 var recordsCtrl = function (
-    $scope, $http, $state,
-    recordsService, errorService
+    $scope, $state, recordsService
 ) {
+
     $scope.loadingRecordsList = true;
 
     $scope.records = function () {
@@ -31,24 +31,19 @@ var recordsCtrl = function (
             updated: moment().format()
         };
 
-        $http.post("/api/records", addition)
-            .success(function (record) {
-                $scope.records.unshift(record);
-                $state.go("records.item.edit", { id: record.id });
-            })
-            .error(function () {
-                errorService.reportError("can't add new record");
-            });
+        recordsService.addRecord(
+            addition,
+            function (err, record) {
+                if (!err) {
+                    $state.go("records.item.edit", { id: record.id });
+                }
+            }
+        );
     };
 
     $scope.remove = function (record) {
-        $http.delete("/api/records/" + record.id)
-            .success(function () {
-                // TODO: make sure of no attempt to save the removed record
-                $scope.records = _.without($scope.records, record);
-            })
-            .error(function () {
-                errorService.reportError("can't remove this record");
-            });
+        // TODO: make sure of no attempt to save the removed record
+        recordsService.deleteRecord(record.id, function () {});
     };
 };
+
