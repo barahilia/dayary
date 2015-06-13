@@ -112,7 +112,7 @@ exports.updateRecord = function (record, callback) {
                 callback(null);
             }
             else {
-                callback("update record: failure updating");
+                callback("update record: failure updating or no changes");
             }
         }
     );

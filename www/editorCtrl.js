@@ -60,6 +60,7 @@ var editorCtrl = function (
     $scope.setCreated = function () {
         if ($scope.settingCreated) {
             $scope.settingCreated = false;
+            // TODO: add recordsService and update the creation date there
             saveRecord();
         }
         else {
