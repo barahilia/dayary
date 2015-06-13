@@ -1,40 +1,40 @@
-var recordsService = function ($http) {
+var recordsService = function ($http, errorService) {
 
-    var simulateSuccessfulResponse = function () {
-        var ret = {
-            success: function (callback) {
-                callback();
-                return ret;
-            },
-            error: function () {
-                return ret;
-            }
-        };
-
-        return ret;
-    };
+    // Design decision: this service should depend on errorService and report
+    // errors itself. While it might not stricly follow the SRP and introduce
+    // eliminatable dependency, the benefits are strong enough: the user can
+    // do nothing about an error here and this service has all the information
+    // needed to report error properly.
 
 
     var service = {};
 
-
     // Local representation of the records db/collection
     // TODO: decide if the array index should be by id (remember deletions)
-    // TODO: decide if to leave this directly accessible or through getAll()
-    service.records = null;
+    var records;
 
-    service.getAll = function () {
-        if (service.records === null) {
-            return $http.get("/api/records")
+
+    service.records = function () {
+        return records;
+    };
+
+    service.getAll = function (callback) {
+        if (records) {
+            callback(null, records);
+        }
+        else {
+            $http.get("/api/records")
                 .success(function (data) {
                     data = _.sortBy(data, 'created');
                     data = data.reverse();
 
-                    service.records = data;
+                    records = data;
+                    callback(null, records);
+                })
+                .error(function () {
+                    errorService.reportError("failure loading records list");
+                    callback(true);
                 });
-        }
-        else {
-            return simulateSuccessfulResponse();
         }
     };
 

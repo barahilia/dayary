@@ -16,7 +16,7 @@
     <ul id="records-list" ng-hide="loadingRecordsList" class="list-unstyled">
 
         <!-- http://stackoverflow.com/questions/28154304/list-and-pull-left-makes-stair -->
-        <li ng-repeat="record in records"
+        <li ng-repeat="record in records()"
             class="clearfix"
             ui-sref-active="bg-success">
 

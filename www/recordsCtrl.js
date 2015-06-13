@@ -4,25 +4,26 @@ var recordsCtrl = function (
 ) {
     $scope.loadingRecordsList = true;
 
-    recordsService.getAll()
-        .success(function () {
-            $scope.loadingRecordsList = false;
+    $scope.records = function () {
+        return recordsService.records();
+    };
 
-            $scope.records = recordsService.records;
+    recordsService.getAll(function (err, records) {
+        $scope.loadingRecordsList = false;
 
-            if($state.params.id) {
-                // Do nothing - we are heading to some specific record
+        if (err) {
+            return;
+        }
+
+        if($state.params.id) {
+            // Do nothing - we are heading to some specific record
+        }
+        else {
+            if(records.length > 0) {
+                $state.go("records.item", { id: records[0].id });
             }
-            else {
-                if($scope.records.length > 0) {
-                    $state.go("records.item", { id: $scope.records[0].id });
-                }
-            }
-        })
-        .error(function () {
-            $scope.loadingRecordsList = false;
-            errorService.reportError("failure while loading records list");
-        });
+        }
+    });
 
     $scope.add = function () {
         var addition = {

@@ -48,16 +48,16 @@ var yearsCtrl = function ($scope, recordsService, errorService) {
         $scope.selectedMonth = month;
     };
 
-    recordsService.getAll()
-        .success(function () {
-            organizeRecords(recordsService.records);
+    recordsService.getAll(function (err, records) {
+        if (err) {
+            return;
+        }
 
-            if (_.some($scope.records)) {
-                $scope.selectYear(_.min(_.keys($scope.records)));
-            }
-        })
-        .error(function () {
-            errorService.reportError("failure while loading records list");
-        });
+        organizeRecords(records);
+
+        if (_.some($scope.records)) {
+            $scope.selectYear(_.min(_.keys($scope.records)));
+        }
+    });
 };
 
