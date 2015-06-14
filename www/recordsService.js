@@ -54,10 +54,17 @@ var recordsService = function ($http, errorService) {
     };
 
     service.getRecord = function (id, callback) {
+        var record = _.findWhere(records, {id: id});
+
+        if (record.text) {
+            callback(null, record);
+            return;
+        }
+
         $http.get("/api/records/" + id)
-            .success(function (record) {
-                // TODO: update internal representation
-                callback(null, record);
+            .success(function (data) {
+                _.extend(record, data);
+                callback(null, data);
             })
             .error(function () {
                 errorService.reportError(
@@ -70,6 +77,9 @@ var recordsService = function ($http, errorService) {
     service.updateRecord = function (record, callback) {
         $http.put("/api/records/" + record.id, record)
             .success(function () {
+                var internalRecord = _.findWhere(records, {id: record.id});
+                _.extend(internalRecord, record);
+
                 callback(null);
             })
             .error(function () {
