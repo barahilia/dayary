@@ -1,9 +1,8 @@
 var viewerCtrl = function (
-    $scope, $http,
-    $state, $stateParams,
-    encryptionService, errorService
+    $scope, $http, $state,
+    recordsService, encryptionService, errorService
 ) {
-    var recordId = $stateParams.id;
+    var recordId = $state.params.id;
     $scope.$state = $state;
 
     $scope.loadingRecord = true;
@@ -30,6 +29,7 @@ var viewerCtrl = function (
         });
 
     $scope.startEdit = function () {
-        $state.go('.edit', $stateParams);
+        $state.go('.edit', $state.params);
     };
 };
+
