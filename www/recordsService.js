@@ -11,6 +11,7 @@ var recordsService = function ($http, errorService) {
 
     // Local representation of the records db/collection
     // TODO: decide if the array index should be by id (remember deletions)
+    // TODO: decide if record.text should be encrypted or decrypted
     var records;
 
 
@@ -53,9 +54,28 @@ var recordsService = function ($http, errorService) {
     };
 
     service.getRecord = function (id, callback) {
+        $http.get("/api/records/" + id)
+            .success(function (record) {
+                // TODO: update internal representation
+                callback(null, record);
+            })
+            .error(function () {
+                errorService.reportError(
+                    "failure while loading the data for record: " + recordId
+                );
+                callback(true);
+            });
     };
 
     service.updateRecord = function (record, callback) {
+        $http.put("/api/records/" + record.id, record)
+            .success(function () {
+                callback(null);
+            })
+            .error(function () {
+                errorService.reportError("failure while saving the record");
+                callback(true);
+            });
     };
 
     service.deleteRecord = function (id, callback) {

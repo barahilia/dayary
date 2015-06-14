@@ -1,5 +1,5 @@
 var viewerCtrl = function (
-    $scope, $http, $state,
+    $scope, $state,
     recordsService, encryptionService, errorService
 ) {
     var recordId = $state.params.id;
@@ -7,26 +7,24 @@ var viewerCtrl = function (
 
     $scope.loadingRecord = true;
 
-    $http.get("/api/records/" + recordId)
-        .success(function (record) {
-            $scope.loadingRecord = false;
+    recordsService.getRecord(recordId, function (err, record) {
+        $scope.loadingRecord = false;
 
-            try {
-                record.text = encryptionService.decrypt(record.text);
-                $scope.record = record;
-            }
-            catch (e) {
-                errorService.reportError(
-                    "Unable to decrypt [" + record.created + "]"
-                );
-            }
-        })
-        .error(function () {
-            $scope.loadingRecord = false;
+        if (err) {
+            return;
+        }
+
+        try {
+            // TODO: beware of security - locking to forget all decrypted ones
+            record.text = encryptionService.decrypt(record.text);
+            $scope.record = record;
+        }
+        catch (e) {
             errorService.reportError(
-                "failure while loading the data for record: " + recordId
+                "Unable to decrypt [" + record.created + "]"
             );
-        });
+        }
+    });
 
     $scope.startEdit = function () {
         $state.go('.edit', $state.params);

@@ -1,7 +1,6 @@
 var editorCtrl = function (
-    $scope, $http, $timeout, $interval,
-    $state,
-    encryptionService, errorService, settingsService
+    $scope, $timeout, $interval, $state,
+    recordsService, encryptionService, settingsService
 ) {
     var autosaving;
 
@@ -19,8 +18,8 @@ var editorCtrl = function (
             text: encrypted
         };
 
-        $http.put("/api/records/" + record.id, record)
-            .success(function () {
+        recordsService.updateRecord(record, function (err) {
+            if (!err) {
                 $scope.textChanged = false;
                 $scope.saved = "saved on " + moment().format('hh:mm');
 
@@ -31,10 +30,8 @@ var editorCtrl = function (
                     },
                     3000
                 );
-            })
-            .error(function () {
-                errorService.reportError("failure while saving the record");
-            });
+            }
+        });
     };
 
     var stopAutosaving = function () {
