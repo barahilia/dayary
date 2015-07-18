@@ -2,7 +2,7 @@ var viewerCtrl = function (
     $scope, $state,
     recordsService, encryptionService, errorService
 ) {
-    var recordId = $state.params.id;
+    var recordId = + $state.params.id;
     $scope.$state = $state;
 
     $scope.loadingRecord = true;
