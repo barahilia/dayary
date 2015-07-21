@@ -43,7 +43,7 @@ var recordsCtrl = function (
 
     $scope.remove = function (record) {
         // TODO: make sure of no attempt to save the removed record
-        recordsService.deleteRecord(record.id, function () {});
+        recordsService.deleteRecord(record, function () {});
     };
 };
 

@@ -93,7 +93,7 @@ var recordsService = function ($http, errorService) {
             });
     };
 
-    service.deleteRecord = function (id, callback) {
+    service.deleteRecord = function (record, callback) {
         $http.delete("/api/records/" + record.id)
             .success(function () {
                 records = _.without(records, record);
