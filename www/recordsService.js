@@ -10,8 +10,10 @@ var recordsService = function ($http, errorService) {
     var service = {};
 
     // Local representation of the records db/collection
+    // Text here is encrypted and decrypted only by the users - viewer & editor
+    // Only copies of objects are provide to the users - guard against
+    // accidental change that won't be persist.
     // TODO: decide if the array index should be by id (remember deletions)
-    // TODO: decide if record.text should be encrypted or decrypted
     var records;
 
 
@@ -21,24 +23,27 @@ var recordsService = function ($http, errorService) {
 
     service.getAll = function (callback) {
         if (records) {
-            callback(null, records);
+            callback(
+                null,
+                _.map(records, _.clone)
+            );
+            return;
         }
-        else {
-            // TODO: call this once automatically at service init or call
-            // from app.run
-            $http.get("/api/records")
-                .success(function (data) {
-                    data = _.sortBy(data, 'created');
-                    data = data.reverse();
 
-                    records = data;
-                    callback(null, records);
-                })
-                .error(function () {
-                    errorService.reportError("failure loading records list");
-                    callback(true);
-                });
-        }
+        // TODO: call this once automatically at service init or call
+        // from app.run
+        $http.get("/api/records")
+            .success(function (data) {
+                data = _.sortBy(data, 'created');
+                data = data.reverse();
+
+                records = data;
+                callback(null, records);
+            })
+            .error(function () {
+                errorService.reportError("failure loading records list");
+                callback(true);
+            });
     };
 
     service.addRecord = function (record, callback) {
@@ -57,7 +62,7 @@ var recordsService = function ($http, errorService) {
         var record = _.findWhere(records, {id: id});
 
         if (record.text) {
-            callback(null, record);
+            callback(null, _.clone(record));
             return;
         }
 

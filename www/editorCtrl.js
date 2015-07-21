@@ -5,18 +5,12 @@ var editorCtrl = function (
     var autosaving;
 
     var saveRecord = function () {
-        var encrypted, record;
+        var record;
 
         $scope.record.updated = moment().format();
 
-        encrypted = encryptionService.encrypt($scope.record.text);
-        // TODO: use clone
-        record = {
-            id: $scope.record.id,
-            created: $scope.record.created,
-            updated: $scope.record.updated,
-            text: encrypted
-        };
+        record = _.pick($scope.record, "id", "created", "updated");
+        record.text = encryptionService.encrypt($scope.record.text);
 
         recordsService.updateRecord(record, function (err) {
             if (!err) {
