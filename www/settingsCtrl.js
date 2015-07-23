@@ -92,4 +92,3 @@ var settingsCtrl = function (
             })
     };
 };
-
