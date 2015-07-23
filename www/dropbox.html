@@ -1,5 +1,14 @@
 <div>
-    Authenticated - {{isAuthenticated}} <br />
-    Name - {{dropboxUser}} <br />
-    <button ng-click="login()">Login</button>
+    <div ng-hide="isAuthenticated">
+        Not logged in yet -
+        <a href="/login/dropbox.html" class="button">
+            Login
+        </a>
+    </div>
+
+    <div ng-show="isAuthenticated">
+        Logged in as - {{dropboxUser}}
+        <br />
+        <button ng-click="getData()">Get data</button>
+    </div>
 </div>

@@ -1,4 +1,4 @@
-var dropboxCtrl = function ($scope, settingsService) {
+var dropboxCtrl = function ($scope, settingsService, errorService) {
 
     var client = new Dropbox.Client({ key: "4hxwutae96fhhbd" });
 
@@ -8,23 +8,24 @@ var dropboxCtrl = function ($scope, settingsService) {
     client.authenticate({interactive: false}, function(error, client) {
         if (error) {
             console.log(error);
+            errorService.reportError("failure checking Dropbox authentication");
             return;
         }
 
         if (client.isAuthenticated()) {
             $scope.isAuthenticated = true;
-            client.getAccountInfo(function(error, accountInfo) {
-                $scope.dropboxUser = accountInfo.name
-            });
         }
     });
 
-    $scope.login = function () {
-        console.log("logging in...");
-        client.authenticate(function(error, client) {
+    $scope.getData = function () {
+        client.getAccountInfo(function(error, accountInfo) {
             if (error) {
                 console.log(error);
+                errorService.reportError("failure accessing Dropbox account info");
+                return;
             }
+
+            $scope.dropboxUser = accountInfo.name;
         });
     };
 };
