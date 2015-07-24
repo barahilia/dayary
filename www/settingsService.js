@@ -4,7 +4,8 @@ var settingsService = function () {
     service.settings = {
         autosaveIntervalSec: 30,
         lockTimeoutMin: 5,
-        lockOnBlur: true
+        lockOnBlur: true,
+        dropboxFolder: "backups/dayary"
     };
 
     service.hash = null;
