@@ -14,7 +14,7 @@ var recordsService = function ($http, errorService) {
     // Get returns a copy of the object to guard against accidental change
     // that won't be persist.
     // TODO: decide if the array index should be by id (remember deletions)
-    var records;
+    var records = [];
 
 
     service.records = function () {
@@ -22,11 +22,17 @@ var recordsService = function ($http, errorService) {
     };
 
     service.getYear = function (year) {
-        return "Tra-ta-ta";
+        return _.filter(
+            records,
+            function (record) {
+                return moment(record.created).year() == year
+            }
+        );
     };
 
+
     service.getAll = function (callback) {
-        if (records) {
+        if (_.any(records)) {
             callback(null, records);
             return;
         }
@@ -105,6 +111,7 @@ var recordsService = function ($http, errorService) {
                 callback(true);
             });
     };
+
 
     return service;
 };
