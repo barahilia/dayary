@@ -21,6 +21,10 @@ var recordsService = function ($http, errorService) {
         return records;
     };
 
+    service.getYear = function (year) {
+        return "Tra-ta-ta";
+    };
+
     service.getAll = function (callback) {
         if (records) {
             callback(
