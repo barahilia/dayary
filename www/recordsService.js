@@ -11,8 +11,8 @@ var recordsService = function ($http, errorService) {
 
     // Local representation of the records db/collection
     // Text here is encrypted and decrypted only by the users - viewer & editor
-    // Only copies of objects are provide to the users - guard against
-    // accidental change that won't be persist.
+    // Get returns a copy of the object to guard against accidental change
+    // that won't be persist.
     // TODO: decide if the array index should be by id (remember deletions)
     var records;
 
@@ -27,10 +27,7 @@ var recordsService = function ($http, errorService) {
 
     service.getAll = function (callback) {
         if (records) {
-            callback(
-                null,
-                _.map(records, _.clone)
-            );
+            callback(null, records);
             return;
         }
 
