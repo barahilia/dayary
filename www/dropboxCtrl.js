@@ -32,7 +32,7 @@ var dropboxCtrl = function ($scope, errorService, recordsService) {
     };
 
     $scope.backupYear = function (year) {
-        var timestamp = moment().format("YYYYMMDDhhmmss");
+        var timestamp = moment().format("YYYYMMDDHHmmss");
         var filename = "" + year + '.' + timestamp + ".json";
         // TODO: get this from settings; decide if should be configurable
         var folder = "backups/dayary";
@@ -41,7 +41,7 @@ var dropboxCtrl = function ($scope, errorService, recordsService) {
         $scope.backuping = true;
         $scope.backupResult = "";
 
-        records = recordsService.getYear(year);
+        records = recordsService.getYearForBackup(year);
         json = JSON.stringify(records);
 
         client.writeFile(

@@ -12,8 +12,7 @@ var recordsService = function ($http, errorService) {
     // Local representation of the records db/collection
     // Text here is encrypted and decrypted only by the users - viewer & editor
     // Get returns a copy of the object to guard against accidental change
-    // that won't be persist.
-    // TODO: decide if the array index should be by id (remember deletions)
+    // that won't persist.
     var records = [];
 
 
@@ -21,13 +20,23 @@ var recordsService = function ($http, errorService) {
         return records;
     };
 
-    service.getYear = function (year) {
-        return _.filter(
+    service.getYearForBackup = function (year) {
+        var yearlyRecordsWithText = _.filter(
             records,
             function (record) {
-                return moment(record.created).year() == year
+                var creationYear = moment(record.created).year();
+                return creationYear == year && record.text;
             }
         );
+
+        var clearAngularAttributes = _.map(
+            yearlyRecordsWithText,
+            function (record) {
+                return _.omit(record, "$$hashKey");
+            }
+        );
+
+        return clearAngularAttributes;
     };
 
 
