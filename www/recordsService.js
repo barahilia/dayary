@@ -1,4 +1,4 @@
-var recordsService = function ($http, errorService) {
+var recordsService = function ($http, $q, errorService) {
 
     // Design decision: this service should depend on errorService and report
     // errors itself. While it might not stricly follow the SRP and introduce
@@ -20,23 +20,57 @@ var recordsService = function ($http, errorService) {
         return records;
     };
 
-    service.getYearForBackup = function (year) {
-        var yearlyRecordsWithText = _.filter(
+    service.getYearForBackup = function (year, messageCallback, doneCallback) {
+
+        var callFor = function (record, message) {
+            messageCallback(
+                "#" + record.id +
+                " - " + record.created +
+                " - " + message
+            );
+        };
+
+        var yearlyRecords = _.filter(
             records,
             function (record) {
-                var creationYear = moment(record.created).year();
-                return creationYear == year && record.text;
+                return year == moment(record.created).year();
             }
         );
 
-        var clearAngularAttributes = _.map(
-            yearlyRecordsWithText,
+        var startRetrievalFromServer = _.map(
+            yearlyRecords,
             function (record) {
-                return _.omit(record, "$$hashKey");
+                if (record.text) {
+                    callFor(record, "in memory");
+                    return null;
+                }
+
+                return $http.get("/api/records/" + record.id)
+                    .then(
+                        function (data) {
+                            record.text = data.data.text;
+                            callFor(record, "retrieved");
+                        },
+                        function () { callFor(record, "failure") }
+                    );
             }
         );
 
-        return clearAngularAttributes;
+        $q.all(
+            _.filter(startRetrievalFromServer)
+        ).then(
+            function () {
+                doneCallback(
+                    _.map(
+                        yearlyRecords,
+                        function (record) {
+                            // Clear Angular attributes
+                            return _.omit(record, "$$hashKey");
+                        }
+                    )
+                );
+            }
+        );
     };
 
 

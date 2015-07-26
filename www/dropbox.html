@@ -18,20 +18,26 @@
     <br />
 
     <div>
-        <button class="btn btn-success"
-                ng-click="backupYear(year)"
-                ng-disabled="backuping">
-            Backup year
-        </button>
+        <div>
+            <button class="btn btn-success"
+                    ng-click="backupYear(year)"
+                    ng-disabled="backuping">
+                Backup year
+            </button>
 
-        <!-- TODO: make this <select> -->
-        <input type="text" ng-model="year">
+            <!-- TODO: make this <select> -->
+            <input type="text" ng-model="year">
 
-        <span ng-show="backuping" class="fa fa-spinner fa-spin">
-        </span>
+            <span ng-show="backuping" class="fa fa-spinner fa-spin">
+            </span>
 
-        <span ng-show="backupCompleted">
-            - completed
-        </span>
+            {{backupResult}}
+        </div>
+
+        <br />
+
+        <div ng-repeat="message in backupMessages">
+            {{message}}
+        <div>
     </div>
 </div>

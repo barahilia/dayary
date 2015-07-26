@@ -43,6 +43,7 @@ var settingsCtrl = function (
                 $scope.settings.autosaveIntervalSec = +settings.autosaveIntervalSec;
                 $scope.settings.lockTimeoutMin = +settings.lockTimeoutMin;
                 $scope.settings.lockOnBlur = !!(+settings.lockOnBlur);
+                $scope.settings.dropboxFolder = settings.dropboxFolder;
 
                 settingsService.initialized = true;
                 processServerHash(settings.hash);

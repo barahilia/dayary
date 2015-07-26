@@ -36,26 +36,29 @@ var dropboxCtrl = function (
     $scope.backupYear = function (year) {
         var timestamp = moment().format("YYYYMMDDHHmmss");
         var filename = "" + year + '.' + timestamp + ".json";
-        var records, json;
 
+        $scope.backupMessages = [];
         $scope.backuping = true;
-        $scope.backupResult = "";
+        $scope.backupResult = "- in progress";
 
-        records = recordsService.getYearForBackup(year);
-        json = JSON.stringify(records);
+        recordsService.getYearForBackup(
+            year,
+            _.bind(Array.prototype.push, $scope.backupMessages),
+            function (records) {
+                client.writeFile(
+                    settingsService.settings.dropboxFolder + '/' + filename,
+                    JSON.stringify(records),
+                    function (error /*, stat*/) {
+                        if (error) {
+                            errorService.reportError(
+                                "failure saving the backup to Dropbox"
+                            );
+                        }
 
-        client.writeFile(
-            settingsService.settings.dropboxFolder + '/' + filename,
-            json,
-            function (error /*, stat*/) {
-                if (error) {
-                    errorService.reportError(
-                        "failure saving the backup to Dropbox"
-                    );
-                }
-
-                $scope.backuping = false;
-                $scope.backupResult = "finished";
+                        $scope.backuping = false;
+                        $scope.backupResult = "- finished";
+                    }
+                );
             }
         );
     };
