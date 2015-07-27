@@ -1,0 +1,20 @@
+<div class="col-md-12">
+    <h2>Locked</h2>
+
+    <div>Enter the pass phrase:</div>
+
+    <input type="text" ng-model="passphrase" ng-trim="false">
+
+    <div class="bg-danger" ng-show="invalidPassphrase()">
+        Invalid Pass Phrase
+    </div>
+
+    <br />
+    <br />
+
+    <button class="btn btn-success"
+            ng-click="enter()"
+            ng-disabled="invalidPassphrase()">
+        Enter
+    </button>
+</div>

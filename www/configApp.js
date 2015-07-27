@@ -9,6 +9,11 @@ var configApp = function ($stateProvider, $urlRouterProvider) {
                 $state.go("settings");
             }
         })
+        .state("lock", {
+            url: "/lock",
+            templateUrl: "lock.html",
+            controller: "lockCtrl"
+        })
         .state("settings", {
             url: "/settings",
             templateUrl: "settings.html",
