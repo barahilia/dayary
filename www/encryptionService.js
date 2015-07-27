@@ -28,7 +28,7 @@ var encryptionService = function () {
 
         if (s) {
             // This can throw - user should catch and take care
-            temp = CryptoJS.AES.decrypt(s, passphrase)
+            temp = CryptoJS.AES.decrypt(s, passphrase);
             temp = temp.toString(CryptoJS.enc.Utf8);
 
             if (temp) {

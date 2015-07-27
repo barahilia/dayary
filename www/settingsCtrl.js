@@ -42,7 +42,7 @@ var settingsCtrl = function (
                 // no need to parse here
                 $scope.settings.autosaveIntervalSec = +settings.autosaveIntervalSec;
                 $scope.settings.lockTimeoutMin = +settings.lockTimeoutMin;
-                $scope.settings.lockOnBlur = !!(+settings.lockOnBlur);
+                $scope.settings.lockOnBlur = settings.lockOnBlur == 1 ? true : false;
                 $scope.settings.dropboxFolder = settings.dropboxFolder;
 
                 settingsService.initialized = true;
@@ -90,6 +90,6 @@ var settingsCtrl = function (
             .error(function () {
                 var msg = "failure setting hash for the pass phrase";
                 errorService.reportError(msg);
-            })
+            });
     };
 };

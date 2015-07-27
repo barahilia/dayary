@@ -51,7 +51,7 @@ var recordsService = function ($http, $q, errorService) {
                             record.text = data.data.text;
                             callFor(record, "retrieved");
                         },
-                        function () { callFor(record, "failure") }
+                        function () { callFor(record, "failure"); }
                     );
             }
         );
