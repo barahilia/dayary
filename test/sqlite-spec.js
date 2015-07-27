@@ -82,7 +82,7 @@ describe("sqlite backend", function () {
             function (err, record) {
                 expect(err).toBe(null);
                 expect(record).toEqual(
-                    { id: 1, text: 'aa', created: '1', updated: '2' }
+                    { id: 1, text: null, created: '1', updated: '2' }
                 );
                 done();
             }
@@ -91,7 +91,7 @@ describe("sqlite backend", function () {
 
     it("should update a record", function (done) {
         backend.updateRecord(
-            { id: 1, text: 'bbb', updated: '15' },
+            { id: 1, text: 'bbb', created: '1', updated: '15' },
             function (err) {
                 expect(err).toBe(null);
                 done();
@@ -103,7 +103,7 @@ describe("sqlite backend", function () {
         backend.updateRecord(
             { id: 17, text: 'bbb', updated: '15' },
             function (err) {
-                expect(err).toBe('update record: failure updating');
+                expect(err).toBe('update record: failure updating or no changes');
                 done();
             }
         )
@@ -111,11 +111,11 @@ describe("sqlite backend", function () {
 
     it("should add another record", function (done) {
         backend.addRecord(
-            {text: 'bb', created: 3, updated: 4 },
+            { created: 3, updated: 4 },
             function (err, record) {
                 expect(err).toBe(null);
                 expect(record).toEqual(
-                    { id: 2, text: 'bb', created: '3', updated: '4' }
+                    { id: 2, text: null, created: '3', updated: '4' }
                 );
                 done();
             }
@@ -126,8 +126,8 @@ describe("sqlite backend", function () {
         backend.getRecordsMetadata(function (err, records) {
             expect(err).toBe(null);
             expect(records).toEqual([
-                { id : 1, created : '1', updated : '15' },
-                { id : 2, created : '3', updated : '4' }
+                { id: 1, created: '1', updated: '15' },
+                { id: 2, created: '3', updated: '4' }
             ]);
             done();
         });
@@ -144,7 +144,7 @@ describe("sqlite backend", function () {
         backend.getRecordsMetadata(function (err, records) {
             expect(err).toBe(null);
             expect(records).toEqual([
-                { id : 2, created : '3', updated : '4' }
+                { id: 2, created: '3', updated: '4' }
             ]);
             done();
         });
