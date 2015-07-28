@@ -1,15 +1,14 @@
 var lockService = function (
-    $window, $interval, $state, encryptionService
+    $window, $interval, $state,
+    settingsService, encryptionService
 ) {
     var locked = true;
-    var lockOnBlur = true;
-    var lockTimeout = moment.duration(1, 'minutes');
     var lastUserAction = new Date();
 
     var lock = function () {
         encryptionService.setPassphrase();
         locked = true;
-        $state.go("settings");
+        $state.go("lock");
     };
 
     var updateUserAction = function () {
@@ -22,7 +21,7 @@ var lockService = function (
     $window.onkeypress = updateUserAction;
 
     $window.onblur = function () {
-        if (lockOnBlur) {
+        if (settingsService.settings.lockOnBlur) {
             lock();
         }
     };
@@ -30,6 +29,11 @@ var lockService = function (
 
     $interval(
         function () {
+            var lockTimeout = moment.duration(
+                settingsService.settings.lockTimeoutMin,
+                'minutes'
+            );
+
             if (locked) {
                 return;
             }
@@ -43,14 +47,6 @@ var lockService = function (
 
 
     var service = {};
-
-    service.setLockOnBlur = function (flag) {
-        lockOnBlur = flag;
-    };
-
-    service.setLockTimeout = function (timeout) {
-        lockTimeout = moment.duration(timeout, 'minutes');
-    };
 
     service.unlock = function () {
         locked = false;
