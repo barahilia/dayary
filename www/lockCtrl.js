@@ -4,6 +4,9 @@ var lockCtrl = function ($scope, $http, encryptionService, lockService) {
 
     var acceptPassphrase = function (passphrase) {
         encryptionService.setPassphrase($scope.passphrase);
+        // TODO: consider passing the passphrase to unlock and it in turn to
+        // set it for the encryptionService. The lockService can be aware of
+        // the hash too.
         lockService.unlock();
 
         // TODO: preserve and go to the previous state
@@ -32,6 +35,8 @@ var lockCtrl = function ($scope, $http, encryptionService, lockService) {
                 errorService.reportError("failure requesting settings");
             });
     }
+
+    lockService.lock();
 
     $scope.invalidPassphrase = function () {
         var computed = encryptionService.computeHash($scope.passphrase);

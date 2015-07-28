@@ -8,6 +8,7 @@ var lockService = function (
     var lock = function () {
         encryptionService.setPassphrase();
         locked = true;
+        // TODO: make sure no loop here - what if already in the lock state?
         $state.go("lock");
     };
 
@@ -47,6 +48,8 @@ var lockService = function (
 
 
     var service = {};
+
+    service.lock = lock;
 
     service.unlock = function () {
         locked = false;
