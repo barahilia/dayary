@@ -14,4 +14,16 @@ angular.module("app", ['ui.router'])
     .controller("recordsCtrl", recordsCtrl)
     .controller("viewerCtrl", viewerCtrl)
     .controller("editorCtrl", editorCtrl)
+    .directive("scrollIfClass", function () {
+        return function (scope, element, attributes) {
+            var scrollToClass = attributes.scrollIfClass;
+
+            scope.$watch(
+                function () { return element.attr('class'); },
+                function (newValue) {
+                    console.log(element);
+                }
+            );
+        };
+    })
     ;

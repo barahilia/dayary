@@ -18,7 +18,8 @@
         <!-- http://stackoverflow.com/questions/28154304/list-and-pull-left-makes-stair -->
         <li ng-repeat="record in records()"
             class="clearfix"
-            ui-sref-active="bg-success">
+            ui-sref-active="bg-success"
+            scroll-if-class="bg-success">
 
             <a ui-sref="records.item({ id: record.id })">
                 {{record.created | date : 'yyyy-MM-dd'}}
