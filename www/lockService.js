@@ -55,6 +55,7 @@ var lockService = function (
     service.lock = lock;
 
     service.unlock = function () {
+        // TODO: consider to get the passphrase for encryptionService
         locked = false;
     };
 
