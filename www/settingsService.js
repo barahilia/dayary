@@ -22,10 +22,6 @@ var settingsService = function () {
 
         service.hash = settings.hash;
 
-        lockService.setLockTimeout($scope.settings.lockTimeoutMin);
-        // TODO: make sure it works on iPad
-        lockService.setLockOnBlur($scope.settings.lockOnBlur);
-
         service.initialized = true;
     };
 

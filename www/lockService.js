@@ -8,8 +8,10 @@ var lockService = function (
     var lock = function () {
         encryptionService.setPassphrase();
         locked = true;
-        // TODO: make sure no loop here - what if already in the lock state?
-        $state.go("lock");
+
+        if (!$state.is("lock")) {
+            $state.go("lock");
+        }
     };
 
     var updateUserAction = function () {
@@ -21,6 +23,7 @@ var lockService = function (
     $window.onclick = updateUserAction;
     $window.onkeypress = updateUserAction;
 
+        // TODO: make sure it works on iPad
     $window.onblur = function () {
         if (settingsService.settings.lockOnBlur) {
             lock();

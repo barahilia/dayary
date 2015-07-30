@@ -1,4 +1,7 @@
-var lockCtrl = function ($scope, $http, encryptionService, lockService) {
+var lockCtrl = function (
+    $scope, $http, $state,
+    encryptionService, settingsService, lockService
+) {
 
     var devPassphrase = "Very secret phrase";
 
