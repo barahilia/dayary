@@ -13,7 +13,7 @@ var lockCtrl = function (
         lockService.unlock();
 
         // TODO: preserve and go to the previous state
-        $state.go("records");
+        $state.go("home");
     };
 
     var processServerHash = function (hash) {

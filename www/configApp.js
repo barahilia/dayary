@@ -6,7 +6,7 @@ var configApp = function ($stateProvider, $urlRouterProvider) {
         .state("home", {
             url: "/",
             controller: function ($state) {
-                $state.go("lock");
+                $state.go("records");
             }
         })
         .state("lock", {
