@@ -6,7 +6,7 @@ var lockCtrl = function (
     var devPassphrase = "Very secret phrase";
 
     var acceptPassphrase = function (passphrase) {
-        encryptionService.setPassphrase($scope.passphrase);
+        encryptionService.setPassphrase(passphrase);
         // TODO: consider passing the passphrase to unlock and it in turn to
         // set it for the encryptionService. The lockService can be aware of
         // the hash too.
