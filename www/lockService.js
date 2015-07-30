@@ -52,6 +52,10 @@ var lockService = function (
 
     var service = {};
 
+    service.locked = function () {
+        return locked;
+    };
+
     service.lock = lock;
 
     service.unlock = function () {
