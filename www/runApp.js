@@ -1,5 +1,8 @@
 var runApp = function ($rootScope, $state, lockService) {
+
     $rootScope.$on('$stateChangeStart', function(e, to) {
+        lockService.previousState($state.current.name, $state.params);
+
         if (to.name === "lock") {
             return;
         }
@@ -13,4 +16,3 @@ var runApp = function ($rootScope, $state, lockService) {
         }
     });
 };
-

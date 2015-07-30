@@ -1,5 +1,5 @@
 var lockCtrl = function (
-    $scope, $http, $state,
+    $scope, $http,
     encryptionService, settingsService, lockService
 ) {
 
@@ -11,9 +11,6 @@ var lockCtrl = function (
         // set it for the encryptionService. The lockService can be aware of
         // the hash too.
         lockService.unlock();
-
-        // TODO: preserve and go to the previous state
-        $state.go("home");
     };
 
     var processServerHash = function (hash) {
@@ -39,6 +36,9 @@ var lockCtrl = function (
             });
     }
 
+    // TODO: this is wrong location; banner needs a controller of its own and
+    // it should call the following directly. Then there would be possible
+    // to preserve the last state and no circular state changes would occur.
     lockService.lock();
 
     $scope.invalidPassphrase = function () {

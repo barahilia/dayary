@@ -3,6 +3,8 @@ var lockService = function (
     settingsService, encryptionService
 ) {
     var locked = true;
+    var lastState = "home";
+    var lastStateParams = {};
     var lastUserAction = new Date();
 
     var lock = function () {
@@ -61,6 +63,14 @@ var lockService = function (
     service.unlock = function () {
         // TODO: consider to get the passphrase for encryptionService
         locked = false;
+        $state.go(lastState, lastStateParams);
+    };
+
+    service.previousState = function(state, params) {
+        if (state && state !== "lock") {
+            lastState = state;
+            lastStateParams = params;
+        }
     };
 
     return service;
