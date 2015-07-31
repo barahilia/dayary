@@ -25,7 +25,12 @@ var lockService = function (
     $window.onclick = updateUserAction;
     $window.onkeypress = updateUserAction;
 
-        // TODO: make sure it works on iPad
+    // TODO: the following works properly on desktop and in Safari iPad. But
+    // doesn't work for Chrome iPad. Refer:
+    // https://code.google.com/p/chromium/issues/detail?id=515461
+    // If I really need this, can be implemented with setInterval(), notice
+    // a large gap between two callbacks and assume it happened due to window
+    // got out of focus.
     $window.onblur = function () {
         if (settingsService.settings.lockOnBlur) {
             lock();
