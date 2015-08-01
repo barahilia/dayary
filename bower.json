@@ -24,6 +24,7 @@
     "cryptojslib": "~3.1.2",
     "underscore": "~1.7.0",
     "moment": "~2.9.0",
-    "font-awesome": "~4.3.0"
+    "font-awesome": "~4.3.0",
+    "jasmine": "~2.3.4"
   }
 }
