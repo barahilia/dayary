@@ -1,4 +1,4 @@
-var recordsService = function ($http, $q, errorService) {
+var recordsService = function ($http, $q, errorService, dbService) {
 
     // Design decision: this service should depend on errorService and report
     // errors itself. While it might not stricly follow the SRP and introduce
@@ -97,6 +97,8 @@ var recordsService = function ($http, $q, errorService) {
     };
 
     service.addRecord = function (record, callback) {
+        dbService.add(record);
+
         $http.post("/api/records", record)
             .success(function (newRecord) {
                 records.unshift(newRecord);

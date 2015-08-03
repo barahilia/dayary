@@ -1,5 +1,7 @@
 var runApp = function ($rootScope, $state, lockService, dbService) {
 
+    dbService.init();
+
     $rootScope.$on('$stateChangeStart', function(e, to) {
         lockService.previousState($state.current.name, $state.params);
 
