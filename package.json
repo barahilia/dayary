@@ -4,11 +4,11 @@
   "description": "Diary tool deployed as a local web-server",
   "main": "server/main.js",
   "scripts": {
-    "start": "node server\\main.js",
-    "test": "node node_modules\\jasmine-node\\lib\\jasmine-node\\cli.js test",
+    "start": "node server/main.js",
+    "test": "node node_modules/jasmine-node/lib/jasmine-node/cli.js test",
     "lint": "npm run lint-server && npm run lint-www",
-    "lint-www": "node node_modules\\jshint\\bin\\jshint www",
-    "lint-server": "node node_modules\\jshint\\bin\\jshint server"
+    "lint-www": "node node_modules/jshint/bin/jshint www",
+    "lint-server": "node node_modules/jshint/bin/jshint server"
   },
   "author": {
     "name": "Ilia Barahovsky",
