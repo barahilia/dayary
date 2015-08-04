@@ -1,5 +1,5 @@
 var fs = require('fs'),
-    backend = require('../server/sqlite-backend');
+    backend = require('../../server/sqlite-backend');
 
 var db = "test/records.sqlite";
 
