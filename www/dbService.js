@@ -44,6 +44,7 @@ var dbService = function (errorService) {
     service.addRecord = function (record, callback) {
         executeSingleQuery(
             "INSERT INTO Records (created, updated) VALUES (?, ?)",
+            callback,
             [record.created, record.updated]
         );
     };
@@ -51,8 +52,8 @@ var dbService = function (errorService) {
     service.getRecord = function (id, callback) {
         executeSingleQuery(
             "SELECT * FROM Records WHERE id = ?",
-            [id],
-            callback
+            callback,
+            [id]
         );
     };
 

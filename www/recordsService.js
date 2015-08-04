@@ -97,8 +97,9 @@ var recordsService = function ($http, $q, errorService, dbService) {
     };
 
     service.addRecord = function (record, callback) {
-        dbService.add(record);
+        dbService.addRecord(record, callback);
 
+        // TODO: no need in this any more
         $http.post("/api/records", record)
             .success(function (newRecord) {
                 records.unshift(newRecord);
@@ -132,6 +133,9 @@ var recordsService = function ($http, $q, errorService, dbService) {
     };
 
     service.updateRecord = function (record, callback) {
+        dbService.updateRecord(record, callback);
+
+        // TODO: no need in this any more
         $http.put("/api/records/" + record.id, record)
             .success(function () {
                 var internalRecord = _.findWhere(records, {id: record.id});
@@ -146,6 +150,9 @@ var recordsService = function ($http, $q, errorService, dbService) {
     };
 
     service.deleteRecord = function (record, callback) {
+        dbService.deleteRecord(record.id, callback);
+
+        // TODO: no need in this any more
         $http.delete("/api/records/" + record.id)
             .success(function () {
                 records = _.without(records, record);
