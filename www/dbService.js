@@ -1,26 +1,26 @@
 var dbService = function (errorService) {
     var db;
 
-    var executeSingleQuery = function (query, callback, data) {
+    var executeSingleQuery = function (query, callback, input) {
+        var success = function (tx, result) {
+            callback(null, result);
+        };
+
+        var failure = function (tx, error) {
+            errorService.reportError("db error: " + error.message);
+            callback(error.message);
+        };
+
         callback = callback || function () {};
 
         db.transaction(function (tx) {
-            tx.executeSql(
-                query,
-                data,
-                function (txAgain, result) {}, // TODO: implement success callback
-                function (txAgain, error) {
-                    errorService.reportError("db error: " + error.message);
-                    callback(error.message);
-                }
-            );
+            tx.executeSql(query, input, success, failure);
         });
     };
 
 
     var service = {};
 
-    // TODO: take care of errors and successes and all the callbacks
     service.init = function () {
         db = openDatabase("dayary", "0.8", "Dayary DB", 5 * 1000 * 1000);
 
@@ -37,14 +37,33 @@ var dbService = function (errorService) {
     service.getAllRecords = function (callback) {
         executeSingleQuery(
             "SELECT id, created, updated FROM Records",
-            callback
+            function (error, data) {
+                if (error) {
+                    callback(error);
+                }
+                else {
+                    callback(
+                        null,
+                        _.map(_.range(data.rows.length), function (index) {
+                            return data.rows.item(index);
+                        })
+                    );
+                }
+            }
         );
     };
 
     service.addRecord = function (record, callback) {
         executeSingleQuery(
             "INSERT INTO Records (created, updated) VALUES (?, ?)",
-            callback,
+            function (error, data) {
+                if (error) {
+                    callback(error);
+                }
+                else {
+                    service.getRecord(data.insertId, callback);
+                }
+            },
             [record.created, record.updated]
         );
     };
@@ -52,7 +71,14 @@ var dbService = function (errorService) {
     service.getRecord = function (id, callback) {
         executeSingleQuery(
             "SELECT * FROM Records WHERE id = ?",
-            callback,
+            function (error, data) {
+                if (error) {
+                    callback(error);
+                }
+                else {
+                    callback(null, data.rows.item(0));
+                }
+            },
             [id]
         );
     };
@@ -62,7 +88,21 @@ var dbService = function (errorService) {
             "UPDATE Records " +
             "SET created = ?, updated = ?, text = ? " +
             "WHERE id = ?",
-            callback,
+            function (error, data) {
+                var message;
+
+                if (error) {
+                    callback(error);
+                }
+                else if (data.rowsAffected === 1) {
+                    callback(null);
+                }
+                else {
+                    message = "update record: failure updating or no changes";
+                    errorService.reportError(message);
+                    callback(message);
+                }
+            },
             [record.created, record.updated, record.text, record.id]
         );
     };
@@ -71,7 +111,21 @@ var dbService = function (errorService) {
     service.deleteRecord = function (id, callback) {
         executeSingleQuery(
             "DELETE FROM Records WHERE id = ?",
-            callback,
+            function (error, data) {
+                var message;
+
+                if (error) {
+                    callback(error);
+                }
+                else if (data.rowsAffected === 1) {
+                    callback(null);
+                }
+                else {
+                    message = "wasn't able to delete or no such id found";
+                    errorService.reportError(message);
+                    callback(message);
+                }
+            },
             [id]
         );
     };

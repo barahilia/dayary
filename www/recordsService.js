@@ -1,5 +1,7 @@
 var recordsService = function ($http, $q, errorService, dbService) {
 
+    // TODO: this service might become redundant after dbService is operational
+
     // Design decision: this service should depend on errorService and report
     // errors itself. While it might not stricly follow the SRP and introduce
     // eliminatable dependency, the benefits are strong enough: the user can
