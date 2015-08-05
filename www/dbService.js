@@ -1,7 +1,7 @@
 var dbService = function (errorService) {
     var db;
 
-    var executeSingleQuery = function (query, callback, input) {
+    var executeSingleQuery = function (query, input, callback) {
         var success = function (tx, result) {
             callback(null, result);
         };
@@ -37,6 +37,7 @@ var dbService = function (errorService) {
     service.getAllRecords = function (callback) {
         executeSingleQuery(
             "SELECT id, created, updated FROM Records",
+            null,
             function (error, data) {
                 if (error) {
                     callback(error);
@@ -56,6 +57,7 @@ var dbService = function (errorService) {
     service.addRecord = function (record, callback) {
         executeSingleQuery(
             "INSERT INTO Records (created, updated) VALUES (?, ?)",
+            [record.created, record.updated],
             function (error, data) {
                 if (error) {
                     callback(error);
@@ -63,14 +65,14 @@ var dbService = function (errorService) {
                 else {
                     service.getRecord(data.insertId, callback);
                 }
-            },
-            [record.created, record.updated]
+            }
         );
     };
 
     service.getRecord = function (id, callback) {
         executeSingleQuery(
             "SELECT * FROM Records WHERE id = ?",
+            [id],
             function (error, data) {
                 if (error) {
                     callback(error);
@@ -78,8 +80,7 @@ var dbService = function (errorService) {
                 else {
                     callback(null, data.rows.item(0));
                 }
-            },
-            [id]
+            }
         );
     };
 
@@ -88,6 +89,9 @@ var dbService = function (errorService) {
             "UPDATE Records " +
             "SET created = ?, updated = ?, text = ? " +
             "WHERE id = ?",
+
+            [record.created, record.updated, record.text, record.id],
+
             function (error, data) {
                 var message;
 
@@ -102,8 +106,7 @@ var dbService = function (errorService) {
                     errorService.reportError(message);
                     callback(message);
                 }
-            },
-            [record.created, record.updated, record.text, record.id]
+            }
         );
     };
 
@@ -111,6 +114,7 @@ var dbService = function (errorService) {
     service.deleteRecord = function (id, callback) {
         executeSingleQuery(
             "DELETE FROM Records WHERE id = ?",
+            [id],
             function (error, data) {
                 var message;
 
@@ -125,8 +129,7 @@ var dbService = function (errorService) {
                     errorService.reportError(message);
                     callback(message);
                 }
-            },
-            [id]
+            }
         );
     };
 
