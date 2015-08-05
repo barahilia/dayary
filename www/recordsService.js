@@ -77,6 +77,7 @@ var recordsService = function ($http, $q, errorService, dbService) {
 
 
     service.getAll = function (callback) {
+        // TODO: complete this.
         if (_.any(records)) {
             callback(null, records);
             return;
@@ -99,18 +100,15 @@ var recordsService = function ($http, $q, errorService, dbService) {
     };
 
     service.addRecord = function (record, callback) {
-        dbService.addRecord(record, callback);
-
-        // TODO: no need in this any more
-        $http.post("/api/records", record)
-            .success(function (newRecord) {
+        dbService.addRecord(record, function (error, newRecord) {
+            if (error) {
+                callback(error);
+            }
+            else {
                 records.unshift(newRecord);
                 callback(null, newRecord);
-            })
-            .error(function () {
-                errorService.reportError("can't add new record");
-                callback(true);
-            });
+            }
+        });
     };
 
     service.getRecord = function (id, callback) {
@@ -121,49 +119,51 @@ var recordsService = function ($http, $q, errorService, dbService) {
             return;
         }
 
-        $http.get("/api/records/" + id)
-            .success(function (data) {
+        dbService.getRecord(id, function (error, data) {
+            if (error) {
+                $http.get("/api/records/" + id)
+                    .success(function (data) {
+                        _.extend(record, data);
+                        callback(null, data);
+                    })
+                    .error(function () {
+                        errorService.reportError(
+                            "failure while loading the data for record: " + recordId
+                        );
+                        callback(true);
+                    });
+            }
+            else {
                 _.extend(record, data);
                 callback(null, data);
-            })
-            .error(function () {
-                errorService.reportError(
-                    "failure while loading the data for record: " + recordId
-                );
-                callback(true);
-            });
+            }
+        });
     };
 
     service.updateRecord = function (record, callback) {
-        dbService.updateRecord(record, callback);
-
-        // TODO: no need in this any more
-        $http.put("/api/records/" + record.id, record)
-            .success(function () {
+        dbService.updateRecord(record, function (error) {
+            if (error) {
+                callback(error);
+            }
+            else {
                 var internalRecord = _.findWhere(records, {id: record.id});
                 _.extend(internalRecord, record);
 
                 callback(null);
-            })
-            .error(function () {
-                errorService.reportError("failure while saving the record");
-                callback(true);
-            });
+            }
+        });
     };
 
     service.deleteRecord = function (record, callback) {
-        dbService.deleteRecord(record.id, callback);
-
-        // TODO: no need in this any more
-        $http.delete("/api/records/" + record.id)
-            .success(function () {
+        dbService.deleteRecord(record.id, function (error) {
+            if (error) {
+                callback(error);
+            }
+            else {
                 records = _.without(records, record);
                 callback(null);
-            })
-            .error(function () {
-                errorService.reportError("can't remove this record");
-                callback(true);
-            });
+            }
+        });
     };
 
 
