@@ -58,7 +58,13 @@ var lockCtrl = function (
     };
 
     $scope.enter = function () {
-        var hash = encryptionService.computeHash($scope.passphrase);
+        var hash;
+
+        if ($scope.invalidPassphrase()) {
+            return;
+        }
+
+        hash = encryptionService.computeHash($scope.passphrase);
 
         $http.put("/api/settings/hash", hash)
             .success(function () {
