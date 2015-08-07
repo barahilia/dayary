@@ -77,6 +77,11 @@ var dbService = function (errorService) {
                 if (error) {
                     callback(error);
                 }
+                else if (data.rows.length !== 1) {
+                    message = "get record: not found or ambiguous id";
+                    errorService.reportError(message);
+                    callback(message);
+                }
                 else {
                     callback(null, data.rows.item(0));
                 }
