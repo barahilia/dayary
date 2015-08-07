@@ -1,8 +1,13 @@
 <div id="banner" class="bg-success col-sm-12">
     <span class="h1">Dayary</span> - day by day
 
-    <!-- TODO: hide all of them if locked -->
     <div class="pull-right">
+        <button class="btn btn-success" ng-click="lock()">
+            Lock
+        </button>
+    </div>
+
+    <div ng-hide="locked()" class="pull-right">
         <a class="btn btn-success" ui-sref="records">
             Records
         </a>
@@ -17,10 +22,6 @@
 
         <a class="btn btn-success" ui-sref="settings">
             Settings
-        </a>
-
-        <a class="btn btn-success" ui-sref="lock">
-            Lock
         </a>
     </div>
 </div>

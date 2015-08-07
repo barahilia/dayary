@@ -7,7 +7,8 @@ var configApp = function ($stateProvider, $urlRouterProvider) {
             abstract: true,
             views: {
                 "banner": {
-                    templateUrl: "banner.html"
+                    templateUrl: "banner.html",
+                    controller: "bannerCtrl"
                 },
                 "": {
                     template: "<ui-view />"
