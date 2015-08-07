@@ -36,11 +36,6 @@ var lockCtrl = function (
             });
     }
 
-    // TODO: this is wrong location; banner needs a controller of its own and
-    // it should call the following directly. Then there would be possible
-    // to preserve the last state and no circular state changes would occur.
-    lockService.lock();
-
     $scope.invalidPassphrase = function () {
         var computed = encryptionService.computeHash($scope.passphrase);
 

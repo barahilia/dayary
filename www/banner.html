@@ -26,8 +26,8 @@
     </div>
 </div>
 
-<!-- TODO: raise errorCtrl to notification/alert control -->
-<div ng-controller="errorCtrl" class="col-sm-12">
+<!-- TODO: make this notification/alert area, not error only -->
+<div class="col-sm-12">
     <div class="bg-danger" ng-show="error">
         Error: {{error}}
         <button type="button" class="close" ng-click="unsetError()">
