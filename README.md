@@ -3,3 +3,11 @@ deployed as a local web server. Second - encryption is done at the
 client side. No one can read your private thoughts even if he gets
 access to the server.
 
+# Dairy tools
+
+# Requirements
+
+# Architecture
+
+# Design
+
