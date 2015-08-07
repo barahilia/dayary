@@ -3,7 +3,7 @@ var lockService = function (
     settingsService, encryptionService
 ) {
     var locked = true;
-    var lastState = "home";
+    var lastState = "records";
     var lastStateParams = {};
     var lastUserAction = new Date();
 

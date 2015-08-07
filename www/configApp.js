@@ -3,33 +3,45 @@ var configApp = function ($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 
     $stateProvider
-        .state("home", {
-            url: "/",
-            controller: function ($state) {
-                $state.go("records");
+        .state("root", {
+            abstract: true,
+            views: {
+                "banner": {
+                    templateUrl: "banner.html"
+                },
+                "": {
+                    template: "<ui-view />"
+                }
             }
         })
+        // TODO: decide if to name it and others "root.lock".
+        // Currently two schemes - parent="root" and "records.item"
         .state("lock", {
-            url: "/lock",
+            parent: "root",
+            url: "/",
             templateUrl: "lock.html",
             controller: "lockCtrl"
         })
         .state("settings", {
+            parent: "root",
             url: "/settings",
             templateUrl: "settings.html",
             controller: "settingsCtrl"
         })
         .state("dropbox", {
+            parent: "root",
             url: "/dropbox",
             templateUrl: "dropbox.html",
             controller: "dropboxCtrl"
         })
         .state("years", {
+            parent: "root",
             url: "/years",
             templateUrl: "years.html",
             controller: "yearsCtrl"
         })
         .state("records", {
+            parent: "root",
             url: "/records",
             templateUrl: "records.html",
             controller: "recordsCtrl"
