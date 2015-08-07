@@ -6,6 +6,7 @@
 
     <link href="site.css" rel="stylesheet">
 
+    <!-- TODO: consider using require.js - one for this and tests -->
     <script src="bower_components/underscore/underscore.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/ui-router/release/angular-ui-router.js"></script>
@@ -37,45 +38,7 @@
 
 <body class="container">
     <div class="row">
-        <div id="banner" class="bg-success col-sm-12">
-            <span class="h1">Dayary</span> - day by day
-
-            <!-- TODO: hide all of them if locked -->
-            <div class="pull-right">
-                <a class="btn btn-success" ui-sref="records">
-                    Records
-                </a>
-
-                <a class="btn btn-success" ui-sref="years">
-                    Years
-                </a>
-
-                <a class="btn btn-success" ui-sref="dropbox">
-                    Dropbox
-                </a>
-
-                <a class="btn btn-success" ui-sref="settings">
-                    Settings
-                </a>
-
-                <a class="btn btn-success" ui-sref="lock">
-                    Lock
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <!-- TODO: raise errorCtrl to notification/alert control -->
-        <div ng-controller="errorCtrl" class="col-sm-12">
-            <div class="bg-danger" ng-show="error">
-                Error: {{error}}
-                <button type="button" class="close" ng-click="unsetError()">
-                    <span>&times;</span>
-                </button>
-            </div>
-        </div>
-
+        <div ui-view="banner"></div>
         <div ui-view></div>
     </div>
 <body>
