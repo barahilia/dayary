@@ -23,13 +23,55 @@ var recordsService = function ($http, $q, errorService, dbService) {
     };
 
     service.migrate = function (message, done) {
+        // TODO: fix multiple issues:
+        //      - too long function
+        //      - reused data
+        //      - use promises
 
         $http.get("/api/records")
             .success(function (data) {
                 message("got " + data.length + " records metadata");
 
-                dbService.setAllRecords(data, message, done);
-                //done();
+                dbService.setAllRecords(
+                    data,
+                    message,
+                    function () {
+                        dbService.getAllRecords(function (error, data) {
+                            var processed = 0;
+
+                            var processOne = function () {
+                                processed++;
+                                if (processed == data.length) {
+                                    message("Finished getting all records text");
+                                    done();
+                                }
+                            };
+
+                            if (error) {
+                                message(error);
+                                done();
+                                return;
+                            }
+
+                            _.each(data, function (record) {
+                                $http.get("/api/records/" + record.id)
+                                    .success(function (data) {
+                                        dbService.updateRecord(
+                                            data,
+                                            function (error) {
+                                                if (error) { message(error); }
+                                                processOne();
+                                            }
+                                        );
+                                    })
+                                    .error(function () {
+                                        message("error getting record id " + record.id);
+                                        processOne();
+                                    });
+                            });
+                        });
+                    }
+                );
             })
             .error(function () {
                 message("error getting metadata");
