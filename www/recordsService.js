@@ -22,6 +22,19 @@ var recordsService = function ($http, $q, errorService, dbService) {
         return records;
     };
 
+    service.migrate = function (message, done) {
+
+        $http.get("/api/records")
+            .success(function (data) {
+                message("got " + data.length + " records metadata");
+                done();
+            })
+            .error(function () {
+                message("error getting metadata");
+                done();
+            });
+    };
+
     service.getYearForBackup = function (year, messageCallback, doneCallback) {
 
         var callFor = function (record, message) {

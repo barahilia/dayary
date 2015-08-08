@@ -1,6 +1,7 @@
 var settingsCtrl = function (
     $scope, $http, $state,
-    errorService, settingsService, encryptionService, lockService
+    errorService, settingsService, encryptionService, lockService,
+    recordsService
 ) {
     $scope.settings = settingsService.settings;
 
@@ -17,5 +18,15 @@ var settingsCtrl = function (
                 $scope.saving = false;
                 errorService.reportError("failure saving settings");
             });
+    };
+
+    $scope.migrate = function () {
+        $scope.migrating = true;
+        $scope.migrateMessages = [];
+
+        recordsService.migrate(
+            _.bind(Array.prototype.push, $scope.migrateMessages),
+            function () { $scope.migrating = false; }
+        );
     };
 };

@@ -1,4 +1,4 @@
-<div class="col-sm-12">
+<div class="col-sm-3">
     <h2>Settings</h2>
     <div>
         <button class="btn btn-success"
@@ -33,4 +33,31 @@
 
     <div>Dropbox folder:</div>
     <input type="text" ng-model="settings.dropboxFolder">
+</div>
+
+<div class="col-sm-3">
+    <h2>Migration</h2>
+
+    <div>
+        <button class="btn btn-success"
+                ng-disabled="migrating"
+                ng-click="migrate()">
+            Migrate
+        </button>
+
+        <span ng-show="migrating" class="fa fa-spinner fa-spin">
+        </span>
+    </div>
+
+    <br />
+
+    <div>
+        Migrate data from the server to the local database.
+    </div>
+
+    <br />
+
+    <div ng-repeat="message in migrateMessages">
+        {{message}}
+    <div>
 </div>
