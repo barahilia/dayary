@@ -27,7 +27,9 @@ var recordsService = function ($http, $q, errorService, dbService) {
         $http.get("/api/records")
             .success(function (data) {
                 message("got " + data.length + " records metadata");
-                done();
+
+                dbService.setAllRecords(data, message, done);
+                //done();
             })
             .error(function () {
                 message("error getting metadata");

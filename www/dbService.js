@@ -54,6 +54,34 @@ var dbService = function (errorService) {
         );
     };
 
+    service.setAllRecords = function (records, message, done) {
+        var processed = 0;
+
+        executeSingleQuery(
+            "DELETE FROM Records",
+            null,
+            message
+        );
+
+        _.each(records, function (record) {
+            executeSingleQuery(
+                "INSERT INTO Records (id, created, updated) VALUES (?, ?, ?)",
+                [record.id, record.created, record.updated],
+                function (error) {
+                    if (error) {
+                        message(error);
+                    }
+
+                    processed++;
+                    if (processed == records.length) {
+                        message("Finished inserting");
+                        done();
+                    }
+                }
+            );
+        });
+    };
+
     service.addRecord = function (record, callback) {
         executeSingleQuery(
             "INSERT INTO Records (created, updated) VALUES (?, ?)",
