@@ -59,7 +59,15 @@ var recordsService = function ($http, $q, errorService, dbService) {
                                         dbService.updateRecord(
                                             data,
                                             function (error) {
-                                                if (error) { message(error); }
+                                                if (error) {
+                                                    message(error);
+                                                }
+                                                else {
+                                                    message(
+                                                        "Saved text for record #" + record.id +
+                                                        " from " + record.created
+                                                    );
+                                                }
                                                 processOne();
                                             }
                                         );
