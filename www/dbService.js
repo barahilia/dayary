@@ -143,7 +143,6 @@ var dbService = function (errorService) {
         );
     };
 
-    // TODO: think if return an error if record doesn't exist
     service.deleteRecord = function (id, callback) {
         executeSingleQuery(
             "DELETE FROM Records WHERE id = ?",
