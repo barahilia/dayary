@@ -1,13 +1,6 @@
-var recordsService = function ($http, $q, errorService, dbService) {
+var recordsService = function ($http, $q, dbService) {
 
     // TODO: this service might become redundant after dbService is operational
-
-    // Design decision: this service should depend on errorService and report
-    // errors itself. While it might not stricly follow the SRP and introduce
-    // eliminatable dependency, the benefits are strong enough: the user can
-    // do nothing about an error here and this service has all the information
-    // needed to report error properly.
-
 
     var service = {};
 
@@ -150,18 +143,18 @@ var recordsService = function ($http, $q, errorService, dbService) {
 
         // TODO: call this once automatically at service init or call
         // from app.run
-        $http.get("/api/records")
-            .success(function (data) {
-                data = _.sortBy(data, 'created');
-                data = data.reverse();
-
-                records = data;
-                callback(null, records);
-            })
-            .error(function () {
-                errorService.reportError("failure loading records list");
+        dbService.getAllRecords(function (error, data) {
+            if (error) {
                 callback(true);
-            });
+                return;
+            }
+
+            data = _.sortBy(data, 'created');
+            data = data.reverse();
+
+            records = data;
+            callback(null, records);
+        });
     };
 
     service.addRecord = function (record, callback) {
@@ -186,17 +179,7 @@ var recordsService = function ($http, $q, errorService, dbService) {
 
         dbService.getRecord(id, function (error, data) {
             if (error) {
-                $http.get("/api/records/" + id)
-                    .success(function (data) {
-                        _.extend(record, data);
-                        callback(null, data);
-                    })
-                    .error(function () {
-                        errorService.reportError(
-                            "failure while loading the data for record: " + recordId
-                        );
-                        callback(true);
-                    });
+                callback(error);
             }
             else {
                 _.extend(record, data);
