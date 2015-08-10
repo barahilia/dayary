@@ -25,6 +25,17 @@ var dbService = function (errorService) {
         db = openDatabase("dayary", "0.8", "Dayary DB", 5 * 1000 * 1000);
 
         executeSingleQuery(
+            "CREATE TABLE IF NOT EXISTS Hash (" +
+                "hash VARCHAR" +
+            ")"
+        );
+        executeSingleQuery(
+            "CREATE TABLE IF NOT EXISTS Settings (" +
+                "key VARCHAR PRIMARY KEY," +
+                "value VARCHAR" +
+            ")"
+        );
+        executeSingleQuery(
             "CREATE TABLE IF NOT EXISTS Records (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "created TEXT," +
@@ -32,6 +43,87 @@ var dbService = function (errorService) {
                 "text TEXT" +
             ")"
         );
+    };
+
+    service.getHash = function (callback) {
+        executeSingleQuery(
+            "SELECT hash FROM Hash",
+            null,
+            function (error, data) {
+                if (error) {
+                    callback(error);
+                }
+                else if (data.rows.length === 0) {
+                    // It's OK - not set yet
+                    callback(null, null);
+                }
+                else {
+                    callback(null, data.rows.item(0).hash);
+                }
+            }
+        );
+    };
+
+    service.setHash = function (hash, callback) {
+        // TODO: ensure cannot override existing one
+        executeSingleQuery(
+            "INSERT INTO Hash (hash) VALUES (?)",
+            [hash],
+            function (error, data) {
+                if (error) {
+                    callback(error);
+                }
+                else {
+                    callback(null);
+                }
+            }
+        );
+    };
+
+    service.getSettings = function (callback) {
+        // TODO: use json parse/stringify for values
+        executeSingleQuery(
+            "SELECT key, value FROM Settings",
+            null,
+            function (error, data) {
+                if (error) {
+                    callback(error);
+                }
+                else {
+                    callback(
+                        null,
+                        _.map(_.range(data.rows.length), function (index) {
+                            var s = data.rows.item(index);
+                            return {
+                                key: s.key,
+                                value: JSON.parse(s.value)
+                            };
+                        })
+                    );
+                }
+            }
+        );
+    };
+
+    service.setSettings = function (settings, callback) {
+        var processed = 0;
+
+        _.each(settings, function (setting) {
+            executeSingleQuery(
+                "INSERT OR REPLACE INTO Settings (key, value) VALUES (?, ?)",
+                [setting.key, JSON.stringify(setting.value)],
+                function (error) {
+                    if (error) {
+                        callback(error);
+                    }
+
+                    processed++;
+                    if (processed === settings.length) {
+                        callback();
+                    }
+                }
+            );
+        });
     };
 
     service.getAllRecords = function (callback) {
