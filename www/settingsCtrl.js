@@ -1,7 +1,6 @@
 var settingsCtrl = function (
     $scope, $http, $state,
-    errorService, settingsService, encryptionService, lockService,
-    migrateService
+    errorService, settingsService, migrateService
 ) {
     $scope.settings = settingsService.settings;
 
