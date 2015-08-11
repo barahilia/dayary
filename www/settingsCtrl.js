@@ -1,22 +1,18 @@
 var settingsCtrl = function (
-    $scope, $http, $state,
-    errorService, settingsService, migrateService
+    $scope,
+    settingsService, migrateService, dbService
 ) {
     $scope.settings = settingsService.settings;
 
     $scope.save = function () {
-        // TODO: return immediately if nothing has changed
-
         $scope.saving = true;
 
-        $http.put("/api/settings", $scope.settings)
-            .success(function () {
+        dbService.setSettings(
+            $scope.settings,
+            function () {
                 $scope.saving = false;
-            })
-            .error(function () {
-                $scope.saving = false;
-                errorService.reportError("failure saving settings");
-            });
+            }
+        );
     };
 
     $scope.migrate = function () {
@@ -29,3 +25,4 @@ var settingsCtrl = function (
         );
     };
 };
+

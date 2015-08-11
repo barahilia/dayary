@@ -1,6 +1,6 @@
 var lockCtrl = function (
-    $scope, $http,
-    encryptionService, settingsService, lockService
+    $scope,
+    dbService, encryptionService, settingsService, lockService
 ) {
 
     var devPassphrase = "Very secret phrase";
@@ -61,14 +61,13 @@ var lockCtrl = function (
 
         hash = encryptionService.computeHash($scope.passphrase);
 
-        $http.put("/api/settings/hash", hash)
-            .success(function () {
-                acceptPassphrase($scope.passphrase);
-            })
-            .error(function () {
-                var msg = "failure setting hash for the pass phrase";
-                errorService.reportError(msg);
-            });
-
+        dbService.setHash(
+            hash,
+            function (error) {
+                if (!error) {
+                    acceptPassphrase($scope.passphrase);
+                }
+            }
+        );
     };
 };
