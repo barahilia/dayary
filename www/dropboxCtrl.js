@@ -1,5 +1,5 @@
 var dropboxCtrl = function (
-    $scope, errorService, settingsService, recordsService
+    $scope, errorService, settingsService, migrateService
 ) {
 
     var client = new Dropbox.Client({ key: "4hxwutae96fhhbd" });
@@ -41,7 +41,7 @@ var dropboxCtrl = function (
         $scope.backuping = true;
         $scope.backupResult = "- in progress";
 
-        recordsService.getYearForBackup(
+        migrateService.getYearForBackup(
             year,
             _.bind(Array.prototype.push, $scope.backupMessages),
             function (records) {
