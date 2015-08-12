@@ -1,55 +1,7 @@
-var lockCtrl = function (
-    $scope,
-    dbService, encryptionService, settingsService, lockService
-) {
-
-    var devPassphrase = "Very secret phrase";
-
-    var acceptPassphrase = function (passphrase) {
-        encryptionService.setPassphrase(passphrase);
-        // TODO: consider passing the passphrase to unlock and it in turn to
-        // set it for the encryptionService. The lockService can be aware of
-        // the hash too.
-        lockService.unlock();
-    };
-
-    var processServerHash = function (hash) {
-        var devHash = encryptionService.computeHash(devPassphrase);
-
-        if (hash && hash === devHash) {
-            // Dev mode - development pass phrase to be used
-            acceptPassphrase(devPassphrase);
-        }
-    };
-
-    if (settingsService.initialized) {
-        // All right; nothing to do
-    }
-    else {
-        $http.get("/api/settings")
-            .success(function (settings) {
-                settingsService.initialize(settings);
-                processServerHash(settingsService.hash);
-            })
-            .error(function () {
-                errorService.reportError("failure requesting settings");
-            });
-    }
+var lockCtrl = function ($scope, lockService) {
 
     $scope.invalidPassphrase = function () {
-        var computed = encryptionService.computeHash($scope.passphrase);
-
-        if ($scope.passphrase) {
-            if (settingsService.hash) {
-                return settingsService.hash !== computed;
-            }
-            else {
-                return false;
-            }
-        }
-        else {
-            return true;
-        }
+        return ! lockService.validPassphrase($scope.passphrase);
     };
 
     $scope.enter = function () {
@@ -59,15 +11,7 @@ var lockCtrl = function (
             return;
         }
 
-        hash = encryptionService.computeHash($scope.passphrase);
-
-        dbService.setHash(
-            hash,
-            function (error) {
-                if (!error) {
-                    acceptPassphrase($scope.passphrase);
-                }
-            }
-        );
+        lockService.unlock($scope.passphrase);
     };
 };
+

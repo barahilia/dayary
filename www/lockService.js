@@ -2,10 +2,29 @@ var lockService = function (
     $window, $interval, $state,
     settingsService, encryptionService
 ) {
+    // TODO: consider moving this futher to encryptionService
+    var hash;
+    var devPassphrase = "Very secret phrase";
+
     var locked = true;
+
     var lastState = "records";
     var lastStateParams = {};
     var lastUserAction = new Date();
+
+
+    var setHash = function (passphrase) {
+        if (hash) {
+            return;
+        }
+
+        hash = encryptionService.computeHash(passphrase);
+
+        dbService.setHash(
+            hash,
+            function () {}
+        );
+    };
 
     var lock = function () {
         encryptionService.setPassphrase();
@@ -20,8 +39,6 @@ var lockService = function (
         lastUserAction = moment();
     };
 
-    // TODO: choose $window.onclick vs angular.element($window).bind vs
-    //       angular.element($window).on("click") vs ...
     $window.onclick = updateUserAction;
     $window.onkeypress = updateUserAction;
 
@@ -36,7 +53,6 @@ var lockService = function (
             lock();
         }
     };
-
 
     $interval(
         function () {
@@ -59,14 +75,43 @@ var lockService = function (
 
     var service = {};
 
+    service.initialize = function () {
+        var devHash = encryptionService.computeHash(devPassphrase);
+
+        dbService.getHash(function (error, dbHash) {
+            if (!error) {
+                hash = dbHash;
+
+                if (hash === devHash) {
+                    // Dev mode - development pass phrase to be used
+                    service.unlock(devPassphrase);
+                }
+            }
+        });
+    };
+
+    service.validPassphrase = function (passphrase) {
+        if (passphrase) {
+            if (hash) {
+                return hash === encryptionService.computeHash(passphrase);
+            }
+            else {
+                return true;
+            }
+        }
+        else {
+            return false;
+        }
+    };
+
     service.locked = function () {
         return locked;
     };
 
     service.lock = lock;
 
-    service.unlock = function () {
-        // TODO: consider to get the passphrase for encryptionService
+    service.unlock = function (passphrase) {
+        encryptionService.setPassphrase(passphrase);
         locked = false;
         $state.go(lastState, lastStateParams);
     };
@@ -80,3 +125,4 @@ var lockService = function (
 
     return service;
 };
+
