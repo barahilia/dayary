@@ -4,10 +4,11 @@ var runApp = function (
 ) {
 
     dbService.init();
+    lockService.init();
 
     dbService.getSettings(function (error, data) {
-        if (!error) {
-            settingsService.initialize(data);
+        if (!error && !_.isEmpty(data)) {
+            settingsService.init(data);
         }
     });
 

@@ -1,6 +1,6 @@
 var lockService = function (
     $window, $interval, $state,
-    settingsService, encryptionService
+    dbService, settingsService, encryptionService
 ) {
     // TODO: consider moving this futher to encryptionService
     var hash;
@@ -75,7 +75,7 @@ var lockService = function (
 
     var service = {};
 
-    service.initialize = function () {
+    service.init= function () {
         var devHash = encryptionService.computeHash(devPassphrase);
 
         dbService.getHash(function (error, dbHash) {
@@ -111,6 +111,7 @@ var lockService = function (
     service.lock = lock;
 
     service.unlock = function (passphrase) {
+        setHash(passphrase);
         encryptionService.setPassphrase(passphrase);
         locked = false;
         $state.go(lastState, lastStateParams);

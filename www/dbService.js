@@ -81,25 +81,22 @@ var dbService = function (errorService) {
     };
 
     service.getSettings = function (callback) {
-        // TODO: use json parse/stringify for values
         executeSingleQuery(
             "SELECT key, value FROM Settings",
             null,
             function (error, data) {
+                var settings = {};
+
                 if (error) {
                     callback(error);
                 }
                 else {
-                    callback(
-                        null,
-                        _.map(_.range(data.rows.length), function (index) {
-                            var s = data.rows.item(index);
-                            return {
-                                key: s.key,
-                                value: JSON.parse(s.value)
-                            };
-                        })
-                    );
+                    _.each(_.range(data.rows.length), function (index) {
+                        var s = data.rows.item(index);
+                        settings[s.key] = JSON.parse(s.value)
+                    });
+
+                    callback(null, settings);
                 }
             }
         );
@@ -108,17 +105,17 @@ var dbService = function (errorService) {
     service.setSettings = function (settings, callback) {
         var processed = 0;
 
-        _.each(settings, function (setting) {
+        _.each(settings, function (value, key) {
             executeSingleQuery(
                 "INSERT OR REPLACE INTO Settings (key, value) VALUES (?, ?)",
-                [setting.key, JSON.stringify(setting.value)],
+                [key, JSON.stringify(value)],
                 function (error) {
                     if (error) {
                         callback(error);
                     }
 
                     processed++;
-                    if (processed === settings.length) {
+                    if (processed === _.size(settings)) {
                         callback();
                     }
                 }

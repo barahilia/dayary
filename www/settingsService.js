@@ -1,7 +1,7 @@
 var settingsService = function () {
-    var service = {};
 
-    service.initialized = false;
+    // TODO: consider removing this service; leave a constant only
+    var service = {};
 
     service.settings = {
         autosaveIntervalSec: 30,
@@ -10,19 +10,8 @@ var settingsService = function () {
         dropboxFolder: "backups/dayary"
     };
 
-    service.hash = null;
-
-    service.initialize = function (settings) {
-        // TODO: save serialized values in backend, not string - then
-        // no need to parse here
-        service.settings.autosaveIntervalSec = +settings.autosaveIntervalSec;
-        service.settings.lockTimeoutMin = +settings.lockTimeoutMin;
-        service.settings.lockOnBlur = settings.lockOnBlur == 1 ? true : false;
-        service.settings.dropboxFolder = settings.dropboxFolder;
-
-        service.hash = settings.hash;
-
-        service.initialized = true;
+    service.init = function (settings) {
+        service.settings = settings;
     };
 
     return service;
