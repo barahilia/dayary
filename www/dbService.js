@@ -1,21 +1,27 @@
 var dbService = function (errorService) {
     var db;
 
-    var executeSingleQuery = function (query, input, callback) {
+    var executeSingleQuery = function (query, input) {
+        var deferred = $q.deferred;
+
         var success = function (tx, result) {
-            callback(null, result);
+            deferred.resolve(
+                result.rows,
+                result.rowsAffected,
+                result.insertId
+            );
         };
 
         var failure = function (tx, error) {
             errorService.reportError("db error: " + error.message);
-            callback(error.message);
+            deferred.reject(error.message);
         };
-
-        callback = callback || function () {};
 
         db.transaction(function (tx) {
             tx.executeSql(query, input, success, failure);
         });
+
+        return deferred.promise; // TODO: promise() ?
     };
 
 
