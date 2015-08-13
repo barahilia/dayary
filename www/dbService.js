@@ -1,7 +1,7 @@
 var dbService = function ($q, errorService) {
     var db;
 
-    var executeSingleQuery = function (query, input) {
+    var query = function (query, input) {
         var deferred = $q.defer();
 
         var success = function (tx, result) {
@@ -26,18 +26,18 @@ var dbService = function ($q, errorService) {
     service.init = function () {
         db = openDatabase("dayary", "0.8", "Dayary DB", 5 * 1000 * 1000);
 
-        executeSingleQuery(
+        query(
             "CREATE TABLE IF NOT EXISTS Hash (" +
                 "hash VARCHAR" +
             ")"
         );
-        executeSingleQuery(
+        query(
             "CREATE TABLE IF NOT EXISTS Settings (" +
                 "key VARCHAR PRIMARY KEY," +
                 "value VARCHAR" +
             ")"
         );
-        executeSingleQuery(
+        query(
             "CREATE TABLE IF NOT EXISTS Records (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "created TEXT," +
@@ -48,7 +48,7 @@ var dbService = function ($q, errorService) {
     };
 
     service.getHash = function () {
-        return executeSingleQuery("SELECT hash FROM Hash")
+        return query("SELECT hash FROM Hash")
             .then(function (result) {
                 if (result.rows.length === 0) {
                     // It's OK - not set yet
@@ -62,7 +62,7 @@ var dbService = function ($q, errorService) {
 
     service.setHash = function (hash, callback) {
         // TODO: ensure cannot override existing one
-        executeSingleQuery(
+        query(
             "INSERT INTO Hash (hash) VALUES (?)",
             [hash],
             function (error, data) {
@@ -77,7 +77,7 @@ var dbService = function ($q, errorService) {
     };
 
     service.getSettings = function (callback) {
-        executeSingleQuery(
+        query(
             "SELECT key, value FROM Settings",
             null,
             function (error, data) {
@@ -102,7 +102,7 @@ var dbService = function ($q, errorService) {
         var processed = 0;
 
         _.each(settings, function (value, key) {
-            executeSingleQuery(
+            query(
                 "INSERT OR REPLACE INTO Settings (key, value) VALUES (?, ?)",
                 [key, JSON.stringify(value)],
                 function (error) {
@@ -120,7 +120,7 @@ var dbService = function ($q, errorService) {
     };
 
     service.getAllRecords = function (callback) {
-        executeSingleQuery(
+        query(
             "SELECT id, created, updated FROM Records",
             null,
             function (error, data) {
@@ -142,14 +142,14 @@ var dbService = function ($q, errorService) {
     service.setAllRecords = function (records, message, done) {
         var processed = 0;
 
-        executeSingleQuery(
+        query(
             "DELETE FROM Records",
             null,
             message
         );
 
         _.each(records, function (record) {
-            executeSingleQuery(
+            query(
                 "INSERT INTO Records (id, created, updated) VALUES (?, ?, ?)",
                 [record.id, record.created, record.updated],
                 function (error) {
@@ -168,7 +168,7 @@ var dbService = function ($q, errorService) {
     };
 
     service.addRecord = function (record, callback) {
-        executeSingleQuery(
+        query(
             "INSERT INTO Records (created, updated) VALUES (?, ?)",
             [record.created, record.updated],
             function (error, data) {
@@ -183,7 +183,7 @@ var dbService = function ($q, errorService) {
     };
 
     service.getRecord = function (id, callback) {
-        executeSingleQuery(
+        query(
             "SELECT * FROM Records WHERE id = ?",
             [id],
             function (error, data) {
@@ -203,7 +203,7 @@ var dbService = function ($q, errorService) {
     };
 
     service.updateRecord = function (record, callback) {
-        executeSingleQuery(
+        query(
             "UPDATE Records " +
             "SET created = ?, updated = ?, text = ? " +
             "WHERE id = ?",
@@ -229,7 +229,7 @@ var dbService = function ($q, errorService) {
     };
 
     service.deleteRecord = function (id, callback) {
-        executeSingleQuery(
+        query(
             "DELETE FROM Records WHERE id = ?",
             [id],
             function (error, data) {
