@@ -3,14 +3,16 @@ var runApp = function (
     lockService, dbService, settingsService
 ) {
 
-    dbService.init();
-    lockService.init();
+    dbService.init()
+        .then(function () {
+            lockService.init();
 
-    dbService.getSettings(function (error, data) {
-        if (!error && !_.isEmpty(data)) {
-            settingsService.init(data);
-        }
-    });
+            dbService.getSettings(function (error, data) {
+                if (!error && !_.isEmpty(data)) {
+                    settingsService.init(data);
+                }
+            });
+        });
 
     $rootScope.$on('$stateChangeStart', function(e, to) {
         lockService.previousState($state.current.name, $state.params);

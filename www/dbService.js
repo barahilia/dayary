@@ -24,27 +24,27 @@ var dbService = function ($q, errorService) {
     var service = {};
 
     service.init = function () {
+        var tables;
+
         db = openDatabase("dayary", "0.8", "Dayary DB", 5 * 1000 * 1000);
 
-        query(
+        tables = [
             "CREATE TABLE IF NOT EXISTS Hash (" +
                 "hash VARCHAR" +
-            ")"
-        );
-        query(
+            ")",
             "CREATE TABLE IF NOT EXISTS Settings (" +
                 "key VARCHAR PRIMARY KEY," +
                 "value VARCHAR" +
-            ")"
-        );
-        query(
+            ")",
             "CREATE TABLE IF NOT EXISTS Records (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "created TEXT," +
                 "updated TEXT," +
                 "text TEXT" +
             ")"
-        );
+        ];
+
+        return $q.all(_.map(tables, _.partial(query, _, undefined)));
     };
 
     service.getHash = function () {
@@ -60,83 +60,52 @@ var dbService = function ($q, errorService) {
             });
     };
 
-    service.setHash = function (hash, callback) {
-        // TODO: ensure cannot override existing one
-        query(
-            "INSERT INTO Hash (hash) VALUES (?)",
-            [hash],
-            function (error, data) {
-                if (error) {
-                    callback(error);
+    service.setHash = function (hash) {
+        return service.getHash()
+            .then(function (oldHash) {
+                if (oldHash) {
+                    throw "Cannot override an existing hash";
                 }
-                else {
-                    callback(null);
-                }
-            }
-        );
+
+                return query("INSERT INTO Hash (hash) VALUES (?)", [hash]);
+            });
     };
 
-    service.getSettings = function (callback) {
-        query(
-            "SELECT key, value FROM Settings",
-            null,
-            function (error, data) {
+    service.getSettings = function () {
+        return query("SELECT key, value FROM Settings")
+            .then(function (result) {
                 var settings = {};
 
-                if (error) {
-                    callback(error);
-                }
-                else {
-                    _.each(_.range(data.rows.length), function (index) {
-                        var s = data.rows.item(index);
-                        settings[s.key] = JSON.parse(s.value)
-                    });
+                _.each(_.range(result.rows.length), function (index) {
+                    var s = result.rows.item(index);
+                    settings[s.key] = JSON.parse(s.value)
+                });
 
-                    callback(null, settings);
-                }
-            }
-        );
+                return settings;
+            });
     };
 
-    service.setSettings = function (settings, callback) {
-        var processed = 0;
-
-        _.each(settings, function (value, key) {
-            query(
-                "INSERT OR REPLACE INTO Settings (key, value) VALUES (?, ?)",
-                [key, JSON.stringify(value)],
-                function (error) {
-                    if (error) {
-                        callback(error);
-                    }
-
-                    processed++;
-                    if (processed === _.size(settings)) {
-                        callback();
-                    }
-                }
-            );
-        });
+    service.setSettings = function (settings) {
+        return $q.all(
+            _.map(settings, function (value, key) {
+                return query(
+                    "INSERT OR REPLACE INTO " +
+                    "Settings (key, value) VALUES (?, ?)",
+                    [key, JSON.stringify(value)]
+                );
+            })
+        );
     };
 
     service.getAllRecords = function (callback) {
-        query(
-            "SELECT id, created, updated FROM Records",
-            null,
-            function (error, data) {
-                if (error) {
-                    callback(error);
-                }
-                else {
-                    callback(
-                        null,
-                        _.map(_.range(data.rows.length), function (index) {
-                            return data.rows.item(index);
-                        })
-                    );
-                }
-            }
-        );
+        return query("SELECT id, created, updated FROM Records")
+            .then(function (result) {
+                return _.map(
+                    _.range(result.rows.length),
+                    result.rows.item,
+                    result.rows
+                );
+            });
     };
 
     service.setAllRecords = function (records, message, done) {
@@ -168,86 +137,58 @@ var dbService = function ($q, errorService) {
     };
 
     service.addRecord = function (record, callback) {
-        query(
+        return query(
             "INSERT INTO Records (created, updated) VALUES (?, ?)",
-            [record.created, record.updated],
-            function (error, data) {
-                if (error) {
-                    callback(error);
-                }
-                else {
-                    service.getRecord(data.insertId, callback);
-                }
-            }
-        );
+            [record.created, record.updated]
+        ).then(function (result) {
+            return service.getRecord(result.insertId, callback);
+        });
     };
 
     service.getRecord = function (id, callback) {
-        query(
-            "SELECT * FROM Records WHERE id = ?",
-            [id],
-            function (error, data) {
-                if (error) {
-                    callback(error);
-                }
-                else if (data.rows.length !== 1) {
+        return query("SELECT * FROM Records WHERE id = ?", [id])
+            .then(function (result) {
+                var message;
+
+                if (result.rows.length !== 1) {
                     message = "get record: not found or ambiguous id";
                     errorService.reportError(message);
-                    callback(message);
+                    throw message;
                 }
-                else {
-                    callback(null, data.rows.item(0));
-                }
+
+                return data.rows.item(0);
             }
         );
     };
 
     service.updateRecord = function (record, callback) {
-        query(
+        return query(
             "UPDATE Records " +
             "SET created = ?, updated = ?, text = ? " +
             "WHERE id = ?",
+            [record.created, record.updated, record.text, record.id]
+        ).then(function (result) {
+            var message;
 
-            [record.created, record.updated, record.text, record.id],
-
-            function (error, data) {
-                var message;
-
-                if (error) {
-                    callback(error);
-                }
-                else if (data.rowsAffected === 1) {
-                    callback(null);
-                }
-                else {
-                    message = "update record: failure updating or no changes";
-                    errorService.reportError(message);
-                    callback(message);
-                }
+            if (data.rowsAffected !== 1) {
+                message = "update record: failure updating or no changes";
+                errorService.reportError(message);
+                throw message;
             }
-        );
+        });
     };
 
     service.deleteRecord = function (id, callback) {
-        query(
-            "DELETE FROM Records WHERE id = ?",
-            [id],
-            function (error, data) {
+        return query("DELETE FROM Records WHERE id = ?", [id])
+            .then(function (result) {
                 var message;
 
-                if (error) {
-                    callback(error);
-                }
-                else if (data.rowsAffected === 1) {
-                    callback(null);
-                }
-                else {
+                if (data.rowsAffected !== 1) {
                     message = "wasn't able to delete or no such id found";
                     errorService.reportError(message);
-                    callback(message);
+                    throw message;
                 }
-            }
-        );
+            });
     };
 
     return service;
