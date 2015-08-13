@@ -20,10 +20,7 @@ var lockService = function (
 
         hash = encryptionService.computeHash(passphrase);
 
-        dbService.setHash(
-            hash,
-            function () {}
-        );
+        dbService.setHash(hash);
     };
 
     var lock = function () {

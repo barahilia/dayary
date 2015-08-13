@@ -4,14 +4,12 @@ var runApp = function (
 ) {
 
     dbService.init()
-        .then(function () {
-            lockService.init();
-
-            dbService.getSettings(function (error, data) {
-                if (!error && !_.isEmpty(data)) {
-                    settingsService.init(data);
-                }
-            });
+        .then(lockService.init)
+        .then(dbService.getSettings)
+        .then(function (settings) {
+            if (!_.isEmpty(settings)) {
+                settingsService.init(settings);
+            }
         });
 
     $rootScope.$on('$stateChangeStart', function(e, to) {

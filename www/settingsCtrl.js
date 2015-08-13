@@ -7,12 +7,10 @@ var settingsCtrl = function (
     $scope.save = function () {
         $scope.saving = true;
 
-        dbService.setSettings(
-            $scope.settings,
-            function () {
+        dbService.setSettings($scope.settings)
+            .finally(function () {
                 $scope.saving = false;
-            }
-        );
+            });
     };
 
     $scope.migrate = function () {
