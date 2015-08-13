@@ -7,6 +7,9 @@ var recordsCtrl = function (
 
     dbService.getAllRecords()
         .then(function (records) {
+            records = _.sortBy(records, 'created');
+            records = records.reverse();
+
             $scope.records = records;
             $scope.loadingRecordsList = false;
 
