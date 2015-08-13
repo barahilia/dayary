@@ -1,4 +1,4 @@
-var yearsCtrl = function ($scope, recordsService, errorService) {
+var yearsCtrl = function ($scope, dbService, errorService) {
 
     var initiateYear = function () {
         var months = [];
@@ -48,16 +48,12 @@ var yearsCtrl = function ($scope, recordsService, errorService) {
         $scope.selectedMonth = month;
     };
 
-    recordsService.getAll(function (err, records) {
-        if (err) {
-            return;
-        }
+    dbService.getAllRecords()
+        .then(function (records) {
+            organizeRecords(records);
 
-        organizeRecords(records);
-
-        if (_.some($scope.records)) {
-            $scope.selectYear(_.min(_.keys($scope.records)));
-        }
-    });
+            if (_.some($scope.records)) {
+                $scope.selectYear(_.min(_.keys($scope.records)));
+            }
+        });
 };
-

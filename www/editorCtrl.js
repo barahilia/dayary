@@ -1,6 +1,6 @@
 var editorCtrl = function (
     $scope, $timeout, $interval, $state,
-    recordsService, encryptionService, settingsService
+    dbService, encryptionService, settingsService
 ) {
     var autosaving;
 
@@ -12,8 +12,8 @@ var editorCtrl = function (
         record = _.pick($scope.record, "id", "created", "updated");
         record.text = encryptionService.encrypt($scope.record.text);
 
-        recordsService.updateRecord(record, function (err) {
-            if (!err) {
+        dbService.updateRecord(record)
+            .then(function () {
                 $scope.textChanged = false;
                 $scope.saved = "saved on " + moment().format('hh:mm');
 
@@ -24,8 +24,7 @@ var editorCtrl = function (
                     },
                     3000
                 );
-            }
-        });
+            });
     };
 
     var stopAutosaving = function () {

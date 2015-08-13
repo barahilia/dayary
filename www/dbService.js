@@ -136,16 +136,16 @@ var dbService = function ($q, errorService) {
         });
     };
 
-    service.addRecord = function (record, callback) {
+    service.addRecord = function (record) {
         return query(
             "INSERT INTO Records (created, updated) VALUES (?, ?)",
             [record.created, record.updated]
         ).then(function (result) {
-            return service.getRecord(result.insertId, callback);
+            return service.getRecord(result.insertId);
         });
     };
 
-    service.getRecord = function (id, callback) {
+    service.getRecord = function (id) {
         return query("SELECT * FROM Records WHERE id = ?", [id])
             .then(function (result) {
                 var message;
@@ -156,12 +156,12 @@ var dbService = function ($q, errorService) {
                     throw message;
                 }
 
-                return data.rows.item(0);
+                return result.rows.item(0);
             }
         );
     };
 
-    service.updateRecord = function (record, callback) {
+    service.updateRecord = function (record) {
         return query(
             "UPDATE Records " +
             "SET created = ?, updated = ?, text = ? " +
@@ -170,7 +170,7 @@ var dbService = function ($q, errorService) {
         ).then(function (result) {
             var message;
 
-            if (data.rowsAffected !== 1) {
+            if (result.rowsAffected !== 1) {
                 message = "update record: failure updating or no changes";
                 errorService.reportError(message);
                 throw message;
@@ -178,12 +178,12 @@ var dbService = function ($q, errorService) {
         });
     };
 
-    service.deleteRecord = function (id, callback) {
+    service.deleteRecord = function (id) {
         return query("DELETE FROM Records WHERE id = ?", [id])
             .then(function (result) {
                 var message;
 
-                if (data.rowsAffected !== 1) {
+                if (result.rowsAffected !== 1) {
                     message = "wasn't able to delete or no such id found";
                     errorService.reportError(message);
                     throw message;
