@@ -78,16 +78,15 @@ var lockService = function (
     service.init= function () {
         var devHash = encryptionService.computeHash(devPassphrase);
 
-        dbService.getHash(function (error, dbHash) {
-            if (!error) {
+        dbService.getHash()
+            .then(function (dbHash) {
                 hash = dbHash;
 
                 if (hash === devHash) {
                     // Dev mode - development pass phrase to be used
                     service.unlock(devPassphrase);
                 }
-            }
-        });
+            });
     };
 
     service.validPassphrase = function (passphrase) {

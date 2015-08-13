@@ -1,15 +1,11 @@
-var dbService = function (errorService) {
+var dbService = function ($q, errorService) {
     var db;
 
     var executeSingleQuery = function (query, input) {
-        var deferred = $q.deferred;
+        var deferred = $q.defer();
 
         var success = function (tx, result) {
-            deferred.resolve(
-                result.rows,
-                result.rowsAffected,
-                result.insertId
-            );
+            deferred.resolve(result);
         };
 
         var failure = function (tx, error) {
@@ -21,7 +17,7 @@ var dbService = function (errorService) {
             tx.executeSql(query, input, success, failure);
         });
 
-        return deferred.promise; // TODO: promise() ?
+        return deferred.promise;
     };
 
 
@@ -51,23 +47,17 @@ var dbService = function (errorService) {
         );
     };
 
-    service.getHash = function (callback) {
-        executeSingleQuery(
-            "SELECT hash FROM Hash",
-            null,
-            function (error, data) {
-                if (error) {
-                    callback(error);
-                }
-                else if (data.rows.length === 0) {
+    service.getHash = function () {
+        return executeSingleQuery("SELECT hash FROM Hash")
+            .then(function (result) {
+                if (result.rows.length === 0) {
                     // It's OK - not set yet
-                    callback(null, null);
+                    return null;
                 }
                 else {
-                    callback(null, data.rows.item(0).hash);
+                    return result.rows.item(0).hash;
                 }
-            }
-        );
+            });
     };
 
     service.setHash = function (hash, callback) {
