@@ -108,32 +108,20 @@ var dbService = function ($q, errorService) {
             });
     };
 
-    service.setAllRecords = function (records, message, done) {
-        var processed = 0;
-
-        query(
-            "DELETE FROM Records",
-            null,
-            message
-        );
-
-        _.each(records, function (record) {
-            query(
-                "INSERT INTO Records (id, created, updated) VALUES (?, ?, ?)",
-                [record.id, record.created, record.updated],
-                function (error) {
-                    if (error) {
-                        message(error);
-                    }
-
-                    processed++;
-                    if (processed == records.length) {
-                        message("Finished inserting");
-                        done();
-                    }
-                }
-            );
-        });
+    service.setAllRecords = function (records, message) {
+        return query("DELETE FROM Records")
+            .catch(message)
+            .then(function () {
+                return $q.all(_.map(records, function (record) {
+                    return query(
+                        "INSERT INTO Records (id, created, updated) " +
+                        "VALUES (?, ?, ?)",
+                        [record.id, record.created, record.updated]
+                    ).catch(message);
+                }));
+            }).then(function () {
+                message("Finished inserting");
+            });
     };
 
     service.addRecord = function (record) {

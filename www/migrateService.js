@@ -1,69 +1,54 @@
 migrateService = function ($http, $q, dbService) {
 
+    var migrateRecord = function (record) {
+        return $http.get("/api/records/" + record.id)
+            .then(
+                function (data) { return data.data; },
+                function (error) {
+                    message("error getting record id " + record.id);
+                }
+            )
+            .then(dbService.updateRecord)
+            .then(
+                function () {
+                    message(
+                        "Saved text for record #" + record.id +
+                        " from " + record.created
+                    );
+                },
+                function (error) { message(error); }
+            );
+    };
+
     var service = {};
 
-    service.migrate = function (message, done) {
-        // TODO: fix multiple issues:
-        //      - too long function
-        //      - reused data
-        //      - use promises
+    // TODO: use promise progress update instead of message
+    service.migrate = function (message) {
+        var records;
 
-        $http.get("/api/records")
-            .success(function (data) {
-                message("got " + data.length + " records metadata");
-
-                dbService.setAllRecords(
-                    data,
-                    message,
-                    function () {
-                        dbService.getAllRecords(function (error, data) {
-                            var processed = 0;
-
-                            var processOne = function () {
-                                processed++;
-                                if (processed == data.length) {
-                                    message("Finished getting all records text");
-                                    done();
-                                }
-                            };
-
-                            if (error) {
-                                message(error);
-                                done();
-                                return;
-                            }
-
-                            _.each(data, function (record) {
-                                $http.get("/api/records/" + record.id)
-                                    .success(function (data) {
-                                        dbService.updateRecord(
-                                            data,
-                                            function (error) {
-                                                if (error) {
-                                                    message(error);
-                                                }
-                                                else {
-                                                    message(
-                                                        "Saved text for record #" + record.id +
-                                                        " from " + record.created
-                                                    );
-                                                }
-                                                processOne();
-                                            }
-                                        );
-                                    })
-                                    .error(function () {
-                                        message("error getting record id " + record.id);
-                                        processOne();
-                                    });
-                            });
-                        });
+        return $http.get("/api/records")
+            .then(
+                function (data) {
+                    message("got " + data.data.length + " records metadata");
+                    return data.data;
+                },
+                function (error) {
+                    message("error getting metadata");
+                }
+            )
+            .then(dbService.setAllRecords)
+            .then(function () {
+                var processOne = function () {
+                    if (processed == data.length) {
+                        message("Finished getting all records text");
                     }
-                );
-            })
-            .error(function () {
-                message("error getting metadata");
-                done();
+                };
+
+                if (error) {
+                    message(error);
+                }
+
+                $q.all(_.map(records, migrateRecord));
             });
     };
 
