@@ -50,57 +50,8 @@ migrateService = function ($http, $q, dbService) {
             });
     };
 
-    service.getYearForBackup = function (year, messageCallback, doneCallback) {
-
-        var callFor = function (record, message) {
-            messageCallback(
-                "#" + record.id +
-                " - " + record.created +
-                " - " + message
-            );
-        };
-
-        var yearlyRecords = _.filter(
-            records,
-            function (record) {
-                return year == moment(record.created).year();
-            }
-        );
-
-        var startRetrievalFromServer = _.map(
-            yearlyRecords,
-            function (record) {
-                if (record.text) {
-                    callFor(record, "in memory");
-                    return null;
-                }
-
-                return $http.get("/api/records/" + record.id)
-                    .then(
-                        function (data) {
-                            record.text = data.data.text;
-                            callFor(record, "retrieved");
-                        },
-                        function () { callFor(record, "failure"); }
-                    );
-            }
-        );
-
-        $q.all(
-            _.filter(startRetrievalFromServer)
-        ).then(
-            function () {
-                doneCallback(
-                    _.map(
-                        yearlyRecords,
-                        function (record) {
-                            // Clear Angular attributes
-                            return _.omit(record, "$$hashKey");
-                        }
-                    )
-                );
-            }
-        );
+    service.getYearForBackup = function (year) {
+        return dbService.getYearlyRecords(year);
     };
 
     return service;

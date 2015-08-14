@@ -97,7 +97,7 @@ var dbService = function ($q, errorService) {
         );
     };
 
-    service.getAllRecords = function (callback) {
+    service.getAllRecords = function () {
         return query("SELECT id, created, updated FROM Records")
             .then(function (result) {
                 return _.map(
@@ -122,6 +122,20 @@ var dbService = function ($q, errorService) {
             }).then(function () {
                 message("Finished inserting records metadata");
             });
+    };
+
+    service.getYearlyRecords = function (year) {
+        return query(
+            "SELECT * FROM Records WHERE created BETWEEN ? AND ?",
+            [moment({ year: year }).format(),
+             moment({ year: year + 1 }).format()]
+        ).then(function (result) {
+            return _.map(
+                _.range(result.rows.length),
+                result.rows.item,
+                result.rows
+            );
+        });
     };
 
     service.getRecord = function (id) {

@@ -41,10 +41,8 @@ var dropboxCtrl = function (
         $scope.backuping = true;
         $scope.backupResult = "- in progress";
 
-        migrateService.getYearForBackup(
-            year,
-            _.bind(Array.prototype.push, $scope.backupMessages),
-            function (records) {
+        migrateService.getYearForBackup(year)
+            .then(function (records) {
                 client.writeFile(
                     settingsService.settings.dropboxFolder + '/' + filename,
                     JSON.stringify(records),
@@ -54,12 +52,12 @@ var dropboxCtrl = function (
                                 "failure saving the backup to Dropbox"
                             );
                         }
-
-                        $scope.backuping = false;
-                        $scope.backupResult = "- finished";
                     }
                 );
-            }
-        );
+            })
+            .finally(function () {
+                $scope.backuping = false;
+                $scope.backupResult = "- finished";
+            });
     };
 };
