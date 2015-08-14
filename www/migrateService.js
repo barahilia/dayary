@@ -22,7 +22,6 @@ migrateService = function ($http, $q, dbService) {
 
     var service = {};
 
-    // TODO: use promise progress update instead of message
     service.migrate = function (message) {
         var records;
 

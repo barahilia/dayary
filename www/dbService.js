@@ -124,15 +124,6 @@ var dbService = function ($q, errorService) {
             });
     };
 
-    service.addRecord = function (record) {
-        return query(
-            "INSERT INTO Records (created, updated) VALUES (?, ?)",
-            [record.created, record.updated]
-        ).then(function (result) {
-            return service.getRecord(result.insertId);
-        });
-    };
-
     service.getRecord = function (id) {
         return query("SELECT * FROM Records WHERE id = ?", [id])
             .then(function (result) {
@@ -147,6 +138,15 @@ var dbService = function ($q, errorService) {
                 return result.rows.item(0);
             }
         );
+    };
+
+    service.addRecord = function (record) {
+        return query(
+            "INSERT INTO Records (created, updated) VALUES (?, ?)",
+            [record.created, record.updated]
+        ).then(function (result) {
+            return service.getRecord(result.insertId);
+        });
     };
 
     service.updateRecord = function (record) {
