@@ -7,9 +7,10 @@ access to the server.
 
 ## Dairy tools
 
-Obviously there are other dairy tools. I had used some before I came to
+There are other dairy tools I had used or considered to use before I came to
 conclusion I need something new. Here are them:
 * Word from MS Office, Writer from LibreOffice or any other word processor
+* Blogging platforms like Wordpress or Jekyll
 * Moment Diary
 * Dairy services online
 * Dairy apps for iOS and Android
@@ -18,8 +19,9 @@ conclusion I need something new. Here are them:
 
 And here are what I needed from the dairy tool and haven't found them in
 existing ones:
-* one
-* two
+* Multiplatform - ability to read and write the diary at least on PC, iOS and Android devices
+* Autosaving
+* Security - records must be encrypted with strong security locally and decrypted only at the user access time
 
 ## Architecture
 
