@@ -1,11 +1,11 @@
 migrateService = function ($http, $q, dbService) {
 
-    var migrateRecord = function (record) {
+    var migrateRecord = function (record, message) {
         return $http.get("/api/records/" + record.id)
             .then(
                 function (data) { return data.data; },
                 function (error) {
-                    message("error getting record id " + record.id);
+                    message("Error getting record id " + record.id);
                 }
             )
             .then(dbService.updateRecord)
@@ -29,26 +29,25 @@ migrateService = function ($http, $q, dbService) {
         return $http.get("/api/records")
             .then(
                 function (data) {
-                    message("got " + data.data.length + " records metadata");
-                    return data.data;
+                    records = data.data;
+                    message("Got " + records.length + " records metadata");
+                    return records;
                 },
                 function (error) {
-                    message("error getting metadata");
+                    message("Error getting metadata");
                 }
             )
-            .then(dbService.setAllRecords)
+            .then(
+                _.partial(dbService.setAllRecords, _, message),
+                message
+            )
             .then(function () {
-                var processOne = function () {
-                    if (processed == data.length) {
-                        message("Finished getting all records text");
-                    }
-                };
-
-                if (error) {
-                    message(error);
-                }
-
-                $q.all(_.map(records, migrateRecord));
+                return $q.all(
+                    _.map(records, _.partial(migrateRecord, _, message))
+                );
+            })
+            .then(function () {
+                message("Finished getting all records text");
             });
     };
 
@@ -107,4 +106,3 @@ migrateService = function ($http, $q, dbService) {
 
     return service;
 };
-

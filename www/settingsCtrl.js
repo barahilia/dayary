@@ -18,9 +18,9 @@ var settingsCtrl = function (
         $scope.migrateMessages = [];
 
         migrateService.migrate(
-            _.bind(Array.prototype.push, $scope.migrateMessages),
-            function () { $scope.migrating = false; }
-        );
+            _.bind(Array.prototype.push, $scope.migrateMessages)
+        ).finally(function () {
+            $scope.migrating = false;
+        });
     };
 };
-

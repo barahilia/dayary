@@ -120,7 +120,7 @@ var dbService = function ($q, errorService) {
                     ).catch(message);
                 }));
             }).then(function () {
-                message("Finished inserting");
+                message("Finished inserting records metadata");
             });
     };
 
