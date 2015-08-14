@@ -17,13 +17,19 @@ conclusion I need something new. Here are them:
 
 ## Requirements
 
-And here are what I needed from the dairy tool and haven't found them in
-existing ones:
+And here are what I needed from the dairy tool and haven't found in the existing ones:
 * Multiplatform - ability to read and write the diary at least on PC, iOS and Android devices
-* Autosaving
+* Autosaving and autobackup to a cloud storage
 * Security - records must be encrypted with strong security locally and decrypted only at the user access time
+* Data organization as entries with convenient and accessible view for all entries
+* Convertability - ability to import and export entries with the other tools
+* Lockable workspace
+* Customisable - ability to add features
 
 ## Architecture
 
 ## Design
 
+## Services, frameworks and libraries
+
+* Services: github, dropbox
