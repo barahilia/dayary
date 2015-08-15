@@ -36,3 +36,20 @@ describe("encryption service", function () {
         expect(decrypted).toBe(s);
     }));
 });
+
+describe("db service", function () {
+
+    beforeEach(module('app'));
+
+    it("should have no settings at the beginning", function (done) {
+        inject(function (errorService) {
+            var service = dbService(Q, errorService);
+            service.init();
+            service.getSettings()
+                .then(function (settings) {
+                    expect(settings).toEqual({});
+                    done();
+                });
+        });
+    });
+});
