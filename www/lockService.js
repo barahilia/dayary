@@ -2,6 +2,7 @@ var lockService = function (
     $window, $interval, $state,
     dbService, settingsService, encryptionService
 ) {
+    // TODO: extract relevant code to new autolockerService
     // TODO: consider moving this futher to encryptionService
     var hash;
     var devPassphrase = "Very secret phrase";
