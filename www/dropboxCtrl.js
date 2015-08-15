@@ -52,12 +52,11 @@ var dropboxCtrl = function (
                                 "failure saving the backup to Dropbox"
                             );
                         }
+
+                        $scope.backuping = false;
+                        $scope.backupResult = "- finished";
                     }
                 );
-            })
-            .finally(function () {
-                $scope.backuping = false;
-                $scope.backupResult = "- finished";
             });
     };
 };
