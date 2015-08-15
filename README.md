@@ -52,6 +52,30 @@ service to be used for backup and synchronization between the clients.
 
 ## Design
 
+The main unit of work is dairy `record`:
+```
+{
+    id: Number, internal identificator
+    created: Datetime, creation time and visual and sync identificator
+    updated: Datetime, last update time, to sync the latest udpate
+    text: String, encrypted textual entry
+}
+```
+AES-256 algorithm is used for encryption. A passphrase is saved for
+the session time to decrypt existing and encrypt updated records.
+Decrypted text is only shown to the user. Database has only encrypted
+text. A SHA-256 hash of the passphrase is presisted to guide the user
+against the incorrect and inconsistent passphrase. A workspace is
+locked after timeout and other conditions; this erases local copy of
+the passphrase.
+
+Views are organazed into states with **ui-router**. The main one
+shows a list of records and allows to read and edit a record.
+
+Backup and sync are done with Dropbox. Records are split to yearly
+chunks and saved to JSON files to allow for relatively small units
+for faster upload and download.
+
 ## Powered by
 
 The tool was built with the help of the following wonderful:
