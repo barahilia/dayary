@@ -1,55 +1,75 @@
 
-describe("lock service", function () {
+describe("app module", function () {
 
     beforeEach(module('app'));
 
-    it("should start locked", inject(function (lockService) {
-        expect(lockService.locked()).toBeTruthy();
-    }));
+    describe("lock service", function () {
+        var service;
 
-    it("should be locked and unlocked", inject(function (lockService) {
-        lockService.unlock();
-        expect(lockService.locked()).toBeFalsy();
-        lockService.lock();
-        expect(lockService.locked()).toBeTruthy();
-    }));
-});
+        beforeEach(inject(function (lockService) {
+            service = lockService;
+        }));
 
-describe("encryption service", function () {
+        it("should start locked", function () {
+            expect(service.locked()).toBeTruthy();
+        });
 
-    beforeEach(module('app'));
+        it("should be locked and unlocked", function () {
+            service.unlock();
+            expect(service.locked()).toBeFalsy();
+            service.lock();
+            expect(service.locked()).toBeTruthy();
+        });
+    });
 
-    it("should change input string", inject(function (encryptionService) {
-        var s = "input string";
-        encryptionService.setPassphrase("passphrase");
-        expect(encryptionService.encrypt(s)).not.toBe(s);
-    }));
+    describe("encryption service", function () {
+        var service;
 
-    it("should decrypt to original", inject(function (encryptionService) {
-        var s = "input string";
-        var encrypted, decrypted;
+        beforeEach(inject(function (encryptionService) {
+            service = encryptionService;
+        }));
 
-        encryptionService.setPassphrase("passphrase");
-        encrypted = encryptionService.encrypt(s);
-        decrypted = encryptionService.decrypt(encrypted);
+        it("should change input string", function () {
+            var s = "input string";
+            service.setPassphrase("passphrase");
+            expect(service.encrypt(s)).not.toBe(s);
+        });
 
-        expect(decrypted).toBe(s);
-    }));
-});
+        it("should decrypt to original", function () {
+            var s = "input string";
+            var encrypted, decrypted;
 
-describe("db service", function () {
+            service.setPassphrase("passphrase");
+            encrypted = service.encrypt(s);
+            decrypted = service.decrypt(encrypted);
 
-    beforeEach(module('app'));
+            expect(decrypted).toBe(s);
+        });
+    });
 
-    it("should have no settings at the beginning", function (done) {
-        inject(function (errorService) {
-            var service = dbService(Q, errorService);
+    describe("db service", function () {
+        var service;
+
+        beforeEach(inject(function (errorService) {
+            service = dbService(Q, errorService);
             service.init();
+        }));
+
+        it("should have no settings at the beginning", function (done) {
             service.getSettings()
                 .then(function (settings) {
                     expect(settings).toEqual({});
                     done();
                 });
         });
+
+        it("should have no records at the beginning", function (done) {
+            service.getAllRecords()
+                .then(function (records) {
+                    expect(records).toEqual([]);
+                    done();
+                });
+        });
     });
+
 });
