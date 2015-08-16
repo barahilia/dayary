@@ -13,11 +13,11 @@ var recordsCtrl = function (
             $scope.records = records;
             $scope.loadingRecordsList = false;
 
-            if($state.params.id) {
+            if ($state.params.id) {
                 // Do nothing - we are heading to some specific record
             }
             else {
-                if(records.length > 0) {
+                if (records.length > 0) {
                     $state.go("records.item", { id: records[0].id });
                 }
             }
@@ -31,11 +31,15 @@ var recordsCtrl = function (
 
         dbService.addRecord(addition)
             .then(function (record) {
+                $scope.records.unshift(record);
                 $state.go("records.item.edit", { id: record.id });
             });
     };
 
     $scope.remove = function (record) {
-        dbService.deleteRecord(record);
+        dbService.deleteRecord(record.id)
+            .then(function () {
+                $scope.records = _.without($scope.records, record);
+            });
     };
 };

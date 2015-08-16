@@ -78,7 +78,7 @@ var dbService = function ($q, errorService) {
 
                 _.each(_.range(result.rows.length), function (index) {
                     var s = result.rows.item(index);
-                    settings[s.key] = JSON.parse(s.value)
+                    settings[s.key] = JSON.parse(s.value);
                 });
 
                 return settings;
