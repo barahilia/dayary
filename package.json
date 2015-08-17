@@ -25,9 +25,9 @@
     "body-parser": "~1.10.1",
     "dropbox": "^0.10.3",
     "express": "~4.10.6",
-    "moment": "~2.9.0",
+    "moment": "^2.9.0",
     "sqlite3": "^3.0.5",
-    "underscore": "~1.7.0"
+    "underscore": "^1.7.0"
   },
   "devDependencies": {
     "jasmine-node": "^1.14.5",
