@@ -7,7 +7,7 @@ var configApp = function ($stateProvider, $urlRouterProvider) {
             abstract: true,
             views: {
                 "banner": {
-                    templateUrl: "banner.html",
+                    templateUrl: "www/banner.html",
                     controller: "bannerCtrl"
                 },
                 "": {
@@ -20,41 +20,41 @@ var configApp = function ($stateProvider, $urlRouterProvider) {
         .state("lock", {
             parent: "root",
             url: "/",
-            templateUrl: "lock.html",
+            templateUrl: "www/lock.html",
             controller: "lockCtrl"
         })
         .state("settings", {
             parent: "root",
             url: "/settings",
-            templateUrl: "settings.html",
+            templateUrl: "www/settings.html",
             controller: "settingsCtrl"
         })
         .state("dropbox", {
             parent: "root",
             url: "/dropbox",
-            templateUrl: "dropbox.html",
+            templateUrl: "www/dropbox.html",
             controller: "dropboxCtrl"
         })
         .state("years", {
             parent: "root",
             url: "/years",
-            templateUrl: "years.html",
+            templateUrl: "www/years.html",
             controller: "yearsCtrl"
         })
         .state("records", {
             parent: "root",
             url: "/records",
-            templateUrl: "records.html",
+            templateUrl: "www/records.html",
             controller: "recordsCtrl"
         })
         .state("records.item", {
             url: "/:id",
-            templateUrl: "viewer.html",
+            templateUrl: "www/viewer.html",
             controller: "viewerCtrl"
         })
         .state("records.item.edit", {
             url: "/edit",
-            templateUrl: "editor.html",
+            templateUrl: "www/editor.html",
             controller: "editorCtrl"
         })
         ;
