@@ -14,7 +14,7 @@ client.authenticate({interactive: true}, function(error, client) {
     }
 
     if (client.isAuthenticated()) {
-        window.location.href = "/";
+        window.location.href = "/dayary";
     }
     else {
         d = document.createElement("div");
