@@ -59,4 +59,22 @@ var dropboxCtrl = function (
                 );
             });
     };
+
+    $scope.listFiles = function () {
+        $scope.listing = true;
+
+        client.readdir(
+            settingsService.settings.dropboxFolder,
+            function (error, names, dirData, entries) {
+                if (error) {
+                    errorService.reportError(
+                        "failure saving the backup to Dropbox"
+                    );
+                }
+
+                $scope.listing = false;
+                $scope.files = entries;
+            }
+        );
+    };
 };

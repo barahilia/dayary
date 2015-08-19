@@ -38,6 +38,23 @@
 
         <div ng-repeat="message in backupMessages">
             {{message}}
+        </div>
+
         <div>
+            <button class="btn btn-success"
+                    ng-click="listFiles()"
+                    ng-disabled="listing">
+                List files
+            </button>
+
+            <span ng-show="listing" class="fa fa-spinner fa-spin">
+            </span>
+        </div>
+
+        <br />
+
+        <div ng-repeat="file in files">
+            {{file.name}} - {{file.humanSize}}
+        </div>
     </div>
 </div>
