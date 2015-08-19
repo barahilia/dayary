@@ -68,12 +68,35 @@ var dropboxCtrl = function (
             function (error, names, dirData, entries) {
                 if (error) {
                     errorService.reportError(
-                        "failure saving the backup to Dropbox"
+                        "failure listing Dropbox files"
                     );
                 }
 
                 $scope.listing = false;
                 $scope.files = entries;
+            }
+        );
+    };
+
+    $scope.migrateFile = function (path) {
+        $scope.migrating = true;
+        $scope.migrationResult = " - in progress";
+
+        client.readFile(
+            settingsService.settings.dropboxFolder + '/' + path,
+            function (error, data) {
+                if (error) {
+                    data = "[]";
+                    errorService.reportError(
+                        "failure reading the file from Dropbox"
+                    );
+                }
+
+                migrateService.updateLocalRecords(JSON.parse(data))
+                    .finally(function () {
+                        $scope.migrating = false;
+                        $scope.migrationResult = " - finished";
+                    });
             }
         );
     };
