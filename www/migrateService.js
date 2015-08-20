@@ -54,5 +54,24 @@ migrateService = function ($http, $q, dbService) {
         return dbService.getYearlyRecords(year);
     };
 
+    service.updateLocalRecords = function (records) {
+        return dbService.getAllRecords()
+            .then(function (metadata) {
+                return $q.all(_.map(records, function (record) {
+                    var criteria = { created: record.created };
+                    var local = _.findWhere(metadata, criteria);
+
+                    if (local) { // Update if needed
+                        if (moment(local.updated).isBefore(record.updated)) {
+                            return dbService.updateRecord(record);
+                        }
+                    }
+                    else { // Insert new
+                        return dbService.addRecord(record);
+                    }
+                }));
+            });
+    };
+
     return service;
 };

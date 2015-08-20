@@ -156,8 +156,8 @@ var dbService = function ($q, errorService) {
 
     service.addRecord = function (record) {
         return query(
-            "INSERT INTO Records (created, updated) VALUES (?, ?)",
-            [record.created, record.updated]
+            "INSERT INTO Records (created, updated, text) VALUES (?, ?, ?)",
+            [record.created, record.updated, record.text]
         ).then(function (result) {
             return service.getRecord(result.insertId);
         });
