@@ -26,7 +26,8 @@ var recordsCtrl = function (
     $scope.add = function () {
         var addition = {
             created: moment().format(),
-            updated: moment().format()
+            updated: moment().format(),
+            text: ""
         };
 
         dbService.addRecord(addition)
