@@ -1,6 +1,8 @@
 var dbService = function ($q, errorService) {
     var db;
 
+    // A caveat to be remembered: returning value of result.rows.item() might
+    // be read-only. Observed in Chrome and Safari in iPad. Clone before use.
     var query = function (query, input) {
         var deferred = $q.defer();
 
@@ -102,8 +104,9 @@ var dbService = function ($q, errorService) {
             .then(function (result) {
                 return _.map(
                     _.range(result.rows.length),
-                    result.rows.item,
-                    result.rows
+                    function (i) {
+                        return _.clone(result.rows.item(i));
+                    }
                 );
             });
     };
@@ -132,8 +135,9 @@ var dbService = function ($q, errorService) {
         ).then(function (result) {
             return _.map(
                 _.range(result.rows.length),
-                result.rows.item,
-                result.rows
+                function (i) {
+                    return _.clone(result.rows.item(i));
+                }
             );
         });
     };
@@ -149,7 +153,7 @@ var dbService = function ($q, errorService) {
                     throw message;
                 }
 
-                return result.rows.item(0);
+                return _.clone(result.rows.item(0));
             }
         );
     };
