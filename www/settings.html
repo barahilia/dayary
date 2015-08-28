@@ -59,5 +59,37 @@
 
     <div ng-repeat="message in migrateMessages">
         {{message}}
+    </div>
+</div>
+
+<div class="col-sm-3">
+    <h2>Clean</h2>
+
     <div>
+        <button class="btn btn-success"
+                ng-disabled="cleaningdb"
+                ng-hide="confirmClean"
+                ng-click="confirmClean = true">
+            Clean
+        </button>
+        <div ng-show="confirmClean">
+            <button class="btn btn-success"
+                    ng-click="confirmClean = false; cleandb();">
+                Confirm
+            </button>
+            <button class="btn btn-success"
+                    ng-click="confirmClean = false">
+                Stop
+            </button>
+        </div>
+
+        <span ng-show="cleaningdb" class="fa fa-spinner fa-spin">
+        </span>
+    </div>
+
+    <br />
+
+    <div>
+        Remove all local data. Then new setup can be done.
+    </div>
 </div>
