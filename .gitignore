@@ -1,7 +1,4 @@
-*~
-
 bower_components/
 node_modules/
 
 data/
-test/records.sqlite
