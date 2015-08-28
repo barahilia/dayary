@@ -1,22 +1,11 @@
 {
   "name": "dayary",
-  "version": "0.1.0",
+  "description": "Diary tool in web app capable to sync with Dropbox",
   "authors": [
     "barahilia <barahilia@gmail.com>"
   ],
-  "description": "Diary tool deployed as a local web-server",
-  "moduleType": [
-    "globals"
-  ],
   "license": "MIT",
   "private": true,
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
   "dependencies": {
     "bootstrap": "~3.3.1",
     "angular": "~1.4.0",

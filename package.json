@@ -1,7 +1,7 @@
 {
   "name": "dayary",
   "version": "0.9.0",
-  "description": "Diary tool deployed as a local web-server",
+  "description": "Diary tool in web app capable to sync with Dropbox",
   "main": "server/main.js",
   "scripts": {
     "start": "node server/main.js",
