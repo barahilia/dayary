@@ -49,11 +49,25 @@ describe("app module", function () {
 
     describe("db service", function () {
         var service;
+        var initialized;
 
         beforeEach(inject(function (errorService) {
-            service = dbService(Q, errorService);
-            service.init();
+            if (!service) {
+                service = dbService(Q, errorService);
+            }
         }));
+
+        beforeEach(function (done) {
+            if (initialized) {
+                done();
+            }
+            else {
+                initialized = true;
+                service.cleanDb()
+                    .then(service.init)
+                    .then(done);
+            }
+        });
 
         it("should have no settings at the beginning", function (done) {
             service.getSettings()
