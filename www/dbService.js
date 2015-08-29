@@ -74,7 +74,7 @@ var dbService = function ($q, errorService) {
         return service.getHash()
             .then(function (oldHash) {
                 if (oldHash) {
-                    throw "Cannot override an existing hash";
+                    throw "set hash: cannot replace existing hash";
                 }
 
                 return query("INSERT INTO Hash (hash) VALUES (?)", [hash]);

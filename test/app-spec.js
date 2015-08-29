@@ -88,6 +88,18 @@ describe("app module", function () {
                 });
         });
 
+        it("should fail resetting hash", function (done) {
+            service.setHash("bcb")
+                .then(
+                    null,
+                    function (err) {
+                        var s = "set hash: cannot replace existing hash";
+                        expect(err).toBe(s);
+                        done();
+                    }
+                );
+        });
+
         it("should set one setting", function (done) {
             service.setSettings({ a: 42 })
                 .then(function (results) {
@@ -169,6 +181,18 @@ describe("app module", function () {
                     ]);
                     done();
                 });
+        });
+
+        it("should fail updating non-existing record", function (done) {
+            service.updateRecord({ id: 17, text: 'bbb', updated: '15' })
+                .then(
+                    null,
+                    function (err) {
+                        var s = 'update record: failure updating or no changes';
+                        expect(err).toBe(s);
+                        done();
+                    }
+                );
         });
     });
 
