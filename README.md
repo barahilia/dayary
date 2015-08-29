@@ -1,11 +1,15 @@
 # Dayary
 
-Dayary is a dairy tool that is different in two ways. First - it can be
-deployed as a local web server. Second - encryption is done at the
-client side. No one can read your private thoughts even if he gets
-access to the server.
+Dayary is a dairy tool that runs in a web app, ecrypts records and allows to
+sync them with a cloud storage.
 
-## Dairy tools
+To use it simply browse https://barahilia.github.io/dayary in Chrome or Safary.
+
+All the records are storred locally, encrypted before save and decrypted at
+viewing or editing only. [Dropbox](https://www.dropbox.com/) can be used for
+backup and restore of encrypted records.
+
+## Other dairy tools
 
 There are other dairy tools I had used or considered to use before I came to
 conclusion I need something different. Here are them:
@@ -14,7 +18,7 @@ conclusion I need something different. Here are them:
 * Moment Diary
 * Dairy services online and apps for iOS and Android
 
-## Requirements
+## Features
 
 And here are what I needed from the dairy tool and haven't found in the existing ones:
 * Multiplatform - ability to read and write the diary at least on PC, iOS and Android devices
@@ -28,6 +32,7 @@ And here are what I needed from the dairy tool and haven't found in the existing
 
 ## Architecture
 
+!! EDIT !!
 There are two architectures. One is implemented already.
 Implementation of the other is work in progress tha should be finished
 in the coming weeks.
@@ -83,3 +88,4 @@ The tool was built with the help of the following wonderful:
 * Tools: Chrome, npm, bower, jshint
 * Frameworks: Angular.js, Jasmine.js, node.js, express.js
 * Libraries: bootstrap, font-awesome, ui-router, Moment.js, Underscore.js, dropbox.js, sqlite3, cryptojslib
+
