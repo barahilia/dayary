@@ -63,7 +63,9 @@ describe("app module", function () {
             }
             else {
                 initialized = true;
-                service.cleanDb()
+                // TODO: it's stupid to init before and after clean
+                service.init()
+                    .then(service.cleanDb)
                     .then(service.init)
                     .then(done);
             }
@@ -73,6 +75,15 @@ describe("app module", function () {
             service.getSettings()
                 .then(function (settings) {
                     expect(settings).toEqual({});
+                    done();
+                });
+        });
+
+        it("should set setting with no error", function (done) {
+            service.setSettings({ a: 42 })
+                .then(function (results) {
+                    expect(results.length).toBe(1);
+                    expect(results[0].rowsAffected).toBe(1);
                     done();
                 });
         });
