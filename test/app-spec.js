@@ -145,10 +145,10 @@ describe("app module", function () {
         });
 
         it("should add another record", function (done) {
-            service.addRecord({ created: 3, updated: 4 })
+            service.addRecord({ text: null, created: 3, updated: 4 })
                 .then(function (record) {
                     expect(record).toEqual(
-                        { id: 2, text: 'undefined', created: '3.0', updated: '4.0' }
+                        { id: 2, text: null, created: '3.0', updated: '4.0' }
                     );
                     done();
                 });
