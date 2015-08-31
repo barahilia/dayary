@@ -5,19 +5,19 @@ CACHE:
 
 index.html
 
-bower_components/bootstrap/dist/css/bootstrap.css
-bower_components/font-awesome/css/font-awesome.css
-bower_components/underscore/underscore.js
-bower_components/angular/angular.js
-bower_components/ui-router/release/angular-ui-router.js
-bower_components/cryptojslib/rollups/aes.js
-bower_components/cryptojslib/rollups/sha256.js
-bower_components/moment/moment.js
+external/js/aes.js
+external/js/moment.js
+external/js/angular.js
+external/js/sha256.js
+external/js/underscore.js
+external/js/angular-ui-router.js
+external/js/dropbox.js
 
-bower_components/font-awesome/fonts/fontawesome-webfont.woff?v=4.4.0
-bower_components/font-awesome/fonts/fontawesome-webfont.woff2?v=4.4.0
+external/css/bootstrap.css
+external/css/font-awesome.css
 
-node_modules/dropbox/lib/dropbox.js
+external/fonts/fontawesome-webfont.woff
+external/fonts/fontawesome-webfont.woff2
 
 www/enforceHttps.js
 www/icons/icon-192x192.png
