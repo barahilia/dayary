@@ -5,7 +5,6 @@
   "main": "server/main.js",
   "scripts": {
     "postinstall": "bower install",
-    "start": "node server/main.js",
     "test": "node_modules/phantomjs/lib/phantom/bin/phantomjs node_modules/jasmine-reporters/bin/phantomjs-testrunner.js /home/iliab/workspace/dayary/test/jasmine.html",
     "lint": "npm run lint-server && npm run lint-www",
     "lint-www": "node node_modules/jshint/bin/jshint www",
@@ -23,12 +22,8 @@
   "readme": "Please refer to the README.md",
   "readmeFilename": "README.md",
   "dependencies": {
-    "body-parser": "~1.10.1",
     "dropbox": "^0.10.3",
-    "express": "~4.10.6",
-    "moment": "^2.9.0",
-    "sqlite3": "^3.0.5",
-    "underscore": "^1.7.0"
+    "express": "~4.10.6"
   },
   "devDependencies": {
     "jasmine-node": "^1.14.5",
