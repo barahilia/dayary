@@ -1,6 +1,6 @@
 var settingsCtrl = function (
     $scope,
-    settingsService, migrateService, dbService
+    settingsService, migrateService, lockService, dbService
 ) {
     $scope.settings = settingsService.settings;
 
@@ -22,5 +22,17 @@ var settingsCtrl = function (
         ).finally(function () {
             $scope.migrating = false;
         });
+    };
+
+    $scope.cleandb = function () {
+        $scope.cleaningdb = true;
+
+        // TODO: possibly better reload - need same actions as in runApp
+        dbService.cleanDb()
+            .then(dbService.init)
+            .then(lockService.init)
+            .finally(function () {
+                $scope.cleaningdb = false;
+            });
     };
 };

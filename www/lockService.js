@@ -74,6 +74,7 @@ var lockService = function (
     var service = {};
 
     service.init= function () {
+        // TODO: consider calling dbService.init(); easier to users
         var devHash = encryptionService.computeHash(devPassphrase);
 
         dbService.getHash()

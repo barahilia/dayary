@@ -49,6 +49,14 @@ var dbService = function ($q, errorService) {
         return $q.all(_.map(tables, _.partial(query, _, undefined)));
     };
 
+    service.cleanDb = function () {
+        var tables = ["Hash", "Settings", "Records"];
+
+        return $q.all(_.map(tables, function (table) {
+            return query("DROP TABLE IF EXISTS " + table);
+        }));
+    };
+
     service.getHash = function () {
         return query("SELECT hash FROM Hash")
             .then(function (result) {
@@ -66,7 +74,7 @@ var dbService = function ($q, errorService) {
         return service.getHash()
             .then(function (oldHash) {
                 if (oldHash) {
-                    throw "Cannot override an existing hash";
+                    throw "set hash: cannot replace existing hash";
                 }
 
                 return query("INSERT INTO Hash (hash) VALUES (?)", [hash]);
