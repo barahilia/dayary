@@ -1,5 +1,7 @@
-migrateService = function ($http, $q, dbService, dropboxService) {
-
+migrateService = function (
+    $http, $q,
+    settingsService, dbService, dropboxService
+) {
     var migrateRecord = function (record, message) {
         return $http.get("/api/records/" + record.id)
             .then(
@@ -74,12 +76,12 @@ migrateService = function ($http, $q, dbService, dropboxService) {
     };
 
     var importFromCloud = function () {
-        return $q.all(
+        return $q.all([
             // Get cloud folder listing: [ { name, updated } ]
-            dropboxService.listFiles(),
+            dropboxService.listFiles(settingsService.settings.dropboxFolder),
             // Load saved files status: { name: { lastImport, lastExport } }
             dbService.getSyncStatus()
-        ).then(function (data) {
+        ]).then(function (data) {
             var cloudFiles = data[0];
             var status = data[1];
 
@@ -87,7 +89,7 @@ migrateService = function ($http, $q, dbService, dropboxService) {
             return $q.all(
                 _.map(cloudFiles, function (file) {
                     // If not in status or updated > lastImport
-                    if (status[file.name] &&
+                    if (status[file.path] &&
                         status[lastImport] > file.updated) {
                         // Do nothing
                     }
@@ -97,6 +99,11 @@ migrateService = function ($http, $q, dbService, dropboxService) {
                             .then(function (data) {
                                 var records = JSON.parse(data);
                                 return service.updateLocalRecords(records);
+                            })
+                            .then(function () {
+                                // Update status
+                                // TODO: make sure it isn't called in case of error
+                                return dbService.updateLastImport(file.path);
                             });
                     }
                 })

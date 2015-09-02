@@ -205,5 +205,14 @@ var dbService = function ($q, errorService) {
             });
     };
 
+    service.getSyncStatus = function () {
+        // TODO: not implemented
+        return {};
+    };
+
+    service.updateLastImport = function (name) {
+        // TODO: not implemented
+    };
+
     return service;
 };

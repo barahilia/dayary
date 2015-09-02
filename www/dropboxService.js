@@ -1,14 +1,30 @@
 dropboxService = function ($q, settingsService) {
 
-    var client = new Dropbox.Client({ key: "4hxwutae96fhhbd" });
+    // TODO: Make this completely generic service; get token
+    // from the user, initialize and call authenticate from runApp.
+    // See if need to throw for not authenticated at all.
 
+    var client = new Dropbox.Client({ key: "4hxwutae96fhhbd" });
+    var authenticated = false;
     var service = {};
 
-    service.listFiles = function () {
+    var throwIfNotAuthenticated = function () {
+        if (!authenticated) {
+            throw "Not authenticated";
+        }
+    }
+
+    client.authenticate({interactive: false}, function(error) {
+        authenticated = !error;
+    });
+
+    service.listFiles = function (path) {
         var deferred = $q.defer();
 
+        throwIfNotAuthenticated();
+
         client.readdir(
-            settingsService.settings.dropboxFolder,
+            path,
             function (error, names, dirData, entries) {
                 if (error) {
                     deferred.reject(error);
@@ -25,8 +41,10 @@ dropboxService = function ($q, settingsService) {
     service.readFile = function (path) {
         var deferred = $q.defer();
 
+        throwIfNotAuthenticated();
+
         client.readFile(
-            settingsService.settings.dropboxFolder + '/' + path,
+            path,
             function (error, data) {
                 if (error) {
                     deferred.reject(error);
