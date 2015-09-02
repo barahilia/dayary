@@ -2,6 +2,8 @@ var dropboxCtrl = function (
     $scope, errorService, settingsService, migrateService
 ) {
 
+    // TODO: remove this completely or use dropboxService
+
     var client = new Dropbox.Client({ key: "4hxwutae96fhhbd" });
 
     $scope.isAuthenticated = false;
