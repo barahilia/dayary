@@ -22,5 +22,23 @@ dropboxService = function ($q, settingsService) {
         return deferred.promise;
     };
 
+    service.readFile = function (path) {
+        var deferred = $q.defer();
+
+        client.readFile(
+            settingsService.settings.dropboxFolder + '/' + path,
+            function (error, data) {
+                if (error) {
+                    deferred.reject(error);
+                }
+                else {
+                    deferred.resolve(data);
+                }
+            }
+        );
+
+        return deferred.promise;
+    };
+
     return service;
 };

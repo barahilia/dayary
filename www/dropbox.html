@@ -74,5 +74,14 @@
         <div ng-repeat="file in files">
             {{file.name}} - {{file.humanSize}}
         </div>
+
+        <br />
+
+        <div>
+            <button class="btn btn-success"
+                    ng-click="autoSync()">
+                Auto sync
+            </button>
+        </div>
     </div>
 </div>

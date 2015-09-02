@@ -102,4 +102,8 @@ var dropboxCtrl = function (
             }
         );
     };
+
+    $scope.autoSync = function () {
+        migrateService.sync();
+    };
 };

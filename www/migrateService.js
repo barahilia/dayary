@@ -1,4 +1,4 @@
-migrateService = function ($http, $q, dbService) {
+migrateService = function ($http, $q, dbService, dropboxService) {
 
     var migrateRecord = function (record, message) {
         return $http.get("/api/records/" + record.id)
@@ -71,6 +71,46 @@ migrateService = function ($http, $q, dbService) {
                     }
                 }));
             });
+    };
+
+    var importFromCloud = function () {
+        return $q.all(
+            // Get cloud folder listing: [ { name, updated } ]
+            dropboxService.listFiles(),
+            // Load saved files status: { name: { lastImport, lastExport } }
+            dbService.getSyncStatus()
+        ).then(function (data) {
+            var cloudFiles = data[0];
+            var status = data[1];
+
+            // For each name in listing:
+            return $q.all(
+                _.map(cloudFiles, function (file) {
+                    // If not in status or updated > lastImport
+                    if (status[file.name] &&
+                        status[lastImport] > file.updated) {
+                        // Do nothing
+                    }
+                    else {
+                        // Import file
+                        return dropboxService.readFile(file.path)
+                            .then(function (data) {
+                                var records = JSON.parse(data);
+                                return service.updateLocalRecords(records);
+                            });
+                    }
+                })
+            );
+        });
+    };
+
+    var exportToCloud = function () {
+        // TODO: not implemented
+    };
+
+    service.sync = function () {
+        return importFromCloud()
+            .then(exportToCloud);
     };
 
     return service;
