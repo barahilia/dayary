@@ -24,6 +24,16 @@ var dbService = function ($q, errorService) {
         return deferred.promise;
     };
 
+    var verifyOneRowAffected = function (result) {
+        var affected = result.rowsAffected;
+        var message = "affected rows: expected one, was " + affected;
+
+        if (affected !== 1) {
+            errorService.reportError(message);
+            throw message;
+        }
+    };
+
 
     var service = {};
 
@@ -189,28 +199,14 @@ var dbService = function ($q, errorService) {
             "SET created = ?, updated = ?, text = ? " +
             "WHERE id = ?",
             [record.created, record.updated, record.text, record.id]
-        ).then(function (result) {
-            var message;
-
-            if (result.rowsAffected !== 1) {
-                message = "update record: failure updating or no changes";
-                errorService.reportError(message);
-                throw message;
-            }
-        });
+        ).then(
+            verifyOneRowAffected
+        );
     };
 
     service.deleteRecord = function (id) {
         return query("DELETE FROM Records WHERE id = ?", [id])
-            .then(function (result) {
-                var message;
-
-                if (result.rowsAffected !== 1) {
-                    message = "wasn't able to delete or no such id found";
-                    errorService.reportError(message);
-                    throw message;
-                }
-            });
+            .then(verifyOneRowAffected);
     };
 
     service.getSyncStatus = function () {
@@ -233,15 +229,9 @@ var dbService = function ($q, errorService) {
             "VALUES (?, ?, " +
             "   (SELECT lastExport FROM Sync WHERE path = ?))",
             [path, moment().format(), path]
-        ).then(function (result) {
-            var message;
-
-            if (result.rowsAffected !== 1) {
-                message = "update last import: failure updating";
-                errorService.reportError(message);
-                throw message;
-            }
-        });
+        ).then(
+            verifyOneRowAffected
+        );
     };
 
     return service;

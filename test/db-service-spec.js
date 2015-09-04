@@ -141,7 +141,7 @@ describe("db service", function () {
             .then(
                 null,
                 function (err) {
-                    var s = 'update record: failure updating or no changes';
+                    var s = 'affected rows: expected one, was 0';
                     expect(err).toBe(s);
                     done();
                 }
