@@ -88,9 +88,12 @@ migrateService = function (
             // For each name in listing:
             return $q.all(
                 _.map(cloudFiles, function (file) {
-                    // If not in status or updated > lastImport
-                    if (status[file.path] &&
-                        status[lastImport] > file.updated) {
+                    var path = file.path;
+
+                    // If in status and lastImport after the file was modified
+                    if (status[path] &&
+                        moment(status[path].lastImport)
+                            .isAfter(file.modifiedAt)) {
                         // Do nothing
                     }
                     else {

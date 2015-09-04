@@ -1,6 +1,8 @@
 var dbService = function ($q, errorService) {
     var db;
 
+    // TODO: add convenience functions: selectOne, selectAll, deleteOne, ...
+
     // A caveat to be remembered: returning value of result.rows.item() might
     // be read-only. Observed in Chrome and Safari in iPad. Clone before use.
     var query = function (query, input) {
@@ -30,6 +32,7 @@ var dbService = function ($q, errorService) {
 
         db = openDatabase("dayary", "0.8", "Dayary DB", 5 * 1000 * 1000);
 
+        // In SQLite TEXT can be used for DATETIME
         tables = [
             "CREATE TABLE IF NOT EXISTS Hash (" +
                 "hash VARCHAR" +
@@ -43,6 +46,11 @@ var dbService = function ($q, errorService) {
                 "created TEXT," +
                 "updated TEXT," +
                 "text TEXT" +
+            ")",
+            "CREATE TABLE IF NOT EXISTS Sync (" +
+                "path VARCHAR PRIMARY KEY," +
+                "lastImport TEXT," +
+                "lastExport TEXT" +
             ")"
         ];
 
@@ -50,7 +58,7 @@ var dbService = function ($q, errorService) {
     };
 
     service.cleanDb = function () {
-        var tables = ["Hash", "Settings", "Records"];
+        var tables = ["Hash", "Settings", "Records", "Sync"];
 
         return $q.all(_.map(tables, function (table) {
             return query("DROP TABLE IF EXISTS " + table);
@@ -206,12 +214,34 @@ var dbService = function ($q, errorService) {
     };
 
     service.getSyncStatus = function () {
-        // TODO: not implemented
-        return {};
+        return query("SELECT * FROM Sync")
+            .then(function (result) {
+                var status = {};
+
+                _.each(_.range(result.rows.length), function (index) {
+                    var item = result.rows.item(index);
+                    status[item.path] = item;
+                });
+
+                return status;
+            });
     };
 
-    service.updateLastImport = function (name) {
-        // TODO: not implemented
+    service.updateLastImport = function (path) {
+        return query(
+            "INSERT OR REPLACE INTO Sync (path, lastImport, lastExport)" +
+            "VALUES (?, ?, " +
+            "   (SELECT lastExport FROM Sync WHERE path = ?))",
+            [path, moment().format(), path]
+        ).then(function (result) {
+            var message;
+
+            if (result.rowsAffected !== 1) {
+                message = "update last import: failure updating";
+                errorService.reportError(message);
+                throw message;
+            }
+        });
     };
 
     return service;
