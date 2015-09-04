@@ -24,6 +24,18 @@ var dbService = function ($q, errorService) {
         return deferred.promise;
     };
 
+    var selectMany = function (selectQuery, input) {
+        return query(selectQuery, input)
+            .then(function (result) {
+                return _.map(
+                    _.range(result.rows.length),
+                    function (i) {
+                        return _.clone(result.rows.item(i));
+                    }
+                );
+            });
+    };
+
     var verifyOneRowAffected = function (result) {
         var affected = result.rowsAffected;
         var message = "affected rows: expected one, was " + affected;
@@ -100,16 +112,15 @@ var dbService = function ($q, errorService) {
     };
 
     service.getSettings = function () {
-        return query("SELECT key, value FROM Settings")
-            .then(function (result) {
-                var settings = {};
-
-                _.each(_.range(result.rows.length), function (index) {
-                    var s = result.rows.item(index);
-                    settings[s.key] = JSON.parse(s.value);
-                });
-
-                return settings;
+        return selectMany("SELECT key, value FROM Settings")
+            .then(function (settings) {
+                return _.object(
+                    _.pluck(settings, 'key'),
+                    _.map(
+                        settings,
+                        function (s) { return JSON.parse(s.value); }
+                    )
+                );
             });
     };
 
@@ -126,15 +137,7 @@ var dbService = function ($q, errorService) {
     };
 
     service.getAllRecords = function () {
-        return query("SELECT id, created, updated FROM Records")
-            .then(function (result) {
-                return _.map(
-                    _.range(result.rows.length),
-                    function (i) {
-                        return _.clone(result.rows.item(i));
-                    }
-                );
-            });
+        return selectMany("SELECT id, created, updated FROM Records");
     };
 
     service.setAllRecords = function (records, message) {
@@ -154,33 +157,19 @@ var dbService = function ($q, errorService) {
     };
 
     service.yearsUpdated = function () {
-        return query(
+        return selectMany(
             "SELECT strftime('%Y', created) AS year," +
             "       max(updated) as updated " +
             "FROM records GROUP BY year"
-        ).then(function (result) {
-            return _.map(
-                _.range(result.rows.length),
-                function (i) {
-                    return _.clone(result.rows.item(i));
-                }
-            );
-        });
+        );
     };
 
     service.getYearlyRecords = function (year) {
-        return query(
+        return selectMany(
             "SELECT * FROM Records WHERE created BETWEEN ? AND ?",
             [moment({ year: year }).format(),
              moment({ year: year + 1 }).format()]
-        ).then(function (result) {
-            return _.map(
-                _.range(result.rows.length),
-                function (i) {
-                    return _.clone(result.rows.item(i));
-                }
-            );
-        });
+        );
     };
 
     service.getRecord = function (id) {
@@ -226,16 +215,12 @@ var dbService = function ($q, errorService) {
 
     // TODO: consider splitting this to import/export status
     service.getSyncStatus = function () {
-        return query("SELECT * FROM Sync")
-            .then(function (result) {
-                var status = {};
-
-                _.each(_.range(result.rows.length), function (index) {
-                    var item = result.rows.item(index);
-                    status[item.path] = item;
-                });
-
-                return status;
+        return selectMany("SELECT * FROM Sync")
+            .then(function (sync) {
+                return _.object(
+                    _.pluck(sync, 'path'),
+                    sync
+                );
             });
     };
 
