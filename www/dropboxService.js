@@ -58,5 +58,25 @@ dropboxService = function ($q, settingsService) {
         return deferred.promise;
     };
 
+    service.writeFile = function (path, data) {
+        var deferred = $q.defer();
+
+        throwIfNotAuthenticated();
+
+        client.writeFile(
+            path, data,
+            function (error) {
+                if (error) {
+                    deferred.reject(error);
+                }
+                else {
+                    deferred.resolve();
+                }
+            }
+        );
+
+        return deferred.promise;
+    };
+
     return service;
 };

@@ -116,6 +116,41 @@ migrateService = function (
 
     var exportToCloud = function () {
         // TODO: not implemented
+        return $q.all([
+            // Last modification per years: [ { year, updated } ]
+            dbService.yearsUpdated(),
+            // Load saved files status: { name: { lastImport, lastExport } }
+            dbService.getSyncStatus()
+        ]).then(function (data) {
+            var years = data[0];
+            var status = data[1];
+
+            // For each name in listing:
+            return $q.all(
+                _.map(years, function (updated, year) {
+                    var path = settingsService.settings.dropboxFolder;
+                    path += '/' + year + '.json';
+
+                    // If in status and lastImport after the file was modified
+                    if (status[path] &&
+                        moment(status[path].lastExport)
+                            .isAfter(updadted)) {
+                        // Do nothing
+                    }
+                    else {
+                        // Import file
+                        return dropboxService.writeFile(
+                            path,
+                            JSON.stringify(service.getYearForBackup(year))
+                        ).then(function () {
+                            // Update status
+                            // TODO: make sure it isn't called in case of error
+                            return dbService.updateLastExport(path);
+                        });
+                    }
+                })
+            );
+        });
     };
 
     service.sync = function () {

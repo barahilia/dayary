@@ -209,6 +209,7 @@ var dbService = function ($q, errorService) {
             .then(verifyOneRowAffected);
     };
 
+    // TODO: consider splitting this to import/export status
     service.getSyncStatus = function () {
         return query("SELECT * FROM Sync")
             .then(function (result) {
@@ -228,6 +229,17 @@ var dbService = function ($q, errorService) {
             "INSERT OR REPLACE INTO Sync (path, lastImport, lastExport)" +
             "VALUES (?, ?, " +
             "   (SELECT lastExport FROM Sync WHERE path = ?))",
+            [path, moment().format(), path]
+        ).then(
+            verifyOneRowAffected
+        );
+    };
+
+    service.updateLastExport = function (path) {
+        return query(
+            "INSERT OR REPLACE INTO Sync (path, lastExport, lastImport)" +
+            "VALUES (?, ?, " +
+            "   (SELECT lastImport FROM Sync WHERE path = ?))",
             [path, moment().format(), path]
         ).then(
             verifyOneRowAffected
