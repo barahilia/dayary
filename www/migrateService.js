@@ -52,10 +52,6 @@ migrateService = function (
             });
     };
 
-    service.getYearForBackup = function (year) {
-        return dbService.getYearlyRecords(year);
-    };
-
     service.updateLocalRecords = function (records) {
         return dbService.getAllRecords()
             .then(function (metadata) {
@@ -115,38 +111,43 @@ migrateService = function (
     };
 
     var exportToCloud = function () {
-        // TODO: not implemented
         return $q.all([
             // Last modification per years: [ { year, updated } ]
             dbService.yearsUpdated(),
             // Load saved files status: { name: { lastImport, lastExport } }
             dbService.getSyncStatus()
         ]).then(function (data) {
-            var years = data[0];
+            var yearStatuses = data[0];
             var status = data[1];
 
             // For each name in listing:
             return $q.all(
-                _.map(years, function (updated, year) {
+                _.map(yearStatuses, function (yearUpdated) {
+                    var year = yearUpdated.year;
+                    var updated = yearUpdated.updated;
+
                     var path = settingsService.settings.dropboxFolder;
                     path += '/' + year + '.json';
 
                     // If in status and lastImport after the file was modified
                     if (status[path] &&
-                        moment(status[path].lastExport)
-                            .isAfter(updadted)) {
+                        moment(status[path].lastExport).isAfter(updated)) {
                         // Do nothing
                     }
                     else {
                         // Import file
-                        return dropboxService.writeFile(
-                            path,
-                            JSON.stringify(service.getYearForBackup(year))
-                        ).then(function () {
-                            // Update status
-                            // TODO: make sure it isn't called in case of error
-                            return dbService.updateLastExport(path);
-                        });
+                        return dbService.getYearlyRecords(year)
+                            .then(function (data) {
+                                return dropboxService.writeFile(
+                                    path,
+                                    JSON.stringify(data)
+                                );
+                            })
+                            .then(function () {
+                                // Update status
+                                // TODO: make sure it isn't called in case of error
+                                return dbService.updateLastExport(path);
+                            });
                     }
                 })
             );

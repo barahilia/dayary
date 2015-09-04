@@ -153,6 +153,21 @@ var dbService = function ($q, errorService) {
             });
     };
 
+    service.yearsUpdated = function () {
+        return query(
+            "SELECT strftime('%Y', created) AS year," +
+            "       max(updated) as updated " +
+            "FROM records GROUP BY year"
+        ).then(function (result) {
+            return _.map(
+                _.range(result.rows.length),
+                function (i) {
+                    return _.clone(result.rows.item(i));
+                }
+            );
+        });
+    };
+
     service.getYearlyRecords = function (year) {
         return query(
             "SELECT * FROM Records WHERE created BETWEEN ? AND ?",
