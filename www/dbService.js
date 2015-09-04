@@ -140,22 +140,6 @@ var dbService = function ($q, errorService) {
         return selectMany("SELECT id, created, updated FROM Records");
     };
 
-    service.setAllRecords = function (records, message) {
-        return query("DELETE FROM Records")
-            .catch(message)
-            .then(function () {
-                return $q.all(_.map(records, function (record) {
-                    return query(
-                        "INSERT INTO Records (id, created, updated) " +
-                        "VALUES (?, ?, ?)",
-                        [record.id, record.created, record.updated]
-                    ).catch(message);
-                }));
-            }).then(function () {
-                message("Finished inserting records metadata");
-            });
-    };
-
     service.yearsUpdated = function () {
         return selectMany(
             "SELECT strftime('%Y', created) AS year," +
