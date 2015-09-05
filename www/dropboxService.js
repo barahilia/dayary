@@ -2,7 +2,6 @@ dropboxService = function ($q, settingsService) {
 
     // TODO: Make this completely generic service; get token
     // from the user, initialize and call authenticate from runApp.
-    // See if need to throw for not authenticated at all.
 
     var client = new Dropbox.Client({ key: "4hxwutae96fhhbd" });
     var authenticated = false;
@@ -43,7 +42,7 @@ dropboxService = function ($q, settingsService) {
     };
 
     client.authenticate({interactive: false}, function(error) {
-        authenticated = !error;
+        authenticated = ! error;
     });
 
     service.listFiles = function (path) {
