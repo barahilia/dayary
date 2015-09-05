@@ -1,6 +1,6 @@
 var settingsCtrl = function (
     $scope,
-    settingsService, migrateService, lockService, dbService
+    settingsService, syncService, lockService, dbService
 ) {
     $scope.settings = settingsService.settings;
 
@@ -17,7 +17,7 @@ var settingsCtrl = function (
         $scope.migrating = true;
         $scope.migrateMessages = [];
 
-        migrateService.migrate(
+        syncService.migrate(
             _.bind(Array.prototype.push, $scope.migrateMessages)
         ).finally(function () {
             $scope.migrating = false;

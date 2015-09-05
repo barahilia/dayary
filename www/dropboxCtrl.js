@@ -1,5 +1,5 @@
 var dropboxCtrl = function (
-    $scope, errorService, settingsService, migrateService
+    $scope, errorService, settingsService, syncService
 ) {
     // TODO: remove this completely or use dropboxService
 
@@ -42,7 +42,7 @@ var dropboxCtrl = function (
         $scope.backuping = true;
         $scope.backupResult = "- in progress";
 
-        migrateService.getYearForBackup(year)
+        syncService.getYearForBackup(year)
             .then(function (records) {
                 client.writeFile(
                     settingsService.settings.dropboxFolder + '/' + filename,
@@ -93,7 +93,7 @@ var dropboxCtrl = function (
                     );
                 }
 
-                migrateService.updateLocalRecords(JSON.parse(data))
+                syncService.updateLocalRecords(JSON.parse(data))
                     .finally(function () {
                         $scope.migrating = false;
                         $scope.migrationResult = " - finished";
@@ -103,6 +103,6 @@ var dropboxCtrl = function (
     };
 
     $scope.autoSync = function () {
-        migrateService.sync();
+        syncService.sync();
     };
 };

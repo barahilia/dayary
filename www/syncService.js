@@ -1,4 +1,4 @@
-migrateService = function ($q, settingsService, dbService, dropboxService) {
+syncService = function ($q, settingsService, dbService, dropboxService) {
 
     var service = {};
 
