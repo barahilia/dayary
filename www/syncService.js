@@ -21,6 +21,22 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
             });
     };
 
+    var importFile = function (path) {
+        return dropboxService.readFile(path)
+            .then(
+                function (records) {
+                    return updateLocalRecords(JSON.parse(records));
+                },
+                function (error) {
+                    // TODO: report with errorService
+                    throw error;
+                }
+            )
+            .then(function () {
+                return dbService.updateLastImport(path);
+            });
+    };
+
     var importFromCloud = function () {
         return $q.all([
             // Get cloud folder listing: [ { name, updated } ]
@@ -31,32 +47,10 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
             var cloudFiles = data[0];
             var status = data[1];
 
-            // For each name in listing:
-            return $q.all(
-                _.map(cloudFiles, function (file) {
-                    var path = file.path;
-
-                    // If in status and lastImport after the file was modified
-                    if (status[path] &&
-                        moment(status[path].lastImport)
-                            .isAfter(file.modifiedAt)) {
-                        // Do nothing
-                    }
-                    else {
-                        // Import file
-                        return dropboxService.readFile(file.path)
-                            .then(function (data) {
-                                var records = JSON.parse(data);
-                                return updateLocalRecords(records);
-                            })
-                            .then(function () {
-                                // Update status
-                                // TODO: make sure it isn't called in case of error
-                                return dbService.updateLastImport(file.path);
-                            });
-                    }
-                })
-            );
+            return $q.all(_.map(
+                service.filesToImport(cloudFiles, status),
+                importFile
+            ));
         });
     };
 
@@ -102,6 +96,24 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
                 })
             );
         });
+    };
+
+    service.filesToImport = function (cloudFiles, status) {
+        var actions = _.map(cloudFiles, function (file) {
+            // If in status and lastImport after the file was modified
+            if (status[file.path] &&
+                moment(status[file.path].lastImport)
+                    .isAfter(file.modifiedAt)) {
+                // Do nothing
+                return null;
+            }
+            else {
+                // Should import file
+                return file.path;
+            }
+        });
+
+        return _.compact(actions);
     };
 
     service.sync = function () {
