@@ -1,6 +1,6 @@
 var settingsCtrl = function (
     $scope,
-    settingsService, syncService, lockService, dbService
+    settingsService, lockService, dbService
 ) {
     $scope.settings = settingsService.settings;
 
@@ -11,17 +11,6 @@ var settingsCtrl = function (
             .finally(function () {
                 $scope.saving = false;
             });
-    };
-
-    $scope.migrate = function () {
-        $scope.migrating = true;
-        $scope.migrateMessages = [];
-
-        syncService.migrate(
-            _.bind(Array.prototype.push, $scope.migrateMessages)
-        ).finally(function () {
-            $scope.migrating = false;
-        });
     };
 
     $scope.cleandb = function () {

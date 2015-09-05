@@ -45,6 +45,19 @@ dropboxService = function ($q, settingsService) {
         authenticated = ! error;
     });
 
+
+    service.isAuthenticated = function () {
+        return authenticated;
+    };
+
+    service.accountInfo = function () {
+        return wrapDropboxApi(
+            client.getAccountInfo,
+            [],
+            function (accountInfo) { return accountInfo; }
+        );
+    };
+
     service.listFiles = function (path) {
         return wrapDropboxApi(
             client.readdir,
