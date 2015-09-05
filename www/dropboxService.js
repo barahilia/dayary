@@ -14,68 +14,58 @@ dropboxService = function ($q, settingsService) {
         }
     }
 
+    // All APIs are called in the similar way:
+    //      client.func(arg1, ..., function (error, res1, ...) {
+    //          if (error) { ... }
+    //          else { ... }
+    //      })
+    // The wrapper simplifies this and also turns callbacks to promises
+    var wrapDropboxApi = function (func, args, callback) {
+        var deferred = $q.defer();
+
+        var wrapCallback = function (error) {
+            if (error) {
+                deferred.reject(error);
+            }
+            else {
+                deferred.resolve(
+                    callback.apply(undefined, _.rest(arguments, 1))
+                );
+            }
+        };
+
+        throwIfNotAuthenticated();
+
+        args.push(wrapCallback);
+        func.apply(client, args);
+
+        return deferred.promise;
+    };
+
     client.authenticate({interactive: false}, function(error) {
         authenticated = !error;
     });
 
     service.listFiles = function (path) {
-        var deferred = $q.defer();
-
-        throwIfNotAuthenticated();
-
-        client.readdir(
-            path,
-            function (error, names, dirData, entries) {
-                if (error) {
-                    deferred.reject(error);
-                }
-                else {
-                    deferred.resolve(entries);
-                }
+        return wrapDropboxApi(
+            client.readdir,
+            [path],
+            function (names, dirData, entries) {
+                return entries;
             }
         );
-
-        return deferred.promise;
     };
 
     service.readFile = function (path) {
-        var deferred = $q.defer();
-
-        throwIfNotAuthenticated();
-
-        client.readFile(
-            path,
-            function (error, data) {
-                if (error) {
-                    deferred.reject(error);
-                }
-                else {
-                    deferred.resolve(data);
-                }
-            }
+        return wrapDropboxApi(
+            client.readFile,
+            [path],
+            function (data) { return data; }
         );
-
-        return deferred.promise;
     };
 
     service.writeFile = function (path, data) {
-        var deferred = $q.defer();
-
-        throwIfNotAuthenticated();
-
-        client.writeFile(
-            path, data,
-            function (error) {
-                if (error) {
-                    deferred.reject(error);
-                }
-                else {
-                    deferred.resolve();
-                }
-            }
-        );
-
-        return deferred.promise;
+        return wrapDropboxApi(client.writeFile, [path, data], _.noop);
     };
 
     return service;
