@@ -2,6 +2,25 @@ migrateService = function ($q, settingsService, dbService, dropboxService) {
 
     var service = {};
 
+    var updateLocalRecords = function (records) {
+        return dbService.getAllRecords()
+            .then(function (metadata) {
+                return $q.all(_.map(records, function (record) {
+                    var criteria = { created: record.created };
+                    var local = _.findWhere(metadata, criteria);
+
+                    if (local) { // Update if needed
+                        if (moment(local.updated).isBefore(record.updated)) {
+                            return dbService.updateRecord(record);
+                        }
+                    }
+                    else { // Insert new
+                        return dbService.addRecord(record);
+                    }
+                }));
+            });
+    };
+
     var importFromCloud = function () {
         return $q.all([
             // Get cloud folder listing: [ { name, updated } ]
@@ -28,7 +47,7 @@ migrateService = function ($q, settingsService, dbService, dropboxService) {
                         return dropboxService.readFile(file.path)
                             .then(function (data) {
                                 var records = JSON.parse(data);
-                                return service.updateLocalRecords(records);
+                                return updateLocalRecords(records);
                             })
                             .then(function () {
                                 // Update status
