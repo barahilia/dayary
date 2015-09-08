@@ -54,6 +54,33 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
         });
     };
 
+    var yearToFile = function (year) {
+        return settingsService.settings.dropboxFolder + '/' + year + '.json';
+    };
+
+    var exportYear = function (year) {
+        var path = yearToFile(year);
+
+        return dbService.getYearlyRecords(year)
+            .then(
+                function (data) {
+                    return dropboxService.writeFile(
+                        path,
+                        JSON.stringify(data)
+                    );
+                },
+                function (error) {
+                    // TODO: report with errorService
+                    throw error;
+                }
+            )
+            .then(function () {
+                // Update status
+                // TODO: make sure it isn't called in case of error
+                return dbService.updateLastExport(path);
+            });
+    };
+
     var exportToCloud = function () {
         return $q.all([
             // Last modification per years: [ { year, updated } ]
@@ -64,37 +91,10 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
             var yearStatuses = data[0];
             var status = data[1];
 
-            // For each name in listing:
-            return $q.all(
-                _.map(yearStatuses, function (yearUpdated) {
-                    var year = yearUpdated.year;
-                    var updated = yearUpdated.updated;
-
-                    var path = settingsService.settings.dropboxFolder;
-                    path += '/' + year + '.json';
-
-                    // If in status and lastImport after the file was modified
-                    if (status[path] &&
-                        moment(status[path].lastExport).isAfter(updated)) {
-                        // Do nothing
-                    }
-                    else {
-                        // Import file
-                        return dbService.getYearlyRecords(year)
-                            .then(function (data) {
-                                return dropboxService.writeFile(
-                                    path,
-                                    JSON.stringify(data)
-                                );
-                            })
-                            .then(function () {
-                                // Update status
-                                // TODO: make sure it isn't called in case of error
-                                return dbService.updateLastExport(path);
-                            });
-                    }
-                })
-            );
+            return $q.all(_.map(
+                service.yearsToExport(yearStatuses, status),
+                exportYear
+            ));
         });
     };
 
@@ -110,6 +110,26 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
             else {
                 // Should import file
                 return file.path;
+            }
+        });
+
+        return _.compact(actions);
+    };
+
+    service.yearsToExport = function (yearsUpdated, status) {
+        var actions = _.map(yearsUpdated, function (yearUpdated) {
+            var year = yearUpdated.year;
+            var updated = yearUpdated.updated;
+            var path = yearToFile(year);
+
+            // If in status and lastExport after the year was updated
+            if (status[path] &&
+                moment(status[path].lastExport).isAfter(updated)) {
+                // Do nothing
+                return null;
+            }
+            else {
+                return year;
             }
         });
 
