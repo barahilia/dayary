@@ -61,4 +61,59 @@ describe("sync service", function () {
 
         expect(res).toEqual(["b", "c"]);
     });
+
+    it("should export nothing for no years", function () {
+        var res = service.yearsToExport([], {});
+        expect(res).toEqual([]);
+    });
+
+    it("should export everything for empty status", function () {
+        var res = service.yearsToExport(
+            [{year: "2000"}, {year: "2001"}],
+            {}
+        );
+
+        expect(res).toEqual(["2000", "2001"]);
+    });
+
+    it("should export everything for unrelated status", function () {
+        var res = service.yearsToExport(
+            [{year: "2000"}, {year: "2001"}],
+            {"2002": null, "2003": null}
+        );
+
+        expect(res).toEqual(["2000", "2001"]);
+    });
+
+    it("should export everything for outdated status", function () {
+        var res = service.yearsToExport(
+            [
+                {year: "2000", updated: "2015-01-01"},
+                {year: "2001", updated: "2015-01-01"}
+            ],
+            {
+                '/backups/dayary/2000.json': {lastExport: "2014-01-01"},
+                '/backups/dayary/2001.json': {lastExport: "2014-01-01"}
+            }
+        );
+
+        expect(res).toEqual(["2000", "2001"]);
+    });
+
+    it("should export recently updated and new years only", function () {
+        var res = service.yearsToExport(
+            [
+                {year: "2000", updated: "2015-01-01"},
+                {year: "2001", updated: "2015-01-01"},
+                {year: "2002", updated: "2015-01-01"},
+            ],
+            {
+                '/backups/dayary/2000.json': {lastExport: "2015-02-02"},
+                '/backups/dayary/2001.json': {lastExport: "2014-01-01"},
+                '/backups/dayary/2003.json': {lastExport: "2014-01-01"}
+            }
+        );
+
+        expect(res).toEqual(["2001", "2002"]);
+    });
 });
