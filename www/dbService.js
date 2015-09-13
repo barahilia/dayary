@@ -1,7 +1,19 @@
 var dbService = function ($q, errorService) {
-    var db;
+    var dbHandle;
 
     // TODO: add convenience functions: selectOne, selectAll, deleteOne, ...
+
+    var db = function () {
+        if ( ! dbHandle) {
+            dbHandle = openDatabase(
+                "dayary",
+                "0.8",
+                "Dayary DB",
+                5 * 1000 * 1000
+            );
+        }
+        return dbHandle;
+    }
 
     // A caveat to be remembered: returning value of result.rows.item() might
     // be read-only. Observed in Chrome and Safari in iPad. Clone before use.
@@ -17,7 +29,7 @@ var dbService = function ($q, errorService) {
             deferred.reject(error.message);
         };
 
-        db.transaction(function (tx) {
+        db().transaction(function (tx) {
             tx.executeSql(query, input, success, failure);
         });
 
@@ -51,8 +63,6 @@ var dbService = function ($q, errorService) {
 
     service.init = function () {
         var tables;
-
-        db = openDatabase("dayary", "0.8", "Dayary DB", 5 * 1000 * 1000);
 
         // In SQLite TEXT can be used for DATETIME
         tables = [
