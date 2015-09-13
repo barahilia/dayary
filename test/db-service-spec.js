@@ -16,9 +16,7 @@ describe("db service", function () {
         }
         else {
             initialized = true;
-            // TODO: it's stupid to init before and after clean
-            service.init()
-                .then(service.cleanDb)
+            service.cleanDb()
                 .then(service.init)
                 .then(done);
         }
