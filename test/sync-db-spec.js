@@ -29,11 +29,7 @@ describe("sync db", function () {
     });
 
     it("should export empty year", function (done) {
-        spyOn(dropbox, "writeFile").and.returnValue({
-            then: function (callback) {
-                callback();
-            }
-        });
+        spyOn(dropbox, "writeFile").and.returnValue( Q(null) );
 
         service.exportYear("2000")
             .then(function (data) {
@@ -45,6 +41,29 @@ describe("sync db", function () {
                 expect(_.keys(data)).toEqual([path]);
                 expect(data[path].lastImport).toBeNull();
                 expect(data[path].lastExport).toBeDefined();
+                done();
+            });
+    });
+
+    it("should import empty file", function (done) {
+        var file = "any.file";
+
+        spyOn(dropbox, "readFile").and.returnValue( Q('[]') );
+
+        service.importFile(file)
+            .then(function (data) {
+                expect(data).toBeUndefined();
+            })
+            .then(db.getSyncStatus)
+            .then(function (data) {
+                expect(_.keys(data))
+                    .toEqual(["/backups/dayary/2000.json", file]);
+                expect(data[file].lastExport).toBeNull();
+                expect(data[file].lastImport).toBeDefined();
+            })
+            .then(db.getAllRecords)
+            .then(function (data) {
+                expect(data).toEqual([]);
                 done();
             });
     });

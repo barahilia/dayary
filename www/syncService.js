@@ -21,39 +21,6 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
             });
     };
 
-    var importFile = function (path) {
-        return dropboxService.readFile(path)
-            .then(
-                function (records) {
-                    return updateLocalRecords(JSON.parse(records));
-                },
-                function (error) {
-                    // TODO: report with errorService
-                    throw error;
-                }
-            )
-            .then(function () {
-                return dbService.updateLastImport(path);
-            });
-    };
-
-    var importFromCloud = function () {
-        return $q.all([
-            // Get cloud folder listing: [ { name, updated } ]
-            dropboxService.listFiles(settingsService.settings.dropboxFolder),
-            // Load saved files status: { name: { lastImport, lastExport } }
-            dbService.getSyncStatus()
-        ]).then(function (data) {
-            var cloudFiles = data[0];
-            var status = data[1];
-
-            return $q.all(_.map(
-                service.filesToImport(cloudFiles, status),
-                importFile
-            ));
-        });
-    };
-
     var yearToFile = function (year) {
         return settingsService.settings.dropboxFolder + '/' + year + '.json';
     };
@@ -136,8 +103,41 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
         });
     };
 
+    service.importFile = function (path) {
+        return dropboxService.readFile(path)
+            .then(
+                function (records) {
+                    return updateLocalRecords(JSON.parse(records));
+                },
+                function (error) {
+                    // TODO: report with errorService
+                    throw error;
+                }
+            )
+            .then(function () {
+                return dbService.updateLastImport(path);
+            });
+    };
+
+    service.importFromCloud = function () {
+        return $q.all([
+            // Get cloud folder listing: [ { name, updated } ]
+            dropboxService.listFiles(settingsService.settings.dropboxFolder),
+            // Load saved files status: { name: { lastImport, lastExport } }
+            dbService.getSyncStatus()
+        ]).then(function (data) {
+            var cloudFiles = data[0];
+            var status = data[1];
+
+            return $q.all(_.map(
+                service.filesToImport(cloudFiles, status),
+                service.importFile
+            ));
+        });
+    };
+
     service.sync = function () {
-        return importFromCloud()
+        return service.importFromCloud()
             .then(service.exportToCloud);
     };
 
