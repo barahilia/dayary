@@ -46,7 +46,7 @@ describe("sync db", function () {
     });
 
     it("should import empty file", function (done) {
-        var file = "any.file";
+        var file = "data.file";
 
         spyOn(dropbox, "readFile").and.returnValue( Q('[]') );
 
@@ -64,6 +64,29 @@ describe("sync db", function () {
             .then(db.getAllRecords)
             .then(function (data) {
                 expect(data).toEqual([]);
+                done();
+            });
+    });
+
+    it("should import file with one record", function (done) {
+        var file = "data.file";
+        var records = '[{' +
+            '"created": "2015-01-01", "updated": "2015-01-01", "text": ""' +
+            '}]';
+
+        spyOn(dropbox, "readFile").and.returnValue( Q(records) );
+
+        service.importFile(file)
+            .then(function (data) {
+                expect(data).toBeUndefined();
+            })
+            .then(db.getAllRecords)
+            .then(function (data) {
+                expect(data).toEqual( [ {
+                    id: 1,
+                    created: "2015-01-01",
+                    updated: "2015-01-01"
+                } ] );
                 done();
             });
     });
