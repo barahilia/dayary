@@ -158,7 +158,13 @@ var dbService = function ($q, errorService) {
         );
     };
 
-    service.getYearlyRecords = function (year) {
+    service.getYearlyRecords = function (strYear) {
+        var year = +strYear;
+
+        if ( _.isNaN(year) ) {
+            throw "Expected numeric year, got " + JSON.stringify(strYear);
+        }
+
         return selectMany(
             "SELECT * FROM Records WHERE created BETWEEN ? AND ?",
             [moment({ year: year }).format(),

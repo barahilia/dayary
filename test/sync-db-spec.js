@@ -24,10 +24,6 @@ describe("sync db", function () {
         }
     });
 
-    it("should pass", function () {
-        expect(true).toBeTruthy();
-    });
-
     it("should export empty year", function (done) {
         spyOn(dropbox, "writeFile").and.returnValue( Q(null) );
 
@@ -71,7 +67,7 @@ describe("sync db", function () {
     it("should import file with one record", function (done) {
         var file = "data.file";
         var records = '[{' +
-            '"created": "2015-01-01", "updated": "2015-01-01", "text": ""' +
+            '"created": "2015-05-01", "updated": "2015-05-01", "text": ""' +
             '}]';
 
         spyOn(dropbox, "readFile").and.returnValue( Q(records) );
@@ -84,10 +80,51 @@ describe("sync db", function () {
             .then(function (data) {
                 expect(data).toEqual( [ {
                     id: 1,
-                    created: "2015-01-01",
-                    updated: "2015-01-01"
+                    created: "2015-05-01",
+                    updated: "2015-05-01"
                 } ] );
                 done();
             });
+    });
+
+    it("should sync file with new records back and forth", function (done) {
+        var file = "data.file";
+        var records = '[' +
+            '{"created": "2015-05-02", "updated": "2015-05-01", "text": ""},' +
+            '{"created": "2015-05-03", "updated": "2015-05-01", "text": ""}' +
+            ']';
+        var backupRecords = '[' +
+            '{"id":1,"created":"2015-05-01",' +
+             '"updated":"2015-05-01","text":""},' +
+            '{"id":2,"created":"2015-05-02",' +
+             '"updated":"2015-05-01","text":""},' +
+            '{"id":3,"created":"2015-05-03",' +
+             '"updated":"2015-05-01","text":""}]';
+        var recordsMetadata = [
+            { id: 1, created: '2015-05-01', updated: '2015-05-01' },
+            { id: 2, created: '2015-05-02', updated: '2015-05-01' },
+            { id: 3, created: '2015-05-03', updated: '2015-05-01' }
+        ];
+
+        spyOn(dropbox, "listFiles").and.returnValue(
+            Q([{path: file, modifiedAt: "9999-01-01"}])
+        );
+        spyOn(dropbox, "readFile").and.returnValue( Q(records) );
+        spyOn(dropbox, "writeFile").and.returnValue( Q(null) );
+
+        service.sync()
+            .then(function () {
+                expect(dropbox.listFiles).toHaveBeenCalled();
+                expect(dropbox.readFile).toHaveBeenCalledWith(file);
+                expect(dropbox.writeFile).toHaveBeenCalledWith(
+                    '/backups/dayary/2015.json',
+                    backupRecords
+                )
+            })
+            .then(db.getAllRecords)
+            .then(function (data) {
+                expect(data).toEqual(recordsMetadata);
+            })
+            .then(done);
     });
 });
