@@ -127,4 +127,65 @@ describe("sync db", function () {
             })
             .then(done);
     });
+
+    it("should do nothing with old files", function (done) {
+        var file = "data.file";
+        var recordsMetadata = [
+            { id: 1, created: '2015-05-01', updated: '2015-05-01' },
+            { id: 2, created: '2015-05-02', updated: '2015-05-01' },
+            { id: 3, created: '2015-05-03', updated: '2015-05-01' }
+        ];
+
+        spyOn(dropbox, "listFiles").and.returnValue(
+            Q([{path: file, modifiedAt: "2000-01-01"}])
+        );
+        spyOn(dropbox, "readFile");
+        spyOn(dropbox, "writeFile");
+
+        service.sync()
+            .then(function () {
+                expect(dropbox.listFiles).toHaveBeenCalled();
+                expect(dropbox.readFile.calls.any()).toBeFalsy();
+                expect(dropbox.writeFile.calls.any()).toBeFalsy();
+            })
+            .then(db.getAllRecords)
+            .then(function (data) {
+                expect(data).toEqual(recordsMetadata);
+            })
+            .then(done);
+    });
+
+    it("should update only newer records", function (done) {
+        var file = "data.file";
+        var records = '[' +
+            '{"created": "2015-05-01", "updated": "2015-05-02",' +
+            ' "text": "newer"},' +
+            '{"created": "2015-05-03", "updated": "2015-05-01",' +
+            ' "text": "newer"}' +
+            ']';
+        var dbRecords = [
+            { id: 1, created: '2015-05-01', updated: '2015-05-02',
+              text: "newer" },
+            { id: 2, created: '2015-05-02', updated: '2015-05-01', text: "" },
+            { id: 3, created: '2015-05-03', updated: '2015-05-01', text: "" }
+        ];
+
+        spyOn(dropbox, "listFiles").and.returnValue(
+            Q([{path: file, modifiedAt: "9999-01-01"}])
+        );
+        spyOn(dropbox, "readFile").and.returnValue( Q(records) );
+        spyOn(dropbox, "writeFile");
+
+        service.sync()
+            .then(function () {
+                expect(dropbox.listFiles).toHaveBeenCalled();
+                expect(dropbox.readFile).toHaveBeenCalledWith(file);
+                expect(dropbox.writeFile.calls.any()).toBeFalsy();
+            })
+            .then(_.partial(db.getYearlyRecords, "2015"))
+            .then(function (data) {
+                expect(data).toEqual(dbRecords);
+            })
+            .then(done);
+    });
 });

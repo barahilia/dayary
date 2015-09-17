@@ -11,7 +11,9 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
 
                     if (local) { // Update if needed
                         if (moment(local.updated).isBefore(record.updated)) {
-                            return dbService.updateRecord(record);
+                            return dbService.updateRecord(
+                                _.extend(local, record)
+                            );
                         }
                     }
                     else { // Insert new
