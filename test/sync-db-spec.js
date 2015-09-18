@@ -188,4 +188,37 @@ describe("sync db", function () {
             })
             .then(done);
     });
+
+    it("should export year due to recently updated record", function (done) {
+        var dbRecords = [
+            { id: 1, created: '2015-05-01', updated: '2015-05-02',
+              text: "newer" },
+            { id: 2, created: '2015-05-02', updated: '2015-05-01',
+              text: "" },
+            { id: 3, created: '2015-05-03', updated: '9999-05-01',
+              text: "recently updated" }
+        ];
+
+        spyOn(dropbox, "listFiles").and.returnValue( Q([]) );
+        spyOn(dropbox, "readFile");
+        spyOn(dropbox, "writeFile").and.returnValue( Q(null) );
+
+        service.sync()
+            .then(function () {
+                expect(dropbox.listFiles).toHaveBeenCalled();
+                expect(dropbox.readFile.calls.any()).toBeFalsy();
+                expect(dropbox.writeFile.calls.any()).toBeFalsy();
+            })
+            .then(_.partial(db.updateRecord, dbRecords[2]))
+            .then(service.sync)
+            .then(function () {
+                expect(dropbox.listFiles).toHaveBeenCalled();
+                expect(dropbox.readFile.calls.any()).toBeFalsy();
+                expect(dropbox.writeFile).toHaveBeenCalledWith(
+                    '/backups/dayary/2015.json',
+                    JSON.stringify(dbRecords)
+                );
+            })
+            .then(done);
+    });
 });
