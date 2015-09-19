@@ -2,27 +2,6 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
 
     var service = {};
 
-    var updateLocalRecords = function (records) {
-        return dbService.getAllRecords()
-            .then(function (metadata) {
-                return $q.all(_.map(records, function (record) {
-                    var criteria = { created: record.created };
-                    var local = _.findWhere(metadata, criteria);
-
-                    if (local) { // Update if needed
-                        if (moment(local.updated).isBefore(record.updated)) {
-                            return dbService.updateRecord(
-                                _.extend(local, record)
-                            );
-                        }
-                    }
-                    else { // Insert new
-                        return dbService.addRecord(record);
-                    }
-                }));
-            });
-    };
-
     var yearToFile = function (year) {
         return settingsService.settings.dropboxFolder + '/' + year + '.json';
     };
@@ -109,7 +88,15 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
         return dropboxService.readFile(path)
             .then(
                 function (records) {
-                    return updateLocalRecords(JSON.parse(records));
+                    return _.reduce(
+                        JSON.parse(records),
+                        function (previous, record) {
+                            return previous.then(
+                                _.partial(dbService.syncRecord, record)
+                            );
+                        },
+                        $q.when(null)
+                    );
                 },
                 function (error) {
                     // TODO: report with errorService
@@ -131,10 +118,13 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
             var cloudFiles = data[0];
             var status = data[1];
 
-            return $q.all(_.map(
+            return _.reduce(
                 service.filesToImport(cloudFiles, status),
-                service.importFile
-            ));
+                function (previous, path) {
+                    return previous.then(_.partial(service.importFile, path));
+                },
+                $q.when(null)
+            );
         });
     };
 

@@ -2,6 +2,7 @@ var dbService = function ($q, errorService) {
     var dbHandle;
 
     // TODO: add convenience functions: selectOne, selectAll, deleteOne, ...
+    // TODO: split to framework websqlService and app-related dbService
 
     var db = function () {
         if ( ! dbHandle) {
@@ -97,6 +98,7 @@ var dbService = function ($q, errorService) {
         }));
     };
 
+
     service.getHash = function () {
         return query("SELECT hash FROM Hash")
             .then(function (result) {
@@ -146,6 +148,7 @@ var dbService = function ($q, errorService) {
         );
     };
 
+
     service.getAllRecords = function () {
         return selectMany("SELECT id, created, updated FROM Records");
     };
@@ -171,6 +174,7 @@ var dbService = function ($q, errorService) {
              moment({ year: year + 1 }).format()]
         );
     };
+
 
     service.getRecord = function (id) {
         return query("SELECT * FROM Records WHERE id = ?", [id])
@@ -212,6 +216,31 @@ var dbService = function ($q, errorService) {
         return query("DELETE FROM Records WHERE id = ?", [id])
             .then(verifyOneRowAffected);
     };
+
+    service.syncRecord = function (record) {
+        return selectMany(
+            "SELECT * FROM Records WHERE created = ?",
+            [record.created]
+        ).then(function (local) {
+            if (local.length === 0) {
+                return service.addRecord(record);
+            }
+            else if (local.length === 1) {
+                if (moment(local[0].updated).isBefore(record.updated)) {
+                    return service.updateRecord({
+                        id: local[0].id,
+                        created: local[0].created,
+                        updated: record.updated,
+                        text: record.text
+                    });
+                }
+            }
+            else {
+                throw "db integrity: multiple " + record.created;
+            }
+        });
+    };
+
 
     // TODO: consider splitting this to import/export status
     service.getSyncStatus = function () {

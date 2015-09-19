@@ -229,9 +229,9 @@ describe("sync db", function () {
             { id: 2, created: '2015-05-04', updated: '2015-05-05', text: "" }
         ];
         var dbRecordsMetadata = [
-            { id: 1, created: '2015-05-01', updated: '2015-05-01' },
+            { id: 1, created: '2015-05-01', updated: '2015-05-02' },
             { id: 2, created: '2015-05-02', updated: '2015-05-01' },
-            { id: 3, created: '2015-05-03', updated: '2015-05-01' },
+            { id: 3, created: '2015-05-03', updated: '9999-05-01' },
             { id: 4, created: '2015-05-04', updated: '2015-05-06' }
         ];
 
@@ -261,20 +261,20 @@ describe("sync db", function () {
             {path: "1", modifiedAt: "9999-01-01"}
         ];
         var fileRecords = [
-            { id: 1, created: '2015-05-05', updated: '2015-05-06', text: "" },
-            { id: 2, created: '2015-05-05', updated: '2015-05-05', text: "" }
+            { id: 1, created: '2015-05-05', updated: '2015-05-05', text: "" },
+            { id: 2, created: '2015-05-05', updated: '2015-05-06', text: "" }
         ];
         var dbRecordsMetadata = [
-            { id: 1, created: '2015-05-01', updated: '2015-05-01' },
+            { id: 1, created: '2015-05-01', updated: '2015-05-02' },
             { id: 2, created: '2015-05-02', updated: '2015-05-01' },
-            { id: 3, created: '2015-05-03', updated: '2015-05-01' },
+            { id: 3, created: '2015-05-03', updated: '9999-05-01' },
             { id: 4, created: '2015-05-04', updated: '2015-05-06' },
             { id: 5, created: '2015-05-05', updated: '2015-05-06' }
         ];
 
         spyOn(dropbox, "listFiles").and.returnValue( Q(files) );
         spyOn(dropbox, "readFile").and.callFake(function (path) {
-            return Q(JSON.stringify(fileRecords[path]));
+            return Q( JSON.stringify( [ fileRecords[path] ] ) );
         });
         spyOn(dropbox, "writeFile");
 
