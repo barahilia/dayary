@@ -221,4 +221,73 @@ describe("sync db", function () {
             })
             .then(done);
     });
+
+    it("should import one of recurrent records in one file", function (done) {
+        var file = "data.file";
+        var fileRecords = [
+            { id: 1, created: '2015-05-04', updated: '2015-05-06', text: "" },
+            { id: 2, created: '2015-05-04', updated: '2015-05-05', text: "" }
+        ];
+        var dbRecordsMetadata = [
+            { id: 1, created: '2015-05-01', updated: '2015-05-01' },
+            { id: 2, created: '2015-05-02', updated: '2015-05-01' },
+            { id: 3, created: '2015-05-03', updated: '2015-05-01' },
+            { id: 4, created: '2015-05-04', updated: '2015-05-06' }
+        ];
+
+        spyOn(dropbox, "listFiles").and.returnValue(
+            Q([{path: file, modifiedAt: "9999-01-01"}])
+        );
+        spyOn(dropbox, "readFile").and.returnValue(
+            Q(JSON.stringify(fileRecords))
+        );
+        spyOn(dropbox, "writeFile");
+
+        service.sync()
+            .then(function () {
+                expect(dropbox.listFiles).toHaveBeenCalled();
+                expect(dropbox.readFile).toHaveBeenCalled();
+            })
+            .then(db.getAllRecords)
+            .then(function (data) {
+                expect(data).toEqual(dbRecordsMetadata);
+            })
+            .then(done);
+    });
+
+    it("should import one of recurrent records in two files", function (done) {
+        var files = [
+            {path: "0", modifiedAt: "9999-01-01"},
+            {path: "1", modifiedAt: "9999-01-01"}
+        ];
+        var fileRecords = [
+            { id: 1, created: '2015-05-05', updated: '2015-05-06', text: "" },
+            { id: 2, created: '2015-05-05', updated: '2015-05-05', text: "" }
+        ];
+        var dbRecordsMetadata = [
+            { id: 1, created: '2015-05-01', updated: '2015-05-01' },
+            { id: 2, created: '2015-05-02', updated: '2015-05-01' },
+            { id: 3, created: '2015-05-03', updated: '2015-05-01' },
+            { id: 4, created: '2015-05-04', updated: '2015-05-06' },
+            { id: 5, created: '2015-05-05', updated: '2015-05-06' }
+        ];
+
+        spyOn(dropbox, "listFiles").and.returnValue( Q(files) );
+        spyOn(dropbox, "readFile").and.callFake(function (path) {
+            return Q(JSON.stringify(fileRecords[path]));
+        });
+        spyOn(dropbox, "writeFile");
+
+        service.sync()
+            .then(function () {
+                expect(dropbox.listFiles).toHaveBeenCalled();
+                expect(dropbox.readFile).toHaveBeenCalledWith("0");
+                expect(dropbox.readFile).toHaveBeenCalledWith("1");
+            })
+            .then(db.getAllRecords)
+            .then(function (data) {
+                expect(data).toEqual(dbRecordsMetadata);
+            })
+            .then(done);
+    });
 });
