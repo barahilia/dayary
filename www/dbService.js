@@ -154,8 +154,9 @@ var dbService = function ($q, errorService) {
     };
 
     service.yearsUpdated = function () {
+        // TODO: move dates to UTC and get back to strftime('%Y', created)
         return selectMany(
-            "SELECT strftime('%Y', created) AS year," +
+            "SELECT substr(created, 1, 4) AS year," +
             "       max(updated) as updated " +
             "FROM records GROUP BY year"
         );
