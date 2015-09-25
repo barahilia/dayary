@@ -20,46 +20,6 @@
     <div>
         <div>
             <button class="btn btn-success"
-                    ng-click="backupYear(year)"
-                    ng-disabled="backuping">
-                Backup year
-            </button>
-
-            <!-- TODO: make this <select> -->
-            <input type="text" ng-model="year">
-
-            <span ng-show="backuping" class="fa fa-spinner fa-spin">
-            </span>
-
-            {{backupResult}}
-        </div>
-
-        <br />
-
-        <div ng-repeat="message in backupMessages">
-            {{message}}
-        </div>
-
-        <div>
-            <button class="btn btn-success"
-                    ng-click="migrateFile(path)"
-                    ng-disabled="migrating">
-                Migrate file
-            </button>
-
-            <!-- TODO: make this <select> -->
-            <input type="text" ng-model="path">
-
-            <span ng-show="migrating" class="fa fa-spinner fa-spin">
-            </span>
-
-            {{migrationResult}}
-        </div>
-
-        <br />
-
-        <div>
-            <button class="btn btn-success"
                     ng-click="listFiles()"
                     ng-disabled="listing">
                 List files
@@ -73,6 +33,15 @@
 
         <div ng-repeat="file in files">
             {{file.name}} - {{file.humanSize}}
+        </div>
+
+        <br />
+
+        <div>
+            <button class="btn btn-success"
+                    ng-click="autoSync()">
+                Auto sync
+            </button>
         </div>
     </div>
 </div>

@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# 2015-08-31:v0.9.0
+# 2015-09-02:v0.9.0
 
 CACHE:
 
@@ -36,11 +36,12 @@ www/lock.html
 www/viewer.html
 www/lockCtrl.js
 www/records.html
+www/dropboxService.js
 www/dropboxCtrl.js
 www/lockService.js
 www/recordsCtrl.js
 www/scrollIfClass.js
-www/migrateService.js
+www/syncService.js
 www/favicon.ico
 www/encryptionService.js
 www/login/dropbox.html

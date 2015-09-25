@@ -1,5 +1,20 @@
 var dbService = function ($q, errorService) {
-    var db;
+    var dbHandle;
+
+    // TODO: add convenience functions: selectOne, selectAll, deleteOne, ...
+    // TODO: split to framework websqlService and app-related dbService
+
+    var db = function () {
+        if ( ! dbHandle) {
+            dbHandle = openDatabase(
+                "dayary",
+                "0.8",
+                "Dayary DB",
+                5 * 1000 * 1000
+            );
+        }
+        return dbHandle;
+    }
 
     // A caveat to be remembered: returning value of result.rows.item() might
     // be read-only. Observed in Chrome and Safari in iPad. Clone before use.
@@ -15,11 +30,33 @@ var dbService = function ($q, errorService) {
             deferred.reject(error.message);
         };
 
-        db.transaction(function (tx) {
+        db().transaction(function (tx) {
             tx.executeSql(query, input, success, failure);
         });
 
         return deferred.promise;
+    };
+
+    var selectMany = function (selectQuery, input) {
+        return query(selectQuery, input)
+            .then(function (result) {
+                return _.map(
+                    _.range(result.rows.length),
+                    function (i) {
+                        return _.clone(result.rows.item(i));
+                    }
+                );
+            });
+    };
+
+    var verifyOneRowAffected = function (result) {
+        var affected = result.rowsAffected;
+        var message = "affected rows: expected one, was " + affected;
+
+        if (affected !== 1) {
+            errorService.reportError(message);
+            throw message;
+        }
     };
 
 
@@ -28,8 +65,7 @@ var dbService = function ($q, errorService) {
     service.init = function () {
         var tables;
 
-        db = openDatabase("dayary", "0.8", "Dayary DB", 5 * 1000 * 1000);
-
+        // In SQLite TEXT can be used for DATETIME
         tables = [
             "CREATE TABLE IF NOT EXISTS Hash (" +
                 "hash VARCHAR" +
@@ -43,6 +79,11 @@ var dbService = function ($q, errorService) {
                 "created TEXT," +
                 "updated TEXT," +
                 "text TEXT" +
+            ")",
+            "CREATE TABLE IF NOT EXISTS Sync (" +
+                "path VARCHAR PRIMARY KEY," +
+                "lastImport TEXT," +
+                "lastExport TEXT" +
             ")"
         ];
 
@@ -50,12 +91,13 @@ var dbService = function ($q, errorService) {
     };
 
     service.cleanDb = function () {
-        var tables = ["Hash", "Settings", "Records"];
+        var tables = ["Hash", "Settings", "Records", "Sync"];
 
         return $q.all(_.map(tables, function (table) {
             return query("DROP TABLE IF EXISTS " + table);
         }));
     };
+
 
     service.getHash = function () {
         return query("SELECT hash FROM Hash")
@@ -82,16 +124,15 @@ var dbService = function ($q, errorService) {
     };
 
     service.getSettings = function () {
-        return query("SELECT key, value FROM Settings")
-            .then(function (result) {
-                var settings = {};
-
-                _.each(_.range(result.rows.length), function (index) {
-                    var s = result.rows.item(index);
-                    settings[s.key] = JSON.parse(s.value);
-                });
-
-                return settings;
+        return selectMany("SELECT key, value FROM Settings")
+            .then(function (settings) {
+                return _.object(
+                    _.pluck(settings, 'key'),
+                    _.map(
+                        settings,
+                        function (s) { return JSON.parse(s.value); }
+                    )
+                );
             });
     };
 
@@ -107,48 +148,33 @@ var dbService = function ($q, errorService) {
         );
     };
 
+
     service.getAllRecords = function () {
-        return query("SELECT id, created, updated FROM Records")
-            .then(function (result) {
-                return _.map(
-                    _.range(result.rows.length),
-                    function (i) {
-                        return _.clone(result.rows.item(i));
-                    }
-                );
-            });
+        return selectMany("SELECT id, created, updated FROM Records");
     };
 
-    service.setAllRecords = function (records, message) {
-        return query("DELETE FROM Records")
-            .catch(message)
-            .then(function () {
-                return $q.all(_.map(records, function (record) {
-                    return query(
-                        "INSERT INTO Records (id, created, updated) " +
-                        "VALUES (?, ?, ?)",
-                        [record.id, record.created, record.updated]
-                    ).catch(message);
-                }));
-            }).then(function () {
-                message("Finished inserting records metadata");
-            });
+    service.yearsUpdated = function () {
+        return selectMany(
+            "SELECT strftime('%Y', created) AS year," +
+            "       max(updated) as updated " +
+            "FROM records GROUP BY year"
+        );
     };
 
-    service.getYearlyRecords = function (year) {
-        return query(
+    service.getYearlyRecords = function (strYear) {
+        var year = +strYear;
+
+        if ( _.isNaN(year) ) {
+            throw "Expected numeric year, got " + JSON.stringify(strYear);
+        }
+
+        return selectMany(
             "SELECT * FROM Records WHERE created BETWEEN ? AND ?",
             [moment({ year: year }).format(),
              moment({ year: year + 1 }).format()]
-        ).then(function (result) {
-            return _.map(
-                _.range(result.rows.length),
-                function (i) {
-                    return _.clone(result.rows.item(i));
-                }
-            );
-        });
+        );
     };
+
 
     service.getRecord = function (id) {
         return query("SELECT * FROM Records WHERE id = ?", [id])
@@ -181,28 +207,72 @@ var dbService = function ($q, errorService) {
             "SET created = ?, updated = ?, text = ? " +
             "WHERE id = ?",
             [record.created, record.updated, record.text, record.id]
-        ).then(function (result) {
-            var message;
-
-            if (result.rowsAffected !== 1) {
-                message = "update record: failure updating or no changes";
-                errorService.reportError(message);
-                throw message;
-            }
-        });
+        ).then(
+            verifyOneRowAffected
+        );
     };
 
     service.deleteRecord = function (id) {
         return query("DELETE FROM Records WHERE id = ?", [id])
-            .then(function (result) {
-                var message;
+            .then(verifyOneRowAffected);
+    };
 
-                if (result.rowsAffected !== 1) {
-                    message = "wasn't able to delete or no such id found";
-                    errorService.reportError(message);
-                    throw message;
+    service.syncRecord = function (record) {
+        return selectMany(
+            "SELECT * FROM Records WHERE created = ?",
+            [record.created]
+        ).then(function (local) {
+            if (local.length === 0) {
+                return service.addRecord(record);
+            }
+            else if (local.length === 1) {
+                if (moment(local[0].updated).isBefore(record.updated)) {
+                    return service.updateRecord({
+                        id: local[0].id,
+                        created: local[0].created,
+                        updated: record.updated,
+                        text: record.text
+                    });
                 }
+            }
+            else {
+                throw "db integrity: multiple " + record.created;
+            }
+        });
+    };
+
+
+    // TODO: consider splitting this to import/export status
+    service.getSyncStatus = function () {
+        return selectMany("SELECT * FROM Sync")
+            .then(function (sync) {
+                return _.object(
+                    _.pluck(sync, 'path'),
+                    sync
+                );
             });
+    };
+
+    service.updateLastImport = function (path) {
+        return query(
+            "INSERT OR REPLACE INTO Sync (path, lastImport, lastExport)" +
+            "VALUES (?, ?, " +
+            "   (SELECT lastExport FROM Sync WHERE path = ?))",
+            [path, moment().format(), path]
+        ).then(
+            verifyOneRowAffected
+        );
+    };
+
+    service.updateLastExport = function (path) {
+        return query(
+            "INSERT OR REPLACE INTO Sync (path, lastExport, lastImport)" +
+            "VALUES (?, ?, " +
+            "   (SELECT lastImport FROM Sync WHERE path = ?))",
+            [path, moment().format(), path]
+        ).then(
+            verifyOneRowAffected
+        );
     };
 
     return service;
