@@ -6,9 +6,7 @@
   "scripts": {
     "postinstall": "bower install",
     "test": "node_modules/phantomjs/lib/phantom/bin/phantomjs node_modules/jasmine-reporters/bin/phantomjs-testrunner.js /home/iliab/workspace/dayary/test/jasmine.html",
-    "lint": "npm run lint-server && npm run lint-www",
-    "lint-www": "node node_modules/jshint/bin/jshint www",
-    "lint-server": "node node_modules/jshint/bin/jshint server"
+    "lint": "node node_modules/jshint/bin/jshint www"
   },
   "author": {
     "name": "Ilia Barahovsky",

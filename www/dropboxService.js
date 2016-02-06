@@ -11,7 +11,7 @@ dropboxService = function ($q, settingsService) {
         if (!authenticated) {
             throw "Not authenticated";
         }
-    }
+    };
 
     // All APIs are called in the similar way:
     //      client.func(arg1, ..., function (error, res1, ...) {

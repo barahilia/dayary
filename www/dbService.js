@@ -14,7 +14,7 @@ var dbService = function ($q, errorService) {
             );
         }
         return dbHandle;
-    }
+    };
 
     // A caveat to be remembered: returning value of result.rows.item() might
     // be read-only. Observed in Chrome and Safari in iPad. Clone before use.
