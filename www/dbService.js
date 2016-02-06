@@ -153,6 +153,47 @@ var dbService = function ($q, errorService) {
         return selectMany("SELECT id, created, updated FROM Records");
     };
 
+    service.getMonthlyRecordsAt = function (recordId) {
+        if (recordId === undefined) {
+            promise = query("SELECT max(created) FROM Records");
+        }
+        else {
+            promise = query(
+                "SELECT created FROM Records WHERE id = ?",
+                [recordId]
+            );
+        }
+
+        return promise
+            .then(function (result) {
+                if (result.rows.length === 0) {
+                    return null;
+                }
+                else if (result.rows.length === 1) {
+                    return result.rows.item(0);
+                }
+                else {
+                    message = "internal error";
+                    errorService.reportError(message);
+                    throw message;
+                }
+            })
+            .then(function (created) {
+                if (created === null) {
+                    return [];
+                }
+                else {
+                    created = moment(created);
+
+                    return selectMany(
+                        "SELECT * FROM Records WHERE created BETWEEN ? AND ?",
+                        [moment(created).startOf('month').format(),
+                         moment(created).endOf('month').format()]
+                    );
+                }
+            });
+    };
+
     service.yearsUpdated = function () {
         // TODO: move dates to UTC and get back to strftime('%Y', created)
         return selectMany(
