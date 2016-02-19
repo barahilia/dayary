@@ -155,11 +155,11 @@ var dbService = function ($q, errorService) {
 
     service.getMonthlyRecordsAt = function (recordId) {
         if (recordId === undefined) {
-            promise = query("SELECT max(created) FROM Records");
+            promise = query("SELECT max(created) AS date FROM Records");
         }
         else {
             promise = query(
-                "SELECT created FROM Records WHERE id = ?",
+                "SELECT created AS date FROM Records WHERE id = ?",
                 [recordId]
             );
         }
@@ -170,7 +170,7 @@ var dbService = function ($q, errorService) {
                     return null;
                 }
                 else if (result.rows.length === 1) {
-                    return result.rows.item(0);
+                    return result.rows.item(0).date;
                 }
                 else {
                     message = "internal error";
@@ -186,7 +186,8 @@ var dbService = function ($q, errorService) {
                     created = moment(created);
 
                     return selectMany(
-                        "SELECT * FROM Records WHERE created BETWEEN ? AND ?",
+                        "SELECT id, created, updated " +
+                        "FROM Records WHERE created BETWEEN ? AND ?",
                         [moment(created).startOf('month').format(),
                          moment(created).endOf('month').format()]
                     );

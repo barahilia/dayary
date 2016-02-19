@@ -1,11 +1,12 @@
 var recordsCtrl = function (
     $scope, $state, dbService
 ) {
+    var specificRecordId = $state.params.id;
 
     $scope.loadingRecordsList = true;
     $scope.records = [];
 
-    dbService.getAllRecords()
+    dbService.getMonthlyRecordsAt(specificRecordId)
         .then(function (records) {
             records = _.sortBy(records, 'created');
             records = records.reverse();
@@ -13,7 +14,7 @@ var recordsCtrl = function (
             $scope.records = records;
             $scope.loadingRecordsList = false;
 
-            if ($state.params.id) {
+            if (specificRecordId) {
                 // Do nothing - we are heading to some specific record
             }
             else {
