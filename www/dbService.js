@@ -14,7 +14,7 @@ var dbService = function ($q, errorService) {
             );
         }
         return dbHandle;
-    }
+    };
 
     // A caveat to be remembered: returning value of result.rows.item() might
     // be read-only. Observed in Chrome and Safari in iPad. Clone before use.
@@ -151,6 +151,48 @@ var dbService = function ($q, errorService) {
 
     service.getAllRecords = function () {
         return selectMany("SELECT id, created, updated FROM Records");
+    };
+
+    service.getMonthlyRecordsAt = function (recordId) {
+        if (recordId === undefined) {
+            promise = query("SELECT max(created) AS date FROM Records");
+        }
+        else {
+            promise = query(
+                "SELECT created AS date FROM Records WHERE id = ?",
+                [recordId]
+            );
+        }
+
+        return promise
+            .then(function (result) {
+                if (result.rows.length === 0) {
+                    return null;
+                }
+                else if (result.rows.length === 1) {
+                    return result.rows.item(0).date;
+                }
+                else {
+                    message = "internal error";
+                    errorService.reportError(message);
+                    throw message;
+                }
+            })
+            .then(function (created) {
+                if (created === null) {
+                    return [];
+                }
+                else {
+                    created = moment(created);
+
+                    return selectMany(
+                        "SELECT id, created, updated " +
+                        "FROM Records WHERE created BETWEEN ? AND ?",
+                        [moment(created).startOf('month').format(),
+                         moment(created).endOf('month').format()]
+                    );
+                }
+            });
     };
 
     service.yearsUpdated = function () {

@@ -1,14 +1,12 @@
 {
   "name": "dayary",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Diary tool in web app capable to sync with Dropbox",
   "main": "server/main.js",
   "scripts": {
     "postinstall": "bower install",
     "test": "node_modules/phantomjs/lib/phantom/bin/phantomjs node_modules/jasmine-reporters/bin/phantomjs-testrunner.js /home/iliab/workspace/dayary/test/jasmine.html",
-    "lint": "npm run lint-server && npm run lint-www",
-    "lint-www": "node node_modules/jshint/bin/jshint www",
-    "lint-server": "node node_modules/jshint/bin/jshint server"
+    "lint": "node node_modules/jshint/bin/jshint www"
   },
   "author": {
     "name": "Ilia Barahovsky",
