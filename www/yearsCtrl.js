@@ -31,6 +31,15 @@ var yearsCtrl = function ($scope, dbService, errorService) {
         );
     };
 
+    var orderRecords = function (organizedRecords) {
+        _.each(organizedRecords, function (yearRecords) {
+            _.each(yearRecords.months, function (monthRecords, month) {
+                sorted = _.sortBy(monthRecords, 'created');
+                yearRecords.months[month] = sorted;
+            });
+        });
+    };
+
     $scope.months = moment.months();
 
     $scope.selectYear = function (year) {
@@ -51,9 +60,10 @@ var yearsCtrl = function ($scope, dbService, errorService) {
     dbService.getAllRecords()
         .then(function (records) {
             organizeRecords(records);
+            orderRecords($scope.records);
 
             if (_.some($scope.records)) {
-                $scope.selectYear(_.min(_.keys($scope.records)));
+                $scope.selectYear(_.max(_.keys($scope.records)));
             }
         });
 };

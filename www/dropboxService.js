@@ -42,7 +42,12 @@ dropboxService = function ($q, settingsService) {
     };
 
     client.authenticate({interactive: false}, function(error) {
-        authenticated = ! error;
+        if (error) {
+            authenticated = false;
+        }
+        else {
+            authenticated = client.isAuthenticated();
+        }
     });
 
 
