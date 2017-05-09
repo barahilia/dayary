@@ -153,7 +153,7 @@ var dbService = function ($q, errorService) {
         return selectMany("SELECT id, created, updated FROM Records");
     };
 
-    service.getMonthlyRecordsAt = function (recordId) {
+    var getCreated = function (recordId) {
         if (recordId === undefined) {
             promise = query("SELECT max(created) AS date FROM Records");
         }
@@ -170,28 +170,49 @@ var dbService = function ($q, errorService) {
                     return null;
                 }
                 else if (result.rows.length === 1) {
-                    return result.rows.item(0).date;
+                    date = result.rows.item(0).date;
+                    return moment(date);
                 }
                 else {
                     message = "internal error";
                     errorService.reportError(message);
                     throw message;
                 }
-            })
-            .then(function (created) {
-                if (created === null) {
-                    return [];
-                }
-                else {
-                    created = moment(created);
+            });
+    };
 
-                    return selectMany(
-                        "SELECT id, created, updated " +
-                        "FROM Records WHERE created BETWEEN ? AND ?",
-                        [moment(created).startOf('month').format(),
-                         moment(created).endOf('month').format()]
-                    );
-                }
+    var getMonthlyRecordsAtDate = function (date) {
+        if (date === null) {
+            return [];
+        }
+        else {
+            return selectMany(
+                "SELECT id, created, updated " +
+                "FROM Records WHERE created BETWEEN ? AND ?",
+                [date.startOf('month').format(),
+                 date.endOf('month').format()]
+            );
+        }
+    };
+
+    service.getMonthlyRecordsAt = function (recordId) {
+        return getCreated(recordId)
+            .then(getMonthlyRecordsAtDate);
+    };
+
+    service.getPreviousMonthlyRecords = function (recordId) {
+        return getCreated(recordId)
+            .then(function (date) {
+                date = date.subtract(1, 'month');
+                return getMonthlyRecordsAtDate(date);
+            });
+    };
+
+    service.getNextMonthlyRecords = function (recordId) {
+        return getCreated(recordId)
+            .then(function (date) {
+                date = date.add(1, 'month');
+                return getMonthlyRecordsAtDate(date);
             });
     };
 

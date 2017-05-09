@@ -22,10 +22,9 @@ body {
     height: 350px;
 }
 
-#records-list {
-    height: 350px;
-    overflow-y: auto;
-    padding-right: 10px;
+#records-actions {
+    display: flex;
+    justify-content: space-between;
 }
 
 .bg-success .remove-record {

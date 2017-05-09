@@ -1,28 +1,31 @@
 var recordsCtrl = function (
     $scope, $state, dbService
 ) {
-    var specificRecordId = $state.params.id;
-
-    $scope.loadingRecordsList = true;
     $scope.records = [];
 
-    dbService.getMonthlyRecordsAt(specificRecordId)
-        .then(function (records) {
-            records = _.sortBy(records, 'created');
-            records = records.reverse();
+    var loadMonth = function (dbGetter, chooser, goToState) {
+        var currentRecordId = $state.params.id;
+        $scope.loadingRecordsList = true;
 
-            $scope.records = records;
-            $scope.loadingRecordsList = false;
+        dbGetter(currentRecordId)
+            .then(function (records) {
+                $scope.loadingRecordsList = false;
 
-            if (specificRecordId) {
-                // Do nothing - we are heading to some specific record
-            }
-            else {
-                if (records.length > 0) {
-                    $state.go("records.item", { id: records[0].id });
+                if (records.length === 0) {
+                    return;
                 }
-            }
-        });
+
+                records = _.sortBy(records, 'created');
+                records = records.reverse();
+                $scope.records = records;
+
+                if (goToState || !currentRecordId) {
+                    $state.go("records.item", { id: chooser(records).id });
+                }
+            });
+    };
+
+    loadMonth(dbService.getMonthlyRecordsAt, _.first);
 
     $scope.add = function () {
         var addition = {
@@ -43,5 +46,13 @@ var recordsCtrl = function (
             .then(function () {
                 $scope.records = _.without($scope.records, record);
             });
+    };
+
+    $scope.loadPrevious = function () {
+        loadMonth(dbService.getPreviousMonthlyRecords, _.first, true);
+    };
+
+    $scope.loadNext = function () {
+        loadMonth(dbService.getNextMonthlyRecords, _.last, true);
     };
 };
