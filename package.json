@@ -1,6 +1,6 @@
 {
   "name": "dayary",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Diary tool in web app capable to sync with Dropbox",
   "main": "server/main.js",
   "scripts": {
