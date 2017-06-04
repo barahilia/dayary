@@ -107,7 +107,7 @@ describe("sync db", function () {
         ];
 
         spyOn(dropbox, "listFiles").and.returnValue(
-            Q([{path: file, modifiedAt: "9999-01-01"}])
+            Q([{path_display: file, server_modified: "9999-01-01"}])
         );
         spyOn(dropbox, "readFile").and.returnValue( Q(records) );
         spyOn(dropbox, "writeFile").and.returnValue( Q(null) );
@@ -137,7 +137,7 @@ describe("sync db", function () {
         ];
 
         spyOn(dropbox, "listFiles").and.returnValue(
-            Q([{path: file, modifiedAt: "2000-01-01"}])
+            Q([{path_display: file, server_modified: "2000-01-01"}])
         );
         spyOn(dropbox, "readFile");
         spyOn(dropbox, "writeFile");
@@ -171,7 +171,7 @@ describe("sync db", function () {
         ];
 
         spyOn(dropbox, "listFiles").and.returnValue(
-            Q([{path: file, modifiedAt: "9999-01-01"}])
+            Q([{path_display: file, server_modified: "9999-01-01"}])
         );
         spyOn(dropbox, "readFile").and.returnValue( Q(records) );
         spyOn(dropbox, "writeFile");
@@ -236,7 +236,7 @@ describe("sync db", function () {
         ];
 
         spyOn(dropbox, "listFiles").and.returnValue(
-            Q([{path: file, modifiedAt: "9999-01-01"}])
+            Q([{path_display: file, server_modified: "9999-01-01"}])
         );
         spyOn(dropbox, "readFile").and.returnValue(
             Q(JSON.stringify(fileRecords))
@@ -257,8 +257,8 @@ describe("sync db", function () {
 
     it("should import one of recurrent records in two files", function (done) {
         var files = [
-            {path: "0", modifiedAt: "9999-01-01"},
-            {path: "1", modifiedAt: "9999-01-01"}
+            {path_display: "0", server_modified: "9999-01-01"},
+            {path_display: "1", server_modified: "9999-01-01"}
         ];
         var fileRecords = [
             { id: 1, created: '2015-05-05', updated: '2015-05-05', text: "" },

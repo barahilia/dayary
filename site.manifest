@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# 2017-05-24:v1.0.4
+# 2017-06-07:v1.1.0
 
 CACHE:
 
@@ -17,7 +17,7 @@ bower_components/moment/moment.js
 bower_components/font-awesome/fonts/fontawesome-webfont.woff?v=4.4.0
 bower_components/font-awesome/fonts/fontawesome-webfont.woff2?v=4.4.0
 
-node_modules/dropbox/lib/dropbox.js
+node_modules/dropbox/dist/Dropbox-sdk.min.js
 
 www/enforceHttps.js
 www/icons/icon-192x192.png

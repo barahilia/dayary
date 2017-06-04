@@ -6,31 +6,39 @@ var dropboxCtrl = function (
 
     $scope.getData = function () {
         dropboxService.accountInfo()
-            .then(
-                function (accountInfo) {
-                    $scope.dropboxUser = accountInfo.name;
-                },
-                function () {
-                    errorService.reportError(
-                        "failure accessing Dropbox account info"
-                    );
-                }
-            );
+            .then(function (accountInfo) {
+                $scope.dropboxUser = accountInfo.name.display_name;
+            })
+            .catch(function (message) {
+                errorService.reportError(
+                    "failure accessing Dropbox account info: " + message
+                );
+            });
     };
 
     $scope.listFiles = function () {
         $scope.listing = true;
 
         dropboxService.listFiles(settingsService.settings.dropboxFolder)
-            .finally(function () {
-                $scope.listing = false;
-            })
             .then(function (entries) {
+                $scope.listing = false;
                 $scope.files = entries;
+            })
+            .catch(function (message) {
+                $scope.listing = false;
+                errorService.reportError(
+                    "failure accessing Dropbox account info: " + message
+                );
             });
     };
 
     $scope.autoSync = function () {
-        syncService.sync();
+        syncService.sync()
+            .then(function () {
+                console.log("Auto sync finished successfully");
+            })
+            .catch(function (message) {
+                errorService.reportError("auto sync fail: " + message);
+            });
     };
 };

@@ -20,7 +20,7 @@
   "readme": "Please refer to the README.md",
   "readmeFilename": "README.md",
   "dependencies": {
-    "dropbox": "^0.10.3",
+    "dropbox": "^2.5.4",
     "express": "~4.10.6"
   },
   "devDependencies": {
