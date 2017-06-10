@@ -9,15 +9,15 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
     service.filesToImport = function (cloudFiles, status) {
         var actions = _.map(cloudFiles, function (file) {
             // If in status and lastImport after the file was modified
-            if (status[file.path] &&
-                moment(status[file.path].lastImport)
-                    .isAfter(file.modifiedAt)) {
+            if (status[file.path_display] &&
+                moment(status[file.path_display].lastImport)
+                    .isAfter(file.server_modified)) {
                 // Do nothing
                 return null;
             }
             else {
                 // Should import file
-                return file.path;
+                return file.path_display;
             }
         });
 
@@ -71,7 +71,7 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
         return $q.all([
             // Last modification per years: [ { year, updated } ]
             dbService.yearsUpdated(),
-            // Load saved files status: { name: { lastImport, lastExport } }
+            // Load saved files status: { path: { lastImport, lastExport } }
             dbService.getSyncStatus()
         ]).then(function (data) {
             var yearStatuses = data[0];
@@ -110,9 +110,9 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
 
     service.importFromCloud = function () {
         return $q.all([
-            // Get cloud folder listing: [ { name, updated } ]
+            // Get cloud folder listing: [ { path, updated } ]
             dropboxService.listFiles(settingsService.settings.dropboxFolder),
-            // Load saved files status: { name: { lastImport, lastExport } }
+            // Load saved files status: { path: { lastImport, lastExport } }
             dbService.getSyncStatus()
         ]).then(function (data) {
             var cloudFiles = data[0];

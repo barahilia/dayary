@@ -1,6 +1,6 @@
 {
   "name": "dayary",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Diary tool in web app capable to sync with Dropbox",
   "main": "server/main.js",
   "scripts": {
@@ -20,7 +20,7 @@
   "readme": "Please refer to the README.md",
   "readmeFilename": "README.md",
   "dependencies": {
-    "dropbox": "^0.10.3",
+    "dropbox": "^2.5.4",
     "express": "~4.10.6"
   },
   "devDependencies": {

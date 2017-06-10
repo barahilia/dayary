@@ -1,24 +1,29 @@
-var client = new Dropbox.Client({ key: "4hxwutae96fhhbd" });
+var getAuthTokenFromHash = function () {
+    var hash = window.location.hash;
+    hash = hash.substr(1);
 
-client.authenticate({interactive: true}, function(error, client) {
-    var d;
+    var hashMap = {};
 
-    if (error) {
-        console.log(error);
+    hash.split('&')
+        .map(function (element) { return element.split('='); })
+        .forEach(function (pair) { hashMap[pair[0]] = pair[1]; });
 
-        d = document.createElement("div");
-        d.innerHTML = "Authentication error - see console for details";
-        document.body.appendChild(d);
+    return hashMap.access_token;
+};
 
-        return;
-    }
+var authTokenFromHash = getAuthTokenFromHash();
 
-    if (client.isAuthenticated()) {
-        window.location.href = "/dayary";
-    }
-    else {
-        d = document.createElement("div");
-        d.innerHTML = "Internal (Dropbox) error - not authenticated";
-        document.body.appendChild(d);
-    }
-});
+if (authTokenFromHash) {
+    localStorage.dropboxAuthToken = authTokenFromHash;
+}
+
+if (localStorage.dropboxAuthToken) {
+    window.location.href = "/dayary";
+}
+else {
+    var dropbox = new Dropbox({ clientId: "4hxwutae96fhhbd" });
+    var authUrl = dropbox.getAuthenticationUrl(
+        'https://barahilia.github.io/dayary/www/login/dropbox.html'
+    );
+    window.location.href = authUrl;
+}

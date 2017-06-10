@@ -14,7 +14,7 @@ describe("sync service", function () {
 
     it("should import everything for empty status", function () {
         var res = service.filesToImport(
-            [{path: "a"}, {path: "b"}],
+            [{path_display: "a"}, {path_display: "b"}],
             {}
         );
 
@@ -23,7 +23,7 @@ describe("sync service", function () {
 
     it("should import everything for unrelated status", function () {
         var res = service.filesToImport(
-            [{path: "a"}, {path: "b"}],
+            [{path_display: "a"}, {path_display: "b"}],
             {"c": null, "d": null}
         );
 
@@ -33,8 +33,8 @@ describe("sync service", function () {
     it("should import everything for outdated status", function () {
         var res = service.filesToImport(
             [
-                {path: "a", modifiedAt: "2015-01-01"},
-                {path: "b", modifiedAt: "2015-01-01"}
+                {path_display: "a", server_modified: "2015-01-01"},
+                {path_display: "b", server_modified: "2015-01-01"}
             ],
             {
                 a: {lastImport: "2014-01-01"},
@@ -48,9 +48,9 @@ describe("sync service", function () {
     it("should import recently updated and new files only", function () {
         var res = service.filesToImport(
             [
-                {path: "a", modifiedAt: "2015-01-01"},
-                {path: "b", modifiedAt: "2015-01-01"},
-                {path: "c", modifiedAt: "2015-01-01"},
+                {path_display: "a", server_modified: "2015-01-01"},
+                {path_display: "b", server_modified: "2015-01-01"},
+                {path_display: "c", server_modified: "2015-01-01"},
             ],
             {
                 a: {lastImport: "2015-02-02"},
