@@ -10,7 +10,7 @@ var dbService = function ($q, errorService) {
                 "dayary",
                 "0.8",
                 "Dayary DB",
-                5 * 1000 * 1000
+                10 * 1000 * 1000
             );
         }
         return dbHandle;

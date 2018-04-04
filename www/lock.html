@@ -1,17 +1,31 @@
 <div class="col-md-3">
     <h2>Locked</h2>
 
-    <div>Enter the pass phrase:</div>
+    <div>Pass phrase:</div>
 
     <!-- TODO: use ngEnter from
          http://stackoverflow.com/questions/17470790/how-to-use-a-keypress-event-in-angularjs -->
-    <input type="text"
+    <input type="password"
            ng-model="passphrase"
            ng-trim="false"
            ng-keypress="($event.which === 13) ? enter() : 0">
 
+    <br />
+    <br />
+
+    <div>
+        <input type="checkbox" ng-model="showPassphrase">
+        Show pass phrase in clear text
+
+        <div ng-show="showPassphrase">
+            {{passphrase}}
+        </div>
+    </div>
+
+
+    <br />
     <div class="bg-danger" ng-show="invalidPassphrase()">
-        Invalid Pass Phrase
+        Wrong Pass Phrase
     </div>
 
     <br />

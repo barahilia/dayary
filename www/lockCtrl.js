@@ -1,7 +1,11 @@
 var lockCtrl = function ($scope, lockService) {
 
+    $scope.showPassphrase = true;
+
+
     $scope.invalidPassphrase = function () {
-        return ! lockService.validPassphrase($scope.passphrase);
+        return $scope.passphrase &&
+               ! lockService.validPassphrase($scope.passphrase);
     };
 
     $scope.enter = function () {
