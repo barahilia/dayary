@@ -1,0 +1,6 @@
+* update `site.manifest`
+** date and version
+** files list
+* update `banner.html`
+** version
+* `npm version <type>`

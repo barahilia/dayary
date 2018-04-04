@@ -6,6 +6,7 @@
   "scripts": {
     "postinstall": "bower install",
     "test": "node_modules/phantomjs/lib/phantom/bin/phantomjs node_modules/jasmine-reporters/bin/phantomjs-testrunner.js /home/iliab/workspace/dayary/test/jasmine.html",
+    "checklistversion": "cat checklist.version",
     "lint": "node node_modules/jshint/bin/jshint www"
   },
   "author": {
