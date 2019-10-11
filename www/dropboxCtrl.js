@@ -33,11 +33,15 @@ var dropboxCtrl = function (
     };
 
     $scope.autoSync = function () {
+        $scope.syncing = true;
+
         syncService.sync()
             .then(function () {
+                $scope.syncing = false;
                 console.log("Auto sync finished successfully");
             })
             .catch(function (message) {
+                $scope.syncing = false;
                 errorService.reportError("auto sync fail: " + message);
             });
     };
