@@ -22,7 +22,7 @@ var dropboxCtrl = function (
         dropboxService.listFiles(settingsService.settings.dropboxFolder)
             .then(function (entries) {
                 $scope.listing = false;
-                $scope.files = entries;
+                $scope.files = _.sortBy(entries, 'name');
             })
             .catch(function (message) {
                 $scope.listing = false;
@@ -33,11 +33,15 @@ var dropboxCtrl = function (
     };
 
     $scope.autoSync = function () {
+        $scope.syncing = true;
+
         syncService.sync()
             .then(function () {
+                $scope.syncing = false;
                 console.log("Auto sync finished successfully");
             })
             .catch(function (message) {
+                $scope.syncing = false;
                 errorService.reportError("auto sync fail: " + message);
             });
     };
