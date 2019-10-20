@@ -9,7 +9,7 @@
 
 <div ng-show="isAuthenticated">
     <div>
-        <button  class="btn btn-success"ng-click="getData(year)">
+        <button  class="btn btn-success" ng-click="getData(year)">
             Get data
         </button>
         Logged in as - {{dropboxUser}}
@@ -39,7 +39,8 @@
 
         <div>
             <button class="btn btn-success"
-                    ng-click="autoSync()">
+                    ng-click="autoSync()"
+                    ng-disabled="syncing">
                 Auto sync
             </button>
 
