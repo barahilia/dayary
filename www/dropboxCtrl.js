@@ -22,7 +22,7 @@ var dropboxCtrl = function (
         dropboxService.listFiles(settingsService.settings.dropboxFolder)
             .then(function (entries) {
                 $scope.listing = false;
-                $scope.files = entries;
+                $scope.files = _.sortBy(entries, 'name');
             })
             .catch(function (message) {
                 $scope.listing = false;
