@@ -8,19 +8,7 @@ def load_json(pathname):
         return load(f)
 
 
-def main():
-    if len(argv) != 3:
-        print('usage: ./merge.py from.json to.json')
-        print()
-        print('merge dayary records from from.json to to.json')
-
-        exit(-1)
-
-    from_pathname, to_pathname = argv[1:]
-
-    from_json = load_json(from_pathname)
-    to_json = load_json(to_pathname)
-
+def merge(from_json, to_json):
     max_id = max(record['id'] for record in to_json)
 
     to_records = {
@@ -46,6 +34,24 @@ def main():
 
             elif from_record['updated'] < to_record['updated']:
                 print(from_created, 'target was updated later; no change')
+
+    return to_records
+
+
+def main():
+    if len(argv) != 3:
+        print('usage: ./merge.py from.json to.json')
+        print()
+        print('merge dayary records from from.json to to.json')
+
+        exit(-1)
+
+    from_pathname, to_pathname = argv[1:]
+
+    from_json = load_json(from_pathname)
+    to_json = load_json(to_pathname)
+
+    to_records = merge(from_json, to_json)
 
     output = sorted(to_records.values(), key=lambda record: record['id'])
     print(dumps(output))
