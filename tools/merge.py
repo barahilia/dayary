@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from sys import argv
 from json import load, dumps
+import logging
 
 
 def load_json(pathname):
@@ -24,16 +25,17 @@ def merge(from_json, to_json):
             to_records[from_created] = from_record
             max_id += 1
             from_record['id'] = max_id
-            print(from_created, 'newly added')
+            logging.warn('newly added - %s', from_created)
 
         else:
             if from_record['updated'] > to_record['updated']:
                 to_records[from_created]['updated'] = from_record['updated']
                 to_records[from_created]['text'] = from_record['text']
-                print(from_created, 'updated')
+                logging.warn('updated - %s', from_created)
 
             elif from_record['updated'] < to_record['updated']:
-                print(from_created, 'target was updated later; no change')
+                logging.warn('target was updated later; no change - %s',
+                             from_created)
 
     return to_records
 
