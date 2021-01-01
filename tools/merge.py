@@ -25,17 +25,17 @@ def merge(from_json, to_json):
             to_records[from_created] = from_record
             max_id += 1
             from_record['id'] = max_id
-            logging.warn('newly added - %s', from_created)
+            logging.warning('newly added - %s', from_created)
 
         else:
             if from_record['updated'] > to_record['updated']:
                 to_records[from_created]['updated'] = from_record['updated']
                 to_records[from_created]['text'] = from_record['text']
-                logging.warn('updated - %s', from_created)
+                logging.warning('updated - %s', from_created)
 
             elif from_record['updated'] < to_record['updated']:
-                logging.warn('target was updated later; no change - %s',
-                             from_created)
+                logging.warning(
+                    'target was updated later; no change - %s', from_created)
 
     return to_records
 
