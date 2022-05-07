@@ -129,6 +129,25 @@ var dbService = function ($q, errorService) {
         console.log('In getHash()');
         console.log(newDb);
 
+        var request = newDb
+            .transaction('hash')
+            .objectStore('hash')
+            .get(0);
+
+        request.onerror = function (event) {
+            console.log('error getting hash 0');
+        };
+
+        request.onsuccess = function (event) {
+            if (request.result) {
+                var hash = request.result.hash;
+                console.log('success: hash = ' + hash);
+            }
+            else {
+                console.log('no hash found');
+            }
+        };
+
         return query("SELECT hash FROM Hash")
             .then(function (result) {
                 if (result.rows.length === 0) {
@@ -136,7 +155,15 @@ var dbService = function ($q, errorService) {
                     return null;
                 }
                 else {
-                    return result.rows.item(0).hash;
+                    var item = result.rows.item(0).hash;
+
+                    // XXX remove this
+                    //newDb
+                    //    .transaction('hash', 'readwrite')
+                    //    .objectStore('hash')
+                    //    .add({id: 0, hash: item});
+
+                    return item;
                 }
             });
     };
