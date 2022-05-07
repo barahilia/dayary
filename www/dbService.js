@@ -1,5 +1,6 @@
 var dbService = function ($q, errorService) {
     var dbHandle;
+    var newDb;
 
     // TODO: add convenience functions: selectOne, selectAll, deleteOne, ...
     // TODO: split to framework websqlService and app-related dbService
@@ -65,15 +66,26 @@ var dbService = function ($q, errorService) {
     service.init = function () {
         // == IndexedDB ==
         var request = window.indexedDB.open('db', 1);
+
+        request.onsuccess = function (event) {
+            console.log('in success');
+            newDb = request.result;
+        };
+
         request.onupgradeneeded = function (event) {
             console.log('in upgrade');
 
-            var db = request.result;
+            var upgradeDb = request.result;
 
-            db.createObjectStore('hash', {keyPath: 'id'});
-            db.createObjectStore('settings', {keyPath: 'key'});
-            db.createObjectStore('records', {keyPath: 'id'});
-            db.createObjectStore('sync', {keyPath: 'path'});
+            upgradeDb.createObjectStore('hash', {keyPath: 'id'});
+            upgradeDb.createObjectStore('settings', {keyPath: 'key'});
+            upgradeDb.createObjectStore('records', {keyPath: 'id'});
+            upgradeDb.createObjectStore('sync', {keyPath: 'path'});
+        };
+
+        request.onerror = function (event) {
+            console.log('in error');
+            // XXX how to report the error?
         };
 
         // == Continue to the old good WebSQL ==
@@ -114,6 +126,9 @@ var dbService = function ($q, errorService) {
 
 
     service.getHash = function () {
+        console.log('In getHash()');
+        console.log(newDb);
+
         return query("SELECT hash FROM Hash")
             .then(function (result) {
                 if (result.rows.length === 0) {
@@ -127,6 +142,9 @@ var dbService = function ($q, errorService) {
     };
 
     service.setHash = function (hash) {
+        console.log('In setHash()');
+        console.log(newDb);
+
         return service.getHash()
             .then(function (oldHash) {
                 if (oldHash) {
