@@ -63,6 +63,20 @@ var dbService = function ($q, errorService) {
     var service = {};
 
     service.init = function () {
+        // == IndexedDB ==
+        var request = window.indexedDB.open('db', 1);
+        request.onupgradeneeded = function (event) {
+            console.log('in upgrade');
+
+            var db = request.result;
+
+            db.createObjectStore('hash', {keyPath: 'id'});
+            db.createObjectStore('settings', {keyPath: 'key'});
+            db.createObjectStore('records', {keyPath: 'id'});
+            db.createObjectStore('sync', {keyPath: 'path'});
+        };
+
+        // == Continue to the old good WebSQL ==
         var tables;
 
         // In SQLite TEXT can be used for DATETIME
