@@ -17,6 +17,25 @@ var dbService = function ($q, errorService) {
         return dbHandle;
     };
 
+    var queryIndexed = function (name, query) {
+        var deferred = $q.defer();
+
+        var request = query(
+            newDb.transaction(name).objectStore(name)
+        );
+
+        request.onsuccess = function (event) {
+            deferred.resolve(request.result);
+        };
+
+        request.onerror = function (event) {
+            errorService.reportError("db error: " + event);
+            deferred.reject(event);
+        };
+
+        return deferred.promise;
+    };
+
     // A caveat to be remembered: returning value of result.rows.item() might
     // be read-only. Observed in Chrome and Safari in iPad. Clone before use.
     var query = function (query, input) {
@@ -129,43 +148,22 @@ var dbService = function ($q, errorService) {
         console.log('In getHash()');
         console.log(newDb);
 
-        var request = newDb
-            .transaction('hash')
-            .objectStore('hash')
-            .get(0);
+        return queryIndexed(
+            'hash',
+            function (store) {
+                return store.get(0);
+            }
+        ).then(function(result) {
+            console.log('get hash - success');
+            console.log(result);
 
-        request.onerror = function (event) {
-            console.log('error getting hash 0');
-        };
-
-        request.onsuccess = function (event) {
-            if (request.result) {
-                var hash = request.result.hash;
-                console.log('success: hash = ' + hash);
+            if (result) {
+                return result.hash;
             }
             else {
-                console.log('no hash found');
+                return null;
             }
-        };
-
-        return query("SELECT hash FROM Hash")
-            .then(function (result) {
-                if (result.rows.length === 0) {
-                    // It's OK - not set yet
-                    return null;
-                }
-                else {
-                    var item = result.rows.item(0).hash;
-
-                    // XXX remove this
-                    //newDb
-                    //    .transaction('hash', 'readwrite')
-                    //    .objectStore('hash')
-                    //    .add({id: 0, hash: item});
-
-                    return item;
-                }
-            });
+        });
     };
 
     service.setHash = function (hash) {
