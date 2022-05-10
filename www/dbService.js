@@ -17,11 +17,12 @@ var dbService = function ($q, errorService) {
         return dbHandle;
     };
 
-    var queryIndexed = function (name, query) {
+    var queryIndexed = function (name, query, mode='readonly') {
         var deferred = $q.defer();
 
         var request = query(
-            newDb.transaction(name).objectStore(name)
+            newDb.transaction(name, mode)
+                .objectStore(name)
         );
 
         request.onsuccess = function (event) {
@@ -153,7 +154,7 @@ var dbService = function ($q, errorService) {
             function (store) {
                 return store.get(0);
             }
-        ).then(function(result) {
+        ).then(function (result) {
             console.log('get hash - success');
             console.log(result);
 
@@ -176,7 +177,14 @@ var dbService = function ($q, errorService) {
                     throw "set hash: cannot replace existing hash";
                 }
 
-                return query("INSERT INTO Hash (hash) VALUES (?)", [hash]);
+                return queryIndexed(
+                    'hash',
+                    function (store) {
+                        console.log('attempt to set hash');
+                        return store.add({id: 0, hash: hash});
+                    },
+                    'readwrite'
+                );
             });
     };
 
