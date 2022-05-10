@@ -189,16 +189,18 @@ var dbService = function ($q, errorService) {
     };
 
     service.getSettings = function () {
-        return selectMany("SELECT key, value FROM Settings")
-            .then(function (settings) {
-                return _.object(
-                    _.pluck(settings, 'key'),
-                    _.map(
-                        settings,
-                        function (s) { return JSON.parse(s.value); }
-                    )
-                );
-            });
+        return queryIndexed(
+            'settings',
+            function (store) {
+                return store.getAll();
+            }
+        )
+        .then(function (settings) {
+            return _.object(
+                _.pluck(settings, 'key'),
+                _.pluck(settings, 'value')
+            );
+        });
     };
 
     service.setSettings = function (settings) {
