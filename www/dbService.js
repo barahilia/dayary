@@ -204,10 +204,12 @@ var dbService = function ($q, errorService) {
     service.setSettings = function (settings) {
         return $q.all(
             _.map(settings, function (value, key) {
-                return query(
-                    "INSERT OR REPLACE INTO " +
-                    "Settings (key, value) VALUES (?, ?)",
-                    [key, JSON.stringify(value)]
+                return queryIndexed(
+                    'settings',
+                    function (store) {
+                        return store.put({key: key, value: value});
+                    },
+                    'readwrite'
                 );
             })
         );
