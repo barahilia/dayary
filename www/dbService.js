@@ -17,7 +17,7 @@ var dbService = function ($q, errorService) {
         return dbHandle;
     };
 
-    var queryIndexed = function (name, query, mode='readonly') {
+    var queryIndexed = function (name, query, mode='readonly') { // jshint ignore:line
         var deferred = $q.defer();
 
         var request = query(
