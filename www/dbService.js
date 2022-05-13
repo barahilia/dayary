@@ -99,8 +99,11 @@ var dbService = function ($q, errorService) {
 
             upgradeDb.createObjectStore('hash', {keyPath: 'id'});
             upgradeDb.createObjectStore('settings', {keyPath: 'key'});
-            upgradeDb.createObjectStore('records', {keyPath: 'id'});
             upgradeDb.createObjectStore('sync', {keyPath: 'path'});
+            upgradeDb.createObjectStore(
+                'records',
+                {keyPath: 'id', autoIncrement: true}
+            );
         };
 
         request.onerror = function (event) {
@@ -310,42 +313,39 @@ var dbService = function ($q, errorService) {
 
 
     service.getRecord = function (id) {
-        return query("SELECT * FROM Records WHERE id = ?", [id])
-            .then(function (result) {
-                var message;
-
-                if (result.rows.length !== 1) {
-                    message = "get record: not found or ambiguous id";
-                    errorService.reportError(message);
-                    throw message;
-                }
-
-                return _.clone(result.rows.item(0));
+        return queryIndexed(
+            'records',
+            function (store) {
+                return store.get(id);
             }
         );
     };
 
     service.addRecord = function (record) {
-        return query(
-            "INSERT INTO Records (created, updated, text) VALUES (?, ?, ?)",
-            [record.created, record.updated, record.text]
-        ).then(function (result) {
-            return service.getRecord(result.insertId);
+        return queryIndexed(
+            'records',
+            function (store) {
+                return store.add(record);
+            },
+            'readwrite'
+        )
+        .then(function (id) {
+            return service.getRecord(id);
         });
     };
 
     service.updateRecord = function (record) {
-        return query(
-            "UPDATE Records " +
-            "SET created = ?, updated = ?, text = ? " +
-            "WHERE id = ?",
-            [record.created, record.updated, record.text, record.id]
-        ).then(
-            verifyOneRowAffected
+        return queryIndexed(
+            'records',
+            function (store) {
+                return store.put(record);
+            },
+            'readwrite'
         );
     };
 
     service.deleteRecord = function (id) {
+        // XXX deleted records should be tracked to work with sync
         return query("DELETE FROM Records WHERE id = ?", [id])
             .then(verifyOneRowAffected);
     };
