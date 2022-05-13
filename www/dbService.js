@@ -37,6 +37,36 @@ var dbService = function ($q, errorService) {
         return deferred.promise;
     };
 
+    var queryIndexed2 = function (name, action, object) {
+        var deferred = $q.defer();
+
+        modes = {
+            get: 'readonly',
+            add: 'readwrite',
+            put: 'readwrite'
+        };
+
+        if (! (action in modes)) {
+            deferred.reject('unsupported action ' + action);
+        }
+
+        var request = newDb
+            .transaction(name, modes[action])
+            .objectStore(name)
+            [action](object);
+
+        request.onsuccess = function (event) {
+            deferred.resolve(request.result);
+        };
+
+        request.onerror = function (event) {
+            errorService.reportError("db error: " + event);
+            deferred.reject(event);
+        };
+
+        return deferred.promise;
+    };
+
     // A caveat to be remembered: returning value of result.rows.item() might
     // be read-only. Observed in Chrome and Safari in iPad. Clone before use.
     var query = function (query, input) {
