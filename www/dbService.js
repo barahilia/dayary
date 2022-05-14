@@ -37,7 +37,7 @@ var dbService = function ($q, errorService) {
         return deferred.promise;
     };
 
-    var queryIndexed2 = function (name, action, object) {
+    var simpleQuery = function (name, action, object) {
         var deferred = $q.defer();
 
         modes = {
@@ -130,10 +130,13 @@ var dbService = function ($q, errorService) {
             upgradeDb.createObjectStore('hash', {keyPath: 'id'});
             upgradeDb.createObjectStore('settings', {keyPath: 'key'});
             upgradeDb.createObjectStore('sync', {keyPath: 'path'});
-            upgradeDb.createObjectStore(
+
+            var store = upgradeDb.createObjectStore(
                 'records',
                 {keyPath: 'id', autoIncrement: true}
             );
+
+            store.createIndex('created', 'created', {unique: true});
         };
 
         request.onerror = function (event) {
@@ -288,20 +291,33 @@ var dbService = function ($q, errorService) {
             return [];
         }
         else {
-            return selectMany(
-                "SELECT id, created, updated " +
-                "FROM Records WHERE created BETWEEN ? AND ?",
-                [date.startOf('month').format(),
-                 date.endOf('month').format()]
-            );
+            return queryIndexed(
+                'records',
+                function (store) {
+                    return store.index('created').getAll(
+                        IDBKeyRange.bound(
+                            date.startOf('month').format(),
+                            date.endOf('month').format()
+                        )
+                    );
+                }
+            ).then(function (result) {
+                console.log('getMonthlyRecordsAtDate()');
+                console.log(result);
+                return result;
+            });
         }
     };
 
     service.getMonthlyRecordsAt = function (recordId) {
-        return getCreated(recordId)
-            .then(getMonthlyRecordsAtDate);
+        // XXX temp hack
+        return getMonthlyRecordsAtDate(moment());
+
+        //return getCreated(recordId)
+        //    .then(getMonthlyRecordsAtDate);
     };
 
+    // XXX support non-consequtive months
     service.getPreviousMonthlyRecords = function (recordId) {
         return getCreated(recordId)
             .then(function (date) {
