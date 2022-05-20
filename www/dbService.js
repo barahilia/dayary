@@ -272,7 +272,7 @@ var dbService = function ($q, errorService) {
             promise = queryIndexed(
                 'records',
                 function (store) {
-                    return store.get(recordId);
+                    return store.get(parseInt(recordId));
                 }
             );
         }
@@ -280,8 +280,9 @@ var dbService = function ($q, errorService) {
         return promise
             .then(function (result) {
                 if (result) {
-                    // XXX ensure this works with cursor and with get
-                    return moment(result.value.created);
+                    // Support both the cursor and the direct get
+                    result = result.value || result;
+                    return moment(result.created);
                 }
                 else {
                     return null;
