@@ -318,11 +318,26 @@ var dbService = function ($q, errorService) {
             .then(getMonthlyRecordsAtDate);
     };
 
-    // XXX support non-consequtive months
     service.getPreviousMonthlyRecords = function (recordId) {
         return getCreated(recordId)
             .then(function (date) {
                 date = date.subtract(1, 'month');
+
+                return queryIndexed(
+                    'records',
+                    function (store) {
+                        var query = IDBKeyRange.upperBound(date.format());
+                        return store.index('created').openCursor(query, 'prev');
+                    }
+                );
+            })
+            .then(function (result) {
+                var date = null;
+
+                if (result) {
+                    date = moment(result.value.created);
+                }
+
                 return getMonthlyRecordsAtDate(date);
             });
     };
@@ -331,6 +346,22 @@ var dbService = function ($q, errorService) {
         return getCreated(recordId)
             .then(function (date) {
                 date = date.add(1, 'month');
+
+                return queryIndexed(
+                    'records',
+                    function (store) {
+                        var query = IDBKeyRange.lowerBound(date.format());
+                        return store.index('created').openCursor(query, 'next');
+                    }
+                );
+            })
+            .then(function (result) {
+                var date = null;
+
+                if (result) {
+                    date = moment(result.value.created);
+                }
+
                 return getMonthlyRecordsAtDate(date);
             });
     };
