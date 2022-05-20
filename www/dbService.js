@@ -260,28 +260,31 @@ var dbService = function ($q, errorService) {
 
     var getCreated = function (recordId) {
         if (recordId === undefined) {
-            promise = query("SELECT max(created) AS date FROM Records");
+            promise = queryIndexed(
+                'records',
+                function (store) {
+                    // Returns maximal value because of 'prev'
+                    return store.index('created').openCursor(null, 'prev');
+                }
+            );
         }
         else {
-            promise = query(
-                "SELECT created AS date FROM Records WHERE id = ?",
-                [recordId]
+            promise = queryIndexed(
+                'records',
+                function (store) {
+                    return store.get(recordId);
+                }
             );
         }
 
         return promise
             .then(function (result) {
-                if (result.rows.length === 0) {
-                    return null;
-                }
-                else if (result.rows.length === 1) {
-                    date = result.rows.item(0).date;
-                    return moment(date);
+                if (result) {
+                    // XXX ensure this works with cursor and with get
+                    return moment(result.value.created);
                 }
                 else {
-                    message = "internal error";
-                    errorService.reportError(message);
-                    throw message;
+                    return null;
                 }
             });
     };
@@ -310,11 +313,8 @@ var dbService = function ($q, errorService) {
     };
 
     service.getMonthlyRecordsAt = function (recordId) {
-        // XXX temp hack
-        return getMonthlyRecordsAtDate(moment());
-
-        //return getCreated(recordId)
-        //    .then(getMonthlyRecordsAtDate);
+        return getCreated(recordId)
+            .then(getMonthlyRecordsAtDate);
     };
 
     // XXX support non-consequtive months
