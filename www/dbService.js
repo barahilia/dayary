@@ -255,7 +255,12 @@ var dbService = function ($q, errorService) {
 
 
     service.getAllRecords = function () {
-        return selectMany("SELECT id, created, updated FROM Records");
+        return queryIndexed(
+            'records',
+            function (store) {
+                return store.getAll();
+            }
+        );
     };
 
     var getCreated = function (recordId) {
