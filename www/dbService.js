@@ -50,8 +50,9 @@ var dbService = function ($q, errorService) {
         };
 
         if (! (action in modes)) {
-            console.error('simpleQuery() mode error');
-            deferred.reject('unsupported action ' + action);
+            var message = 'unsupported action ' + action;
+            errorService.reportError(message);
+            deferred.reject(message);
         }
 
         var store = newDb
@@ -112,16 +113,6 @@ var dbService = function ($q, errorService) {
             });
     };
 
-    var verifyOneRowAffected = function (result) {
-        var affected = result.rowsAffected;
-        var message = "affected rows: expected one, was " + affected;
-
-        if (affected !== 1) {
-            errorService.reportError(message);
-            throw message;
-        }
-    };
-
 
     var service = {};
 
@@ -149,8 +140,9 @@ var dbService = function ($q, errorService) {
         };
 
         request.onerror = function (event) {
-            // XXX how to report the error?
-            console.error('in error');
+            var message = 'Get IndexedDB error';
+            errorService.reportError(message);
+            throw message;
         };
 
         // == Continue to the old good WebSQL ==
@@ -355,10 +347,16 @@ var dbService = function ($q, errorService) {
             throw "Expected numeric year, got " + JSON.stringify(strYear);
         }
 
-        return selectMany(
-            "SELECT * FROM Records WHERE created BETWEEN ? AND ?",
-            [moment({ year: year }).format(),
-             moment({ year: year + 1 }).format()]
+        return queryIndexed(
+            'records',
+            function (store) {
+                return store.index('created').getAll(
+                    IDBKeyRange.bound(
+                        moment({ year: year }).format(),
+                        moment({ year: year + 1 }).format()
+                    )
+                );
+            }
         );
     };
 
@@ -380,15 +378,17 @@ var dbService = function ($q, errorService) {
 
     service.deleteRecord = function (id) {
         // XXX deleted records should be tracked to work with sync
-        return query("DELETE FROM Records WHERE id = ?", [id])
-            .then(verifyOneRowAffected);
+        return simpleQuery('records', 'delete', id);
     };
 
     service.syncRecord = function (record) {
-        return selectMany(
-            "SELECT * FROM Records WHERE created = ?",
-            [record.created]
-        ).then(function (local) {
+        return queryIndexed(
+            'records',
+            function (store) {
+                return store.index('created').getAll(record.created);
+            }
+        )
+        .then(function (local) {
             if (local.length === 0) {
                 return service.addRecord(record);
             }
@@ -409,9 +409,8 @@ var dbService = function ($q, errorService) {
     };
 
 
-    // TODO: consider splitting this to import/export status
     service.getSyncStatus = function () {
-        return selectMany("SELECT * FROM Sync")
+        return simpleQuery('sync', 'getAll', null)
             .then(function (sync) {
                 return _.object(
                     _.pluck(sync, 'path'),
@@ -421,25 +420,25 @@ var dbService = function ($q, errorService) {
     };
 
     service.updateLastImport = function (path) {
-        return query(
-            "INSERT OR REPLACE INTO Sync (path, lastImport, lastExport)" +
-            "VALUES (?, ?, " +
-            "   (SELECT lastExport FROM Sync WHERE path = ?))",
-            [path, moment().format(), path]
-        ).then(
-            verifyOneRowAffected
-        );
+        return simpleQuery('sync', 'get', path)
+            .then(function (result) {
+                return simpleQuery('sync', 'put', {
+                    path: path,
+                    lastImport: moment().format(),
+                    lastExport: result.lastExport
+                });
+            });
     };
 
     service.updateLastExport = function (path) {
-        return query(
-            "INSERT OR REPLACE INTO Sync (path, lastExport, lastImport)" +
-            "VALUES (?, ?, " +
-            "   (SELECT lastImport FROM Sync WHERE path = ?))",
-            [path, moment().format(), path]
-        ).then(
-            verifyOneRowAffected
-        );
+        return simpleQuery('sync', 'get', path)
+            .then(function (result) {
+                return simpleQuery('sync', 'put', {
+                    path: path,
+                    lastImport: result.lastImport,
+                    lastExport: moment().format()
+                });
+            });
     };
 
     return service;
