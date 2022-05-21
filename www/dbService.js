@@ -42,18 +42,28 @@ var dbService = function ($q, errorService) {
 
         modes = {
             get: 'readonly',
+            getAll: 'readonly',
             add: 'readwrite',
             put: 'readwrite'
         };
 
         if (! (action in modes)) {
+            console.error('simpleQuery() mode error');
             deferred.reject('unsupported action ' + action);
         }
 
-        var request = newDb
+        var store = newDb
             .transaction(name, modes[action])
-            .objectStore(name)
-            [action](object);
+            .objectStore(name);
+
+        var request;
+
+        if (object === null) {
+            request = store[action]();
+        }
+        else {
+            request = store[action](object);
+        }
 
         request.onsuccess = function (event) {
             deferred.resolve(request.result);
@@ -118,13 +128,10 @@ var dbService = function ($q, errorService) {
         var request = window.indexedDB.open('db', 1);
 
         request.onsuccess = function (event) {
-            console.log('in success');
             newDb = request.result;
         };
 
         request.onupgradeneeded = function (event) {
-            console.log('in upgrade');
-
             var upgradeDb = request.result;
 
             upgradeDb.createObjectStore('hash', {keyPath: 'id'});
@@ -140,8 +147,8 @@ var dbService = function ($q, errorService) {
         };
 
         request.onerror = function (event) {
-            console.log('in error');
             // XXX how to report the error?
+            console.error('in error');
         };
 
         // == Continue to the old good WebSQL ==
@@ -182,88 +189,54 @@ var dbService = function ($q, errorService) {
 
 
     service.getHash = function () {
-        console.log('In getHash()');
-        console.log(newDb);
-
-        return queryIndexed(
-            'hash',
-            function (store) {
-                return store.get(0);
-            }
-        ).then(function (result) {
-            console.log('get hash - success');
-            console.log(result);
-
-            if (result) {
-                return result.hash;
-            }
-            else {
-                return null;
-            }
-        });
+        return simpleQuery('hash', 'get', 0)
+            .then(function (result) {
+                if (result) {
+                    return result.hash;
+                }
+                else {
+                    return null;
+                }
+            });
     };
 
     service.setHash = function (hash) {
-        console.log('In setHash()');
-        console.log(newDb);
-
         return service.getHash()
             .then(function (oldHash) {
                 if (oldHash) {
                     throw "set hash: cannot replace existing hash";
                 }
 
-                return queryIndexed(
-                    'hash',
-                    function (store) {
-                        console.log('attempt to set hash');
-                        return store.add({id: 0, hash: hash});
-                    },
-                    'readwrite'
-                );
+                return simpleQuery('hash', 'add', {id: 0, hash: hash});
             });
     };
 
     service.getSettings = function () {
-        return queryIndexed(
-            'settings',
-            function (store) {
-                return store.getAll();
-            }
-        )
-        .then(function (settings) {
-            return _.object(
-                _.pluck(settings, 'key'),
-                _.pluck(settings, 'value')
-            );
-        });
+        return simpleQuery('settings', 'getAll', null)
+            .then(function (settings) {
+                return _.object(
+                    _.pluck(settings, 'key'),
+                    _.pluck(settings, 'value')
+                );
+            });
     };
 
     service.setSettings = function (settings) {
         return $q.all(
             _.map(settings, function (value, key) {
-                return queryIndexed(
-                    'settings',
-                    function (store) {
-                        return store.put({key: key, value: value});
-                    },
-                    'readwrite'
-                );
+                return simpleQuery('settings', 'put', {key: key, value: value});
             })
         );
     };
 
 
     service.getAllRecords = function () {
-        return queryIndexed(
-            'records',
-            function (store) {
-                return store.getAll();
-            }
-        );
+        return simpleQuery('records', 'getAll', null);
     };
 
     var getCreated = function (recordId) {
+        var promise;
+
         if (recordId === undefined) {
             promise = queryIndexed(
                 'records',
@@ -274,12 +247,7 @@ var dbService = function ($q, errorService) {
             );
         }
         else {
-            promise = queryIndexed(
-                'records',
-                function (store) {
-                    return store.get(parseInt(recordId));
-                }
-            );
+            promise = simpleQuery('records', 'get', parseInt(recordId));
         }
 
         return promise
@@ -311,8 +279,6 @@ var dbService = function ($q, errorService) {
                     );
                 }
             ).then(function (result) {
-                console.log('getMonthlyRecordsAtDate()');
-                console.log(result);
                 return result;
             });
         }
@@ -396,35 +362,18 @@ var dbService = function ($q, errorService) {
 
 
     service.getRecord = function (id) {
-        return queryIndexed(
-            'records',
-            function (store) {
-                return store.get(id);
-            }
-        );
+        return simpleQuery('records', 'get', id);
     };
 
     service.addRecord = function (record) {
-        return queryIndexed(
-            'records',
-            function (store) {
-                return store.add(record);
-            },
-            'readwrite'
-        )
-        .then(function (id) {
-            return service.getRecord(id);
-        });
+        return simpleQuery('records', 'add', record)
+            .then(function (id) {
+                return service.getRecord(id);
+            });
     };
 
     service.updateRecord = function (record) {
-        return queryIndexed(
-            'records',
-            function (store) {
-                return store.put(record);
-            },
-            'readwrite'
-        );
+        return simpleQuery('records', 'put', record);
     };
 
     service.deleteRecord = function (id) {
