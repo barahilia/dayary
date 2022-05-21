@@ -44,7 +44,9 @@ var dbService = function ($q, errorService) {
             get: 'readonly',
             getAll: 'readonly',
             add: 'readwrite',
-            put: 'readwrite'
+            put: 'readwrite',
+            delete: 'readwrite',
+            clear: 'readwrite'
         };
 
         if (! (action in modes)) {
@@ -180,10 +182,10 @@ var dbService = function ($q, errorService) {
     };
 
     service.cleanDb = function () {
-        var tables = ["Hash", "Settings", "Records", "Sync"];
+        var tables = ["hash", "settings", "records", "sync"];
 
         return $q.all(_.map(tables, function (table) {
-            return query("DROP TABLE IF EXISTS " + table);
+            return simpleQuery(table, 'clear', null);
         }));
     };
 
