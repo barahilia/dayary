@@ -251,7 +251,7 @@ var dbService = function ($q, errorService) {
     service.getPreviousMonthlyRecords = function (recordId) {
         return getCreated(recordId)
             .then(function (date) {
-                date = date.subtract(1, 'month');
+                date = date.endOf('month').subtract(1, 'month');
 
                 return queryIndexed(
                     'records',
@@ -275,7 +275,7 @@ var dbService = function ($q, errorService) {
     service.getNextMonthlyRecords = function (recordId) {
         return getCreated(recordId)
             .then(function (date) {
-                date = date.add(1, 'month');
+                date = date.startOf('month').add(1, 'month');
 
                 return queryIndexed(
                     'records',
