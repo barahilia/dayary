@@ -1,21 +1,8 @@
 var dbService = function ($q, errorService) {
-    var dbHandle;
     var newDb;
 
     // TODO: add convenience functions: selectOne, selectAll, deleteOne, ...
     // TODO: split to framework websqlService and app-related dbService
-
-    var db = function () {
-        if ( ! dbHandle) {
-            dbHandle = openDatabase(
-                "dayary",
-                "0.8",
-                "Dayary DB",
-                10 * 1000 * 1000
-            );
-        }
-        return dbHandle;
-    };
 
     var queryIndexed = function (name, query, mode='readonly') { // jshint ignore:line
         var deferred = $q.defer();
@@ -82,7 +69,8 @@ var dbService = function ($q, errorService) {
 
     // A caveat to be remembered: returning value of result.rows.item() might
     // be read-only. Observed in Chrome and Safari in iPad. Clone before use.
-    var query = function (query, input) {
+    // XXX remove it
+    var queryXXX = function (query, input) {
         var deferred = $q.defer();
 
         var success = function (tx, result) {
@@ -117,11 +105,13 @@ var dbService = function ($q, errorService) {
     var service = {};
 
     service.init = function () {
-        // == IndexedDB ==
+        var deferred = $q.defer();
+
         var request = window.indexedDB.open('db', 1);
 
         request.onsuccess = function (event) {
             newDb = request.result;
+            deferred.resolve(null);
         };
 
         request.onupgradeneeded = function (event) {
@@ -142,35 +132,10 @@ var dbService = function ($q, errorService) {
         request.onerror = function (event) {
             var message = 'Get IndexedDB error';
             errorService.reportError(message);
-            throw message;
+            deferred.reject(message);
         };
 
-        // == Continue to the old good WebSQL ==
-        var tables;
-
-        // In SQLite TEXT can be used for DATETIME
-        tables = [
-            "CREATE TABLE IF NOT EXISTS Hash (" +
-                "hash VARCHAR" +
-            ")",
-            "CREATE TABLE IF NOT EXISTS Settings (" +
-                "key VARCHAR PRIMARY KEY," +
-                "value VARCHAR" +
-            ")",
-            "CREATE TABLE IF NOT EXISTS Records (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "created TEXT," +
-                "updated TEXT," +
-                "text TEXT" +
-            ")",
-            "CREATE TABLE IF NOT EXISTS Sync (" +
-                "path VARCHAR PRIMARY KEY," +
-                "lastImport TEXT," +
-                "lastExport TEXT" +
-            ")"
-        ];
-
-        return $q.all(_.map(tables, _.partial(query, _, undefined)));
+        return deferred.promise;
     };
 
     service.cleanDb = function () {
