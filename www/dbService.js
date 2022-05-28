@@ -67,40 +67,6 @@ var dbService = function ($q, errorService) {
         return deferred.promise;
     };
 
-    // A caveat to be remembered: returning value of result.rows.item() might
-    // be read-only. Observed in Chrome and Safari in iPad. Clone before use.
-    // XXX remove it
-    var queryXXX = function (query, input) {
-        var deferred = $q.defer();
-
-        var success = function (tx, result) {
-            deferred.resolve(result);
-        };
-
-        var failure = function (tx, error) {
-            errorService.reportError("db error: " + error.message);
-            deferred.reject(error.message);
-        };
-
-        db().transaction(function (tx) {
-            tx.executeSql(query, input, success, failure);
-        });
-
-        return deferred.promise;
-    };
-
-    var selectMany = function (selectQuery, input) {
-        return query(selectQuery, input)
-            .then(function (result) {
-                return _.map(
-                    _.range(result.rows.length),
-                    function (i) {
-                        return _.clone(result.rows.item(i));
-                    }
-                );
-            });
-    };
-
 
     var service = {};
 
@@ -297,12 +263,32 @@ var dbService = function ($q, errorService) {
     };
 
     service.yearsUpdated = function () {
-        // TODO: move dates to UTC and get back to strftime('%Y', created)
-        return selectMany(
-            "SELECT substr(created, 1, 4) AS year," +
-            "       max(updated) as updated " +
-            "FROM records GROUP BY year"
-        );
+        return service.getAllRecords()
+            .then(function (records) {
+                var groups = _.groupBy(records, function (value) {
+                    return moment(value.created).year();
+                });
+
+                var yearLastUpdated = {};
+
+                _.forEach(groups, function(value, key) {
+                    var updated = _.map(value, function (record) {
+                        return record.updated;
+                    });
+
+                    var lastUpdated = _.reduce(updated, function(a, b) {
+                        return a > b ? a : b;
+                    });
+
+                    yearLastUpdated[key] = lastUpdated;
+                });
+
+                yearLastUpdated = _.map(yearLastUpdated, function (value, key) {
+                    return {year: key, updated: value};
+                });
+
+                return yearLastUpdated;
+            });
     };
 
     service.getYearlyRecords = function (strYear) {
