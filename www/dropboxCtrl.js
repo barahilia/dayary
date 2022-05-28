@@ -42,6 +42,7 @@ var dropboxCtrl = function (
             })
             .catch(function (message) {
                 $scope.syncing = false;
+                message = JSON.stringify(message).substring(0, 100);
                 errorService.reportError("auto sync fail: " + message);
             });
     };
