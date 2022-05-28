@@ -341,6 +341,7 @@ var dbService = function ($q, errorService) {
         )
         .then(function (local) {
             if (local.length === 0) {
+                delete record.id;
                 return service.addRecord(record);
             }
             else if (local.length === 1) {
