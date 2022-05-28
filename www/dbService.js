@@ -376,7 +376,7 @@ var dbService = function ($q, errorService) {
                 return simpleQuery('sync', 'put', {
                     path: path,
                     lastImport: moment().format(),
-                    lastExport: result.lastExport
+                    lastExport: result ? result.lastExport : null
                 });
             });
     };
@@ -386,7 +386,7 @@ var dbService = function ($q, errorService) {
             .then(function (result) {
                 return simpleQuery('sync', 'put', {
                     path: path,
-                    lastImport: result.lastImport,
+                    lastImport: result ? result.lastImport : null,
                     lastExport: moment().format()
                 });
             });
