@@ -1,113 +1,126 @@
 var dbService = function ($q, errorService) {
-    var dbHandle;
+    var newDb;
 
     // TODO: add convenience functions: selectOne, selectAll, deleteOne, ...
     // TODO: split to framework websqlService and app-related dbService
 
-    var db = function () {
-        if ( ! dbHandle) {
-            dbHandle = openDatabase(
-                "dayary",
-                "0.8",
-                "Dayary DB",
-                10 * 1000 * 1000
-            );
-        }
-        return dbHandle;
-    };
-
-    // A caveat to be remembered: returning value of result.rows.item() might
-    // be read-only. Observed in Chrome and Safari in iPad. Clone before use.
-    var query = function (query, input) {
+    var queryIndexed = function (name, query, mode='readonly') { // jshint ignore:line
         var deferred = $q.defer();
 
-        var success = function (tx, result) {
-            deferred.resolve(result);
+        var request = query(
+            newDb.transaction(name, mode)
+                .objectStore(name)
+        );
+
+        request.onsuccess = function (event) {
+            deferred.resolve(request.result);
         };
 
-        var failure = function (tx, error) {
-            errorService.reportError("db error: " + error.message);
-            deferred.reject(error.message);
+        request.onerror = function (event) {
+            errorService.reportError("db error: " + event);
+            deferred.reject(event);
         };
-
-        db().transaction(function (tx) {
-            tx.executeSql(query, input, success, failure);
-        });
 
         return deferred.promise;
     };
 
-    var selectMany = function (selectQuery, input) {
-        return query(selectQuery, input)
-            .then(function (result) {
-                return _.map(
-                    _.range(result.rows.length),
-                    function (i) {
-                        return _.clone(result.rows.item(i));
-                    }
-                );
-            });
-    };
+    var simpleQuery = function (name, action, object) {
+        var deferred = $q.defer();
 
-    var verifyOneRowAffected = function (result) {
-        var affected = result.rowsAffected;
-        var message = "affected rows: expected one, was " + affected;
+        modes = {
+            get: 'readonly',
+            getAll: 'readonly',
+            add: 'readwrite',
+            put: 'readwrite',
+            delete: 'readwrite',
+            clear: 'readwrite'
+        };
 
-        if (affected !== 1) {
+        if (! (action in modes)) {
+            var message = 'unsupported action ' + action;
             errorService.reportError(message);
-            throw message;
+            deferred.reject(message);
         }
+
+        var store = newDb
+            .transaction(name, modes[action])
+            .objectStore(name);
+
+        var request;
+
+        if (object === null) {
+            request = store[action]();
+        }
+        else {
+            request = store[action](object);
+        }
+
+        request.onsuccess = function (event) {
+            deferred.resolve(request.result);
+        };
+
+        request.onerror = function (event) {
+            errorService.reportError("db error: " + event);
+            deferred.reject(event);
+        };
+
+        return deferred.promise;
     };
 
 
     var service = {};
 
     service.init = function () {
-        var tables;
+        var deferred = $q.defer();
 
-        // In SQLite TEXT can be used for DATETIME
-        tables = [
-            "CREATE TABLE IF NOT EXISTS Hash (" +
-                "hash VARCHAR" +
-            ")",
-            "CREATE TABLE IF NOT EXISTS Settings (" +
-                "key VARCHAR PRIMARY KEY," +
-                "value VARCHAR" +
-            ")",
-            "CREATE TABLE IF NOT EXISTS Records (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "created TEXT," +
-                "updated TEXT," +
-                "text TEXT" +
-            ")",
-            "CREATE TABLE IF NOT EXISTS Sync (" +
-                "path VARCHAR PRIMARY KEY," +
-                "lastImport TEXT," +
-                "lastExport TEXT" +
-            ")"
-        ];
+        var request = window.indexedDB.open('db', 1);
 
-        return $q.all(_.map(tables, _.partial(query, _, undefined)));
+        request.onsuccess = function (event) {
+            newDb = request.result;
+            deferred.resolve(null);
+        };
+
+        request.onupgradeneeded = function (event) {
+            var upgradeDb = request.result;
+
+            upgradeDb.createObjectStore('hash', {keyPath: 'id'});
+            upgradeDb.createObjectStore('settings', {keyPath: 'key'});
+            upgradeDb.createObjectStore('sync', {keyPath: 'path'});
+
+            var store = upgradeDb.createObjectStore(
+                'records',
+                {keyPath: 'id', autoIncrement: true}
+            );
+
+            store.createIndex('created', 'created', {unique: true});
+        };
+
+        request.onerror = function (event) {
+            var message = 'Get IndexedDB error';
+            errorService.reportError(message);
+            deferred.reject(message);
+        };
+
+        return deferred.promise;
     };
 
     service.cleanDb = function () {
-        var tables = ["Hash", "Settings", "Records", "Sync"];
+        var tables = ["hash", "settings", "records", "sync"];
 
         return $q.all(_.map(tables, function (table) {
-            return query("DROP TABLE IF EXISTS " + table);
+            return simpleQuery(table, 'clear', null);
         }));
     };
 
 
     service.getHash = function () {
-        return query("SELECT hash FROM Hash")
+        return simpleQuery('hash', 'get', 0)
             .then(function (result) {
-                if (result.rows.length === 0) {
-                    // It's OK - not set yet
-                    return null;
+                if (result) {
+                    return result.hash;
                 }
                 else {
-                    return result.rows.item(0).hash;
+                    return null;
                 }
             });
     };
@@ -119,19 +132,16 @@ var dbService = function ($q, errorService) {
                     throw "set hash: cannot replace existing hash";
                 }
 
-                return query("INSERT INTO Hash (hash) VALUES (?)", [hash]);
+                return simpleQuery('hash', 'add', {id: 0, hash: hash});
             });
     };
 
     service.getSettings = function () {
-        return selectMany("SELECT key, value FROM Settings")
+        return simpleQuery('settings', 'getAll', null)
             .then(function (settings) {
                 return _.object(
                     _.pluck(settings, 'key'),
-                    _.map(
-                        settings,
-                        function (s) { return JSON.parse(s.value); }
-                    )
+                    _.pluck(settings, 'value')
                 );
             });
     };
@@ -139,44 +149,41 @@ var dbService = function ($q, errorService) {
     service.setSettings = function (settings) {
         return $q.all(
             _.map(settings, function (value, key) {
-                return query(
-                    "INSERT OR REPLACE INTO " +
-                    "Settings (key, value) VALUES (?, ?)",
-                    [key, JSON.stringify(value)]
-                );
+                return simpleQuery('settings', 'put', {key: key, value: value});
             })
         );
     };
 
 
     service.getAllRecords = function () {
-        return selectMany("SELECT id, created, updated FROM Records");
+        return simpleQuery('records', 'getAll', null);
     };
 
     var getCreated = function (recordId) {
+        var promise;
+
         if (recordId === undefined) {
-            promise = query("SELECT max(created) AS date FROM Records");
+            promise = queryIndexed(
+                'records',
+                function (store) {
+                    // Returns maximal value because of 'prev'
+                    return store.index('created').openCursor(null, 'prev');
+                }
+            );
         }
         else {
-            promise = query(
-                "SELECT created AS date FROM Records WHERE id = ?",
-                [recordId]
-            );
+            promise = simpleQuery('records', 'get', parseInt(recordId));
         }
 
         return promise
             .then(function (result) {
-                if (result.rows.length === 0) {
-                    return null;
-                }
-                else if (result.rows.length === 1) {
-                    date = result.rows.item(0).date;
-                    return moment(date);
+                if (result) {
+                    // Support both the cursor and the direct get
+                    result = result.value || result;
+                    return moment(result.created);
                 }
                 else {
-                    message = "internal error";
-                    errorService.reportError(message);
-                    throw message;
+                    return null;
                 }
             });
     };
@@ -186,12 +193,19 @@ var dbService = function ($q, errorService) {
             return [];
         }
         else {
-            return selectMany(
-                "SELECT id, created, updated " +
-                "FROM Records WHERE created BETWEEN ? AND ?",
-                [date.startOf('month').format(),
-                 date.endOf('month').format()]
-            );
+            return queryIndexed(
+                'records',
+                function (store) {
+                    return store.index('created').getAll(
+                        IDBKeyRange.bound(
+                            date.startOf('month').format(),
+                            date.endOf('month').format()
+                        )
+                    );
+                }
+            ).then(function (result) {
+                return result;
+            });
         }
     };
 
@@ -203,7 +217,23 @@ var dbService = function ($q, errorService) {
     service.getPreviousMonthlyRecords = function (recordId) {
         return getCreated(recordId)
             .then(function (date) {
-                date = date.subtract(1, 'month');
+                date = date.endOf('month').subtract(1, 'month');
+
+                return queryIndexed(
+                    'records',
+                    function (store) {
+                        var query = IDBKeyRange.upperBound(date.format());
+                        return store.index('created').openCursor(query, 'prev');
+                    }
+                );
+            })
+            .then(function (result) {
+                var date = null;
+
+                if (result) {
+                    date = moment(result.value.created);
+                }
+
                 return getMonthlyRecordsAtDate(date);
             });
     };
@@ -211,18 +241,54 @@ var dbService = function ($q, errorService) {
     service.getNextMonthlyRecords = function (recordId) {
         return getCreated(recordId)
             .then(function (date) {
-                date = date.add(1, 'month');
+                date = date.startOf('month').add(1, 'month');
+
+                return queryIndexed(
+                    'records',
+                    function (store) {
+                        var query = IDBKeyRange.lowerBound(date.format());
+                        return store.index('created').openCursor(query, 'next');
+                    }
+                );
+            })
+            .then(function (result) {
+                var date = null;
+
+                if (result) {
+                    date = moment(result.value.created);
+                }
+
                 return getMonthlyRecordsAtDate(date);
             });
     };
 
     service.yearsUpdated = function () {
-        // TODO: move dates to UTC and get back to strftime('%Y', created)
-        return selectMany(
-            "SELECT substr(created, 1, 4) AS year," +
-            "       max(updated) as updated " +
-            "FROM records GROUP BY year"
-        );
+        return service.getAllRecords()
+            .then(function (records) {
+                var groups = _.groupBy(records, function (value) {
+                    return moment(value.created).year();
+                });
+
+                var yearLastUpdated = {};
+
+                _.forEach(groups, function(value, key) {
+                    var updated = _.map(value, function (record) {
+                        return record.updated;
+                    });
+
+                    var lastUpdated = _.reduce(updated, function(a, b) {
+                        return a > b ? a : b;
+                    });
+
+                    yearLastUpdated[key] = lastUpdated;
+                });
+
+                yearLastUpdated = _.map(yearLastUpdated, function (value, key) {
+                    return {year: key, updated: value};
+                });
+
+                return yearLastUpdated;
+            });
     };
 
     service.getYearlyRecords = function (strYear) {
@@ -232,61 +298,50 @@ var dbService = function ($q, errorService) {
             throw "Expected numeric year, got " + JSON.stringify(strYear);
         }
 
-        return selectMany(
-            "SELECT * FROM Records WHERE created BETWEEN ? AND ?",
-            [moment({ year: year }).format(),
-             moment({ year: year + 1 }).format()]
+        return queryIndexed(
+            'records',
+            function (store) {
+                return store.index('created').getAll(
+                    IDBKeyRange.bound(
+                        moment({ year: year }).format(),
+                        moment({ year: year + 1 }).format()
+                    )
+                );
+            }
         );
     };
 
 
     service.getRecord = function (id) {
-        return query("SELECT * FROM Records WHERE id = ?", [id])
-            .then(function (result) {
-                var message;
-
-                if (result.rows.length !== 1) {
-                    message = "get record: not found or ambiguous id";
-                    errorService.reportError(message);
-                    throw message;
-                }
-
-                return _.clone(result.rows.item(0));
-            }
-        );
+        return simpleQuery('records', 'get', id);
     };
 
     service.addRecord = function (record) {
-        return query(
-            "INSERT INTO Records (created, updated, text) VALUES (?, ?, ?)",
-            [record.created, record.updated, record.text]
-        ).then(function (result) {
-            return service.getRecord(result.insertId);
-        });
+        return simpleQuery('records', 'add', record)
+            .then(function (id) {
+                return service.getRecord(id);
+            });
     };
 
     service.updateRecord = function (record) {
-        return query(
-            "UPDATE Records " +
-            "SET created = ?, updated = ?, text = ? " +
-            "WHERE id = ?",
-            [record.created, record.updated, record.text, record.id]
-        ).then(
-            verifyOneRowAffected
-        );
+        return simpleQuery('records', 'put', record);
     };
 
     service.deleteRecord = function (id) {
-        return query("DELETE FROM Records WHERE id = ?", [id])
-            .then(verifyOneRowAffected);
+        // XXX deleted records should be tracked to work with sync
+        return simpleQuery('records', 'delete', id);
     };
 
     service.syncRecord = function (record) {
-        return selectMany(
-            "SELECT * FROM Records WHERE created = ?",
-            [record.created]
-        ).then(function (local) {
+        return queryIndexed(
+            'records',
+            function (store) {
+                return store.index('created').getAll(record.created);
+            }
+        )
+        .then(function (local) {
             if (local.length === 0) {
+                delete record.id;
                 return service.addRecord(record);
             }
             else if (local.length === 1) {
@@ -306,9 +361,8 @@ var dbService = function ($q, errorService) {
     };
 
 
-    // TODO: consider splitting this to import/export status
     service.getSyncStatus = function () {
-        return selectMany("SELECT * FROM Sync")
+        return simpleQuery('sync', 'getAll', null)
             .then(function (sync) {
                 return _.object(
                     _.pluck(sync, 'path'),
@@ -318,25 +372,25 @@ var dbService = function ($q, errorService) {
     };
 
     service.updateLastImport = function (path) {
-        return query(
-            "INSERT OR REPLACE INTO Sync (path, lastImport, lastExport)" +
-            "VALUES (?, ?, " +
-            "   (SELECT lastExport FROM Sync WHERE path = ?))",
-            [path, moment().format(), path]
-        ).then(
-            verifyOneRowAffected
-        );
+        return simpleQuery('sync', 'get', path)
+            .then(function (result) {
+                return simpleQuery('sync', 'put', {
+                    path: path,
+                    lastImport: moment().format(),
+                    lastExport: result ? result.lastExport : null
+                });
+            });
     };
 
     service.updateLastExport = function (path) {
-        return query(
-            "INSERT OR REPLACE INTO Sync (path, lastExport, lastImport)" +
-            "VALUES (?, ?, " +
-            "   (SELECT lastImport FROM Sync WHERE path = ?))",
-            [path, moment().format(), path]
-        ).then(
-            verifyOneRowAffected
-        );
+        return simpleQuery('sync', 'get', path)
+            .then(function (result) {
+                return simpleQuery('sync', 'put', {
+                    path: path,
+                    lastImport: result ? result.lastImport : null,
+                    lastExport: moment().format()
+                });
+            });
     };
 
     return service;

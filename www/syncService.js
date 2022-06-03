@@ -10,6 +10,7 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
         var actions = _.map(cloudFiles, function (file) {
             // If in status and lastImport after the file was modified
             if (status[file.path_display] &&
+                status[file.path_display].lastImport &&
                 moment(status[file.path_display].lastImport)
                     .isAfter(file.server_modified)) {
                 // Do nothing
@@ -32,6 +33,7 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
 
             // If in status and lastExport after the year was updated
             if (status[path] &&
+                status[path].lastExport &&
                 moment(status[path].lastExport).isAfter(updated)) {
                 // Do nothing
                 return null;
