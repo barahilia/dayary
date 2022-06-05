@@ -10,6 +10,14 @@ var dropboxCtrl = function (
                 $scope.dropboxUser = accountInfo.name.display_name;
             })
             .catch(function (message) {
+                var tag = message.error && message.error['.tag'];
+
+                if (tag === "expired_access_token") {
+                    $scope.isAuthenticated = false;
+                }
+
+                message = JSON.stringify(message).substring(0, 100);
+
                 errorService.reportError(
                     "failure accessing Dropbox account info: " + message
                 );
@@ -27,7 +35,7 @@ var dropboxCtrl = function (
             .catch(function (message) {
                 $scope.listing = false;
                 errorService.reportError(
-                    "failure accessing Dropbox account info: " + message
+                    "failure accessing Dropbox list of files: " + message
                 );
             });
     };
