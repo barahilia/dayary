@@ -13,6 +13,10 @@ dropboxService = function ($q, settingsService) {
         return !!dropbox.accessToken;
     };
 
+    service.expire = function () {
+        localStorage.dropboxAuthToken = '';
+    };
+
     service.accountInfo = function () {
         return dropbox.usersGetCurrentAccount();
     };

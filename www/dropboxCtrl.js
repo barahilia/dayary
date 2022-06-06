@@ -10,10 +10,11 @@ var dropboxCtrl = function (
                 $scope.dropboxUser = accountInfo.name.display_name;
             })
             .catch(function (message) {
-                var tag = message.error && message.error['.tag'];
+                var error = message.error && message.error.error;
+                var tag = error && error['.tag'];
 
                 if (tag === "expired_access_token") {
-                    $scope.isAuthenticated = false;
+                    dropboxService.expire();
                 }
 
                 message = JSON.stringify(message).substring(0, 100);
