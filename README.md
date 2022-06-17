@@ -71,11 +71,24 @@ Backup and sync are done with Dropbox. Records are split to yearly
 chunks and saved to JSON files to allow for relatively small units
 for faster upload and download.
 
+## Development
+
+Start with:
+```sh
+cd dayary
+# Consider adding: --omit=dev
+npm install
+python -m http.server --bind 127.0.0.1 3000
+```
+Then navigate to http://127.0.0.1:3000 in the browser. The choice of port,
+3000 is deliberate, as Dropbox will redirect back to this address after
+authentication.
+
 ## Powered by
 
 The tool was built with the help of the following wonderful:
 * Services: GitHub (including GitHub Pages), Dropbox
 * Tools: Chrome, npm, bower, jshint
-* Frameworks: Angular.js, Jasmine.js, node.js, express.js
+* Frameworks: Angular.js, Jasmine.js, node.js
 * Libraries: bootstrap, font-awesome, ui-router, Moment.js, Underscore.js, dropbox.js, sqlite3, cryptojslib
 
