@@ -6,7 +6,7 @@ var settingsService = function () {
     service.settings = {
         autosaveIntervalSec: 30,
         lockTimeoutMin: 5,
-        lockOnBlur: true,
+        lockOnBlur: false,
         dropboxFolder: "/backups/dayary"
     };
 
