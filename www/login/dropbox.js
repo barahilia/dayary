@@ -1,29 +1,43 @@
-var getAuthTokenFromHash = function () {
-    var hash = window.location.hash;
-    hash = hash.substr(1);
+var getCodeFromSearch = function () {
+    var search = window.location.search;
+    search = search.substr(1);
 
     var hashMap = {};
 
-    hash.split('&')
+    search.split('&')
         .map(function (element) { return element.split('='); })
         .forEach(function (pair) { hashMap[pair[0]] = pair[1]; });
 
-    return hashMap.access_token;
+    return hashMap.code;
 };
 
-var authTokenFromHash = getAuthTokenFromHash();
+var clientId = "4hxwutae96fhhbd";
+var redirectUrl = 'http://localhost:3000/www/login/dropbox.html';
 
-if (authTokenFromHash) {
-    localStorage.dropboxAuthToken = authTokenFromHash;
-}
+var dbxAuth = new Dropbox.DropboxAuth({ clientId: clientId });
 
-if (localStorage.dropboxAuthToken) {
-    window.location.href = "/";
+var hasRedirectedFromAuth = !!getCodeFromSearch();
+
+if (hasRedirectedFromAuth) {
+    dbxAuth.setCodeVerifier(localStorage.dropboxCodeVerifier);
+
+    dbxAuth.getAccessTokenFromCode(redirectUrl, getCodeFromSearch())
+        .then(response => {
+            localStorage.dropboxAuthToken = response.result.access_token;
+            window.location.href = "/";
+        });
+
 }
 else {
-    var dropbox = new Dropbox({ clientId: "4hxwutae96fhhbd" });
-    var authUrl = dropbox.getAuthenticationUrl(
-        'http://localhost:3000/www/login/dropbox.html'
+    dbxAuth.getAuthenticationUrl(
+        redirectUrl, undefined, 'code', 'offline',
+        undefined, undefined, true
+    )
+    .then(authUrl => {
+        localStorage.dropboxCodeVerifier = dbxAuth.codeVerifier;
+        window.location.href = authUrl;
+    })
+    .catch(
+        error => console.error(error)
     );
-    window.location.href = authUrl;
 }
