@@ -19,10 +19,11 @@
     </div>
 
     <!-- Use ng-bind to ensure no spare spaces of white lines -->
-    <p id="text-viewer"
-       ng-hide="loadingRecord"
-       ng-bind="record.text">
-    </p>
+    <div id="text-viewer" ng-hide="loadingRecord">
+        <p ng-repeat="paragraph in paragraphs">
+            {{paragraph}}
+        </p>
+    </div>
 
     <span class="pull-right">
         last updated on
