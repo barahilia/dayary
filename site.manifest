@@ -17,7 +17,7 @@ bower_components/moment/moment.js
 bower_components/font-awesome/fonts/fontawesome-webfont.woff?v=4.4.0
 bower_components/font-awesome/fonts/fontawesome-webfont.woff2?v=4.4.0
 
-node_modules/dropbox/dist/Dropbox-sdk.min.js
+node_modules/dropbox/dist/Dropbox-sdk.js
 
 www/enforceHttps.js
 www/icons/icon-192x192.png
