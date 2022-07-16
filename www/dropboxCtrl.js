@@ -6,7 +6,8 @@ var dropboxCtrl = function (
 
     $scope.getData = function () {
         dropboxService.accountInfo()
-            .then(function (accountInfo) {
+            .then(function (response) {
+                var accountInfo = response.result;
                 $scope.dropboxUser = accountInfo.name.display_name;
             })
             .catch(function (message) {

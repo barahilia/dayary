@@ -1,6 +1,6 @@
 {
   "name": "dayary",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Diary tool in web app capable to sync with Dropbox",
   "main": "server/main.js",
   "scripts": {
@@ -21,13 +21,12 @@
   "readme": "Please refer to the README.md",
   "readmeFilename": "README.md",
   "dependencies": {
-    "dropbox": "^2.5.4",
-    "express": "~4.10.6"
+    "dropbox": "^10.31.0"
   },
   "devDependencies": {
     "jasmine-node": "^1.14.5",
     "jasmine-reporters": "^2.0.7",
-    "phantomjs": "^1.9.18",
-    "jshint": "^2.8.0"
+    "jshint": "^2.8.0",
+    "phantomjs": "^1.9.18"
   }
 }

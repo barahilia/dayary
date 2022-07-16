@@ -14,8 +14,8 @@ body {
 }
 
 #text-viewer {
-    white-space: pre-line;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
+    text-indent: 15px;
 }
 
 #text-editor {
