@@ -13,7 +13,6 @@ var viewerCtrl = function (
                 // TODO: beware of security - locking to forget all decrypted ones
                 record.text = encryptionService.decrypt(record.text);
                 $scope.record = record;
-                $scope.paragraphs = record.text.split('\n');
             }
             catch (e) {
                 errorService.reportError(

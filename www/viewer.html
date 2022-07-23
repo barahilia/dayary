@@ -18,9 +18,8 @@
         <span class="fa fa-spinner fa-spin"></span>
     </div>
 
-    <!-- Use ng-bind to ensure no spare spaces of white lines -->
     <div id="text-viewer" ng-hide="loadingRecord">
-        <p ng-repeat="paragraph in paragraphs">
+        <p ng-repeat="paragraph in record.text.split('\n')">
             {{paragraph}}
         </p>
     </div>
