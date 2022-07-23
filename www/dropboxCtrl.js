@@ -2,6 +2,22 @@ var dropboxCtrl = function (
     $scope, errorService, settingsService, syncService, dropboxService
 ) {
     $scope.isAuthenticated = dropboxService.isAuthenticated();
+    $scope.isReady = false;
+
+    if ($scope.isAuthenticated) {
+        dropboxService.prepareDropbox()
+            .then(function () {
+                $scope.isReady = true;
+            })
+            .catch(function (message) {
+                message = JSON.stringify(message).substring(0, 100);
+                errorService.reportError("Dropbox prepare: " + message);
+            });
+    }
+    else {
+        // XXX go directly to the login/dropbox.html?
+    }
+
     $scope.dropboxUser = "N/A";
 
     $scope.getData = function () {
