@@ -19,11 +19,14 @@ var dbxAuth = new Dropbox.DropboxAuth({ clientId: clientId });
 var hasRedirectedFromAuth = !!getCodeFromSearch();
 
 if (hasRedirectedFromAuth) {
-    dbxAuth.setCodeVerifier(localStorage.dropboxCodeVerifier);
+    dbxAuth.setCodeVerifier(sessionStorage.dropboxCodeVerifier);
 
     dbxAuth.getAccessTokenFromCode(redirectUrl, getCodeFromSearch())
         .then(response => {
-            localStorage.dropboxAuthToken = response.result.access_token;
+            // XXX confirm is not needed and remove
+            //sessionStorage.dropboxAccessToken = response.result.access_token;
+            localStorage.dropboxRefreshToken = response.result.refresh_token;
+
             window.location.href = "/dayary";
         });
 }
@@ -33,7 +36,7 @@ else {
         undefined, undefined, true
     )
     .then(authUrl => {
-        localStorage.dropboxCodeVerifier = dbxAuth.codeVerifier;
+        sessionStorage.dropboxCodeVerifier = dbxAuth.codeVerifier;
         window.location.href = authUrl;
     })
     .catch(

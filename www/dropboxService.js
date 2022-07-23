@@ -1,31 +1,33 @@
 dropboxService = function ($q, settingsService) {
 
-    // TODO: Make this completely generic service; get token
-    // from the user, initialize and call authenticate from runApp.
+    var clientId = "4hxwutae96fhhbd";
 
-    var dropbox = function () {
-        var dbxAuth = new Dropbox.DropboxAuth();
-        dbxAuth.setAccessToken(localStorage.dropboxAuthToken);
+    var dbxAuth = new Dropbox.DropboxAuth({
+        clientId: clientId,
+        refreshToken: localStorage.dropboxRefreshToken
+    });
 
-        return new Dropbox.Dropbox({ auth: dbxAuth });
-    };
+    var dropbox;
 
     var service = {};
 
     service.isAuthenticated = function () {
-        return !!localStorage.dropboxAuthToken;
+        return !!localStorage.dropboxRefreshToken;
     };
 
-    service.expire = function () {
-        localStorage.dropboxAuthToken = '';
+    service.prepareDropbox = function () {
+        return dbxAuth.checkAndRefreshAccessToken()
+            .then(function () {
+                dropbox = new Dropbox.Dropbox({ auth: dbxAuth });
+            });
     };
 
     service.accountInfo = function () {
-        return dropbox().usersGetCurrentAccount();
+        return dropbox.usersGetCurrentAccount();
     };
 
     service.listFiles = function (path) {
-        return dropbox().filesListFolder({path: path})
+        return dropbox.filesListFolder({path: path})
             .then(function(response) {
                 return response.result.entries;
             });
@@ -34,7 +36,7 @@ dropboxService = function ($q, settingsService) {
     service.readFile = function (path) {
         var deferred = $q.defer();
 
-        dropbox().filesDownload({path: path})
+        dropbox.filesDownload({path: path})
             .then(function (response) {
                 var reader = new FileReader();
 
@@ -49,7 +51,7 @@ dropboxService = function ($q, settingsService) {
     };
 
     service.writeFile = function (path, data) {
-        return dropbox().filesUpload({
+        return dropbox.filesUpload({
             path: path, contents: data,
             mode: {'.tag': 'overwrite'}
             // , mute: true // for muting client notification

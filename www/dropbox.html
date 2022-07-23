@@ -7,17 +7,14 @@
     </a>
 </div>
 
-<div ng-show="isAuthenticated">
-    <div>
-        <a href="www/login/dropbox.html" class="btn btn-success">
-            Login again
-        </a>
-    </div>
+<div ng-show="isAuthenticated && !isReady">
+    Preparing Dropbox service...
+    <span class="fa fa-spinner fa-spin">
+</div>
 
-    <br />
-
+<div ng-show="isReady">
     <div>
-        <button  class="btn btn-success" ng-click="getData(year)">
+        <button class="btn btn-success" ng-click="getData()">
             Get data
         </button>
         Logged in as - {{dropboxUser}}
