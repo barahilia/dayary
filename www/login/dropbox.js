@@ -29,7 +29,6 @@ if (hasRedirectedFromAuth) {
 
             window.location.href = "/";
         });
-
 }
 else {
     dbxAuth.getAuthenticationUrl(

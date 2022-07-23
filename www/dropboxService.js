@@ -1,5 +1,12 @@
 dropboxService = function ($q, settingsService) {
 
+    var clientId = "4hxwutae96fhhbd";
+
+    var dbxAuth = new Dropbox.DropboxAuth({
+        clientId: clientId,
+        refreshToken: localStorage.dropboxRefreshToken
+    });
+
     var dropbox;
 
     var service = {};
@@ -9,13 +16,6 @@ dropboxService = function ($q, settingsService) {
     };
 
     service.prepareDropbox = function () {
-        var clientId = "4hxwutae96fhhbd";
-
-        var dbxAuth = new Dropbox.DropboxAuth({
-            clientId: clientId,
-            refreshToken: localStorage.dropboxRefreshToken
-        });
-
         return dbxAuth.checkAndRefreshAccessToken()
             .then(function () {
                 dropbox = new Dropbox.Dropbox({ auth: dbxAuth });
