@@ -19,7 +19,7 @@
     </div>
 
     <div id="text-viewer" ng-hide="loadingRecord">
-        <p ng-repeat="paragraph in record.text.split('\n')">
+        <p ng-repeat="paragraph in record.text.split('\n') track by $index">
             {{paragraph}}
         </p>
     </div>
