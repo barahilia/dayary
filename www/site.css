@@ -10,7 +10,8 @@ body {
 }
 
 #banner .btn {
-    margin-left: 10px;
+    margin-left: 5px;
+    margin-top: 5px;
 }
 
 #text-viewer {

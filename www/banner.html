@@ -1,37 +1,95 @@
-<div id="banner" class="bg-success col-sm-12">
-    <span class="h1">Dayary</span> - day by day (v2.1.2)
-
-    <div class="pull-right">
-        <button class="btn btn-success" ng-click="lock()">
-            Lock
-        </button>
+<div id="banner" class="bg-success row">
+    <div class="col-xs-3">
+        <span class="h1">Dayary</span>
+    </div>
+    <div class="col-xs-2">
+        <div>
+            day by day
+        </div>
+        <div>
+            v2.1.2
+        </div>
     </div>
 
-    <div ng-hide="locked()" class="pull-right">
-        <a class="btn btn-success" ui-sref="records">
-            Records
-        </a>
+    <div class="col-xs-7 visible-xs-block" ng-hide="locked()">
+        <div>
+            <button class="btn btn-success pull-right" ng-click="toggleMenu()" ng-hide="showMenu">
+                <span class="fa fa-bars"></span>
+            </button>
+        </div>
 
-        <a class="btn btn-success" ui-sref="years">
-            Years
-        </a>
+        <div ng-show="showMenu">
+            <div>
+                <a class="btn btn-success btn-block" ui-sref="records">
+                    Records
+                </a>
+            </div>
 
-        <a class="btn btn-success" ui-sref="dropbox">
-            Dropbox
-        </a>
+            <div>
+                <a class="btn btn-success btn-block" ui-sref="years">
+                    Years
+                </a>
+            </div>
 
-        <a class="btn btn-success" ui-sref="settings">
-            Settings
-        </a>
+            <div>
+                <a class="btn btn-success btn-block" ui-sref="dropbox">
+                    Dropbox
+                </a>
+            </div>
+
+            <div>
+                <a class="btn btn-success btn-block" ui-sref="settings">
+                    Settings
+                </a>
+            </div>
+
+            <div>
+                <button class="btn btn-success btn-block" ng-click="lock()">
+                    Lock
+                </button>
+            </div>
+
+            <div>
+                <button class="btn btn-success btn-block" ng-click="toggleMenu()">
+                    Close menu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-7 hidden-xs" ng-hide="locked()">
+        <div class="pull-right">
+            <a class="btn btn-success" ui-sref="records">
+                Records
+            </a>
+
+            <a class="btn btn-success" ui-sref="years">
+                Years
+            </a>
+
+            <a class="btn btn-success" ui-sref="dropbox">
+                Dropbox
+            </a>
+
+            <a class="btn btn-success" ui-sref="settings">
+                Settings
+            </a>
+
+            <button class="btn btn-success" ng-click="lock()">
+                Lock
+            </button>
+        </div>
     </div>
 </div>
 
 <!-- TODO: make this notification/alert area, not error only -->
-<div class="col-sm-12">
-    <div class="bg-danger" ng-show="error">
-        Error: {{error}}
-        <button type="button" class="close" ng-click="unsetError()">
-            <span>&times;</span>
-        </button>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="bg-danger" ng-show="error">
+            Error: {{error}}
+            <button type="button" class="close" ng-click="unsetError()">
+                <span>&times;</span>
+            </button>
+        </div>
     </div>
 </div>
