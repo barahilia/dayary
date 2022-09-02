@@ -10,7 +10,15 @@ body {
 }
 
 #banner .btn {
-    margin-left: 10px;
+    margin-left: 5px;
+    margin-top: 5px;
+}
+
+.banner-id {
+    display: inline-block;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-right: 10px;
 }
 
 #text-viewer {
