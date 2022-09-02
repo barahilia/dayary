@@ -1,17 +1,13 @@
 <div id="banner" class="bg-success row">
-    <div class="col-xs-3">
-        <span class="h1">Dayary</span>
-    </div>
-    <div class="col-xs-2">
-        <div>
-            day by day
-        </div>
-        <div>
-            v2.1.2
+    <div class="col-sm-4 col-xs-8">
+        <div class="banner-id h1">Dayary</div>
+        <div class="banner-id">
+            <div>day by day</div>
+            <div>v2.1.2</div>
         </div>
     </div>
 
-    <div class="col-xs-7 visible-xs-block" ng-hide="locked()">
+    <div class="col-xs-4 visible-xs-block" ng-hide="locked()">
         <div>
             <button class="btn btn-success pull-right" ng-click="toggleMenu()" ng-hide="showMenu">
                 <span class="fa fa-bars"></span>
@@ -57,7 +53,7 @@
         </div>
     </div>
 
-    <div class="col-xs-7 hidden-xs" ng-hide="locked()">
+    <div class="col-sm-8 hidden-xs" ng-hide="locked()">
         <div class="pull-right">
             <a class="btn btn-success" ui-sref="records">
                 Records
