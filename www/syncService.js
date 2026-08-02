@@ -29,12 +29,23 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
         var actions = _.map(yearsUpdated, function (yearUpdated) {
             var year = yearUpdated.year;
             var updated = yearUpdated.updated;
-            var path = yearToFile(year);
+            var pathStatus = status[yearToFile(year)];
 
-            // If in status and lastExport after the year was updated
-            if (status[path] &&
-                status[path].lastExport &&
-                moment(status[path].lastExport).isAfter(updated)) {
+            // Last time this device's copy is known to match the cloud
+            // copy: either because it was just exported, or because it
+            // was just imported (e.g. a fresh device pulling everything
+            // for the first time).
+            var lastSynced = pathStatus && (
+                pathStatus.lastExport && pathStatus.lastImport ?
+                    moment.max(
+                        moment(pathStatus.lastExport),
+                        moment(pathStatus.lastImport)
+                    ) :
+                    (pathStatus.lastExport || pathStatus.lastImport)
+            );
+
+            // If lastSynced after the year was updated
+            if (lastSynced && moment(lastSynced).isAfter(updated)) {
                 // Do nothing
                 return null;
             }

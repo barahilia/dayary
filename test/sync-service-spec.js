@@ -116,4 +116,53 @@ describe("sync service", function () {
 
         expect(res).toEqual(["2001", "2002"]);
     });
+
+    it("should not re-export a year just imported and unchanged since", function () {
+        var res = service.yearsToExport(
+            [{year: "2000", updated: "2010-01-01"}],
+            {
+                '/backups/dayary/2000.json': {
+                    lastImport: "2016-01-01",
+                    lastExport: null
+                }
+            }
+        );
+
+        expect(res).toEqual([]);
+    });
+
+    it("should export a year locally changed after the last import", function () {
+        var res = service.yearsToExport(
+            [{year: "2000", updated: "2016-06-01"}],
+            {
+                '/backups/dayary/2000.json': {
+                    lastImport: "2016-01-01",
+                    lastExport: null
+                }
+            }
+        );
+
+        expect(res).toEqual(["2000"]);
+    });
+
+    it("should use the later of lastImport/lastExport to decide", function () {
+        var res = service.yearsToExport(
+            [
+                {year: "2000", updated: "2016-01-15"},
+                {year: "2001", updated: "2016-01-15"}
+            ],
+            {
+                '/backups/dayary/2000.json': {
+                    lastImport: "2016-02-01",
+                    lastExport: "2014-01-01"
+                },
+                '/backups/dayary/2001.json': {
+                    lastImport: "2014-01-01",
+                    lastExport: "2016-02-01"
+                }
+            }
+        );
+
+        expect(res).toEqual([]);
+    });
 });
