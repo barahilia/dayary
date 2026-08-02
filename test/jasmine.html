@@ -13,11 +13,15 @@
 
 
         <script>
-            jasmine.getEnv().addReporter(new jasmineReporters.TerminalReporter({
-                verbosity: 3,
-                color: true,
-                showStack: true
-            }));
+            if (typeof jasmineReporters !== 'undefined') {
+                jasmine.getEnv().addReporter(
+                    new jasmineReporters.TerminalReporter({
+                        verbosity: 3,
+                        color: true,
+                        showStack: true
+                    })
+                );
+            }
         </script>
 
         <!-- Lib -->

@@ -15,13 +15,15 @@ describe("sync db", function () {
     ));
 
     beforeEach(function (done) {
-        if (initialized) {
-            done();
-        }
-        else {
-            initialized = true;
-            db.cleanDb().then(db.init).then(done);
-        }
+        db.init().then(function () {
+            if (initialized) {
+                done();
+            }
+            else {
+                initialized = true;
+                db.cleanDb().then(done);
+            }
+        });
     });
 
     it("should export empty year", function (done) {
