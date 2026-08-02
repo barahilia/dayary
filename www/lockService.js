@@ -54,10 +54,13 @@ var lockService = function (
 
     $interval(
         function () {
-            var lockTimeout = moment.duration(
-                settingsService.settings.lockTimeoutMin,
-                'minutes'
-            );
+            var lockTimeoutMin = settingsService.settings.lockTimeoutMin;
+
+            if (!lockTimeoutMin || lockTimeoutMin < 1) {
+                lockTimeoutMin = 1;
+            }
+
+            var lockTimeout = moment.duration(lockTimeoutMin, 'minutes');
 
             if (locked) {
                 return;
