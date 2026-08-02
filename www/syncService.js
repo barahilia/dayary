@@ -7,7 +7,7 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
     };
 
     service.filesToImport = function (cloudFiles, status) {
-        var actions = _.map(cloudFiles, function (file) {
+        var actions = cloudFiles.map(function (file) {
             // If in status and lastImport after the file was modified
             if (status[file.path_display] &&
                 status[file.path_display].lastImport &&
@@ -22,11 +22,11 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
             }
         });
 
-        return _.compact(actions);
+        return actions.filter(Boolean);
     };
 
     service.yearsToExport = function (yearsUpdated, status) {
-        var actions = _.map(yearsUpdated, function (yearUpdated) {
+        var actions = yearsUpdated.map(function (yearUpdated) {
             var year = yearUpdated.year;
             var updated = yearUpdated.updated;
             var pathStatus = status[yearToFile(year)];
@@ -54,7 +54,7 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
             }
         });
 
-        return _.compact(actions);
+        return actions.filter(Boolean);
     };
 
     service.exportYear = function (year) {
@@ -90,10 +90,10 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
             var yearStatuses = data[0];
             var status = data[1];
 
-            return $q.all(_.map(
-                service.yearsToExport(yearStatuses, status),
-                service.exportYear
-            ));
+            return $q.all(
+                service.yearsToExport(yearStatuses, status)
+                    .map(service.exportYear)
+            );
         });
     };
 
@@ -101,12 +101,11 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
         return dropboxService.readFile(path)
             .then(
                 function (records) {
-                    return _.reduce(
-                        JSON.parse(records),
+                    return JSON.parse(records).reduce(
                         function (previous, record) {
-                            return previous.then(
-                                _.partial(dbService.syncRecord, record)
-                            );
+                            return previous.then(function () {
+                                return dbService.syncRecord(record);
+                            });
                         },
                         $q.when(null)
                     );
@@ -131,10 +130,11 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
             var cloudFiles = data[0];
             var status = data[1];
 
-            return _.reduce(
-                service.filesToImport(cloudFiles, status),
+            return service.filesToImport(cloudFiles, status).reduce(
                 function (previous, path) {
-                    return previous.then(_.partial(service.importFile, path));
+                    return previous.then(function () {
+                        return service.importFile(path);
+                    });
                 },
                 $q.when(null)
             );

@@ -34,7 +34,7 @@ describe("sync db", function () {
             .then(db.getSyncStatus)
             .then(function (data) {
                 var path = "/backups/dayary/2000.json";
-                expect(_.keys(data)).toEqual([path]);
+                expect(Object.keys(data)).toEqual([path]);
                 expect(data[path].lastImport).toBeNull();
                 expect(data[path].lastExport).toBeDefined();
                 done();
@@ -52,7 +52,7 @@ describe("sync db", function () {
             })
             .then(db.getSyncStatus)
             .then(function (data) {
-                expect(_.keys(data))
+                expect(Object.keys(data))
                     .toEqual(["/backups/dayary/2000.json", file]);
                 expect(data[file].lastExport).toBeNull();
                 expect(data[file].lastImport).toBeDefined();
@@ -182,7 +182,9 @@ describe("sync db", function () {
                 expect(dropbox.readFile).toHaveBeenCalledWith(file);
                 expect(dropbox.writeFile.calls.any()).toBeFalsy();
             })
-            .then(_.partial(db.getYearlyRecords, "2015"))
+            .then(function () {
+                return db.getYearlyRecords("2015");
+            })
             .then(function (data) {
                 expect(data).toEqual(dbRecords);
             })
@@ -209,7 +211,9 @@ describe("sync db", function () {
                 expect(dropbox.readFile.calls.any()).toBeFalsy();
                 expect(dropbox.writeFile.calls.any()).toBeFalsy();
             })
-            .then(_.partial(db.updateRecord, dbRecords[2]))
+            .then(function () {
+                return db.updateRecord(dbRecords[2]);
+            })
             .then(service.sync)
             .then(function () {
                 expect(dropbox.listFiles).toHaveBeenCalled();

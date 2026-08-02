@@ -15,7 +15,9 @@ var recordsCtrl = function (
                     return;
                 }
 
-                records = _.sortBy(records, 'created');
+                records = records.slice().sort(function (a, b) {
+                    return a.created < b.created ? -1 : a.created > b.created ? 1 : 0;
+                });
                 records = records.reverse();
                 $scope.records = records;
 
@@ -25,7 +27,15 @@ var recordsCtrl = function (
             });
     };
 
-    loadMonth(dbService.getMonthlyRecordsAt, _.first);
+    var first = function (records) {
+        return records[0];
+    };
+
+    var last = function (records) {
+        return records[records.length - 1];
+    };
+
+    loadMonth(dbService.getMonthlyRecordsAt, first);
 
     $scope.add = function () {
         var addition = {
@@ -44,15 +54,17 @@ var recordsCtrl = function (
     $scope.remove = function (record) {
         dbService.deleteRecord(record.id)
             .then(function () {
-                $scope.records = _.without($scope.records, record);
+                $scope.records = $scope.records.filter(function (r) {
+                    return r !== record;
+                });
             });
     };
 
     $scope.loadPrevious = function () {
-        loadMonth(dbService.getPreviousMonthlyRecords, _.first, true);
+        loadMonth(dbService.getPreviousMonthlyRecords, first, true);
     };
 
     $scope.loadNext = function () {
-        loadMonth(dbService.getNextMonthlyRecords, _.last, true);
+        loadMonth(dbService.getNextMonthlyRecords, last, true);
     };
 };

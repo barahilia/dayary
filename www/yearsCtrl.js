@@ -3,9 +3,9 @@ var yearsCtrl = function ($scope, dbService, errorService) {
     var initiateYear = function () {
         var months = [];
 
-        _.each(_.range(12), function (n) {
+        for (var n = 0; n < 12; n++) {
             months[n] = [];
-        });
+        }
 
         return { count: 0, months: months };
     };
@@ -14,27 +14,29 @@ var yearsCtrl = function ($scope, dbService, errorService) {
     var organizeRecords = function (records) {
         $scope.records = {};
 
-        _.each(
-            records,
-            function (record) {
-                var created = moment(record.created),
-                    year = created.year(),
-                    month = created.month();
+        records.forEach(function (record) {
+            var created = moment(record.created),
+                year = created.year(),
+                month = created.month();
 
-                var yearRecords = $scope.records[year] =
-                    $scope.records[year] || initiateYear();
-                var monthRecords = yearRecords.months[month];
+            var yearRecords = $scope.records[year] =
+                $scope.records[year] || initiateYear();
+            var monthRecords = yearRecords.months[month];
 
-                yearRecords.count ++;
-                monthRecords.push(record);
-            }
-        );
+            yearRecords.count ++;
+            monthRecords.push(record);
+        });
     };
 
     var orderRecords = function (organizedRecords) {
-        _.each(organizedRecords, function (yearRecords) {
-            _.each(yearRecords.months, function (monthRecords, month) {
-                sorted = _.sortBy(monthRecords, 'created');
+        Object.keys(organizedRecords).forEach(function (year) {
+            var yearRecords = organizedRecords[year];
+
+            yearRecords.months.forEach(function (monthRecords, month) {
+                var sorted = monthRecords.slice().sort(function (a, b) {
+                    return a.created < b.created ? -1 :
+                        a.created > b.created ? 1 : 0;
+                });
                 yearRecords.months[month] = sorted;
             });
         });
@@ -45,12 +47,16 @@ var yearsCtrl = function ($scope, dbService, errorService) {
     $scope.selectYear = function (year) {
         $scope.selectedYear = year;
 
-        $scope.selectMonth(_.find(
-            _.range(12),
-            function (month) {
-                return _.some($scope.records[year].months[month]);
+        var months = $scope.records[year].months;
+        var month;
+
+        for (month = 0; month < 12; month++) {
+            if (months[month].length > 0) {
+                break;
             }
-        ));
+        }
+
+        $scope.selectMonth(month < 12 ? month : undefined);
     };
 
     $scope.selectMonth = function (month) {
@@ -62,8 +68,12 @@ var yearsCtrl = function ($scope, dbService, errorService) {
             organizeRecords(records);
             orderRecords($scope.records);
 
-            if (_.some($scope.records)) {
-                $scope.selectYear(_.max(_.keys($scope.records)));
+            var years = Object.keys($scope.records);
+
+            if (years.length > 0) {
+                $scope.selectYear(years.reduce(function (a, b) {
+                    return a > b ? a : b;
+                }));
             }
         });
 };

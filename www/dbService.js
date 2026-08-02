@@ -107,7 +107,7 @@ var dbService = function ($q, errorService) {
     service.cleanDb = function () {
         var tables = ["hash", "settings", "records", "sync"];
 
-        return $q.all(_.map(tables, function (table) {
+        return $q.all(tables.map(function (table) {
             return simpleQuery(table, 'clear', null);
         }));
     };
@@ -139,17 +139,19 @@ var dbService = function ($q, errorService) {
     service.getSettings = function () {
         return simpleQuery('settings', 'getAll', null)
             .then(function (settings) {
-                return _.object(
-                    _.pluck(settings, 'key'),
-                    _.pluck(settings, 'value')
-                );
+                return settings.reduce(function (result, setting) {
+                    result[setting.key] = setting.value;
+                    return result;
+                }, {});
             });
     };
 
     service.setSettings = function (settings) {
         return $q.all(
-            _.map(settings, function (value, key) {
-                return simpleQuery('settings', 'put', {key: key, value: value});
+            Object.keys(settings).map(function (key) {
+                return simpleQuery(
+                    'settings', 'put', {key: key, value: settings[key]}
+                );
             })
         );
     };
@@ -265,36 +267,30 @@ var dbService = function ($q, errorService) {
     service.yearsUpdated = function () {
         return service.getAllRecords()
             .then(function (records) {
-                var groups = _.groupBy(records, function (value) {
-                    return moment(value.created).year();
-                });
+                var groups = records.reduce(function (result, record) {
+                    var year = moment(record.created).year();
+                    (result[year] = result[year] || []).push(record);
+                    return result;
+                }, {});
 
-                var yearLastUpdated = {};
-
-                _.forEach(groups, function(value, key) {
-                    var updated = _.map(value, function (record) {
+                return Object.keys(groups).map(function (year) {
+                    var updated = groups[year].map(function (record) {
                         return record.updated;
                     });
 
-                    var lastUpdated = _.reduce(updated, function(a, b) {
+                    var lastUpdated = updated.reduce(function (a, b) {
                         return a > b ? a : b;
                     });
 
-                    yearLastUpdated[key] = lastUpdated;
+                    return {year: year, updated: lastUpdated};
                 });
-
-                yearLastUpdated = _.map(yearLastUpdated, function (value, key) {
-                    return {year: key, updated: value};
-                });
-
-                return yearLastUpdated;
             });
     };
 
     service.getYearlyRecords = function (strYear) {
         var year = +strYear;
 
-        if ( _.isNaN(year) ) {
+        if ( Number.isNaN(year) ) {
             throw "Expected numeric year, got " + JSON.stringify(strYear);
         }
 
@@ -364,10 +360,10 @@ var dbService = function ($q, errorService) {
     service.getSyncStatus = function () {
         return simpleQuery('sync', 'getAll', null)
             .then(function (sync) {
-                return _.object(
-                    _.pluck(sync, 'path'),
-                    sync
-                );
+                return sync.reduce(function (result, item) {
+                    result[item.path] = item;
+                    return result;
+                }, {});
             });
     };
 

@@ -9,7 +9,11 @@ var editorCtrl = function (
 
         $scope.record.updated = moment().format();
 
-        record = _.pick($scope.record, "id", "created", "updated");
+        record = {
+            id: $scope.record.id,
+            created: $scope.record.created,
+            updated: $scope.record.updated
+        };
         record.text = encryptionService.encrypt($scope.record.text);
 
         dbService.updateRecord(record)

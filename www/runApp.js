@@ -7,7 +7,7 @@ var runApp = function (
         .then(lockService.init)
         .then(dbService.getSettings)
         .then(function (settings) {
-            if (!_.isEmpty(settings)) {
+            if (Object.keys(settings).length > 0) {
                 settingsService.init(settings);
             }
         });

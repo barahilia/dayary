@@ -48,7 +48,9 @@ var dropboxCtrl = function (
         dropboxService.listFiles(settingsService.settings.dropboxFolder)
             .then(function (entries) {
                 $scope.listing = false;
-                $scope.files = _.sortBy(entries, 'name');
+                $scope.files = entries.slice().sort(function (a, b) {
+                    return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+                });
             })
             .catch(function (message) {
                 $scope.listing = false;
