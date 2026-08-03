@@ -1,4 +1,4 @@
-var lockCtrl = function ($scope, lockService) {
+export var lockCtrl = function ($scope, lockService) {
 
     $scope.showPassphrase = true;
 
@@ -19,3 +19,4 @@ var lockCtrl = function ($scope, lockService) {
     };
 };
 
+lockCtrl.$inject = ['$scope', 'lockService'];

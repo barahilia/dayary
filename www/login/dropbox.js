@@ -1,3 +1,5 @@
+import { DropboxAuth } from 'dropbox';
+
 var getCodeFromSearch = function () {
     var search = window.location.search;
     search = search.substr(1);
@@ -14,7 +16,7 @@ var getCodeFromSearch = function () {
 var clientId = "4hxwutae96fhhbd";
 var redirectUrl = 'http://localhost:3000/www/login/dropbox.html';
 
-var dbxAuth = new Dropbox.DropboxAuth({ clientId: clientId });
+var dbxAuth = new DropboxAuth({ clientId: clientId });
 
 var hasRedirectedFromAuth = !!getCodeFromSearch();
 

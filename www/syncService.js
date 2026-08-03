@@ -1,4 +1,6 @@
-syncService = function ($q, settingsService, dbService, dropboxService) {
+import moment from 'moment';
+
+export var syncService = function ($q, settingsService, dbService, dropboxService) {
 
     var service = {};
 
@@ -148,3 +150,5 @@ syncService = function ($q, settingsService, dbService, dropboxService) {
 
     return service;
 };
+
+syncService.$inject = ['$q', 'settingsService', 'dbService', 'dropboxService'];

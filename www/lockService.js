@@ -1,4 +1,6 @@
-var lockService = function (
+import moment from 'moment';
+
+export var lockService = function (
     $window, $interval, $state,
     dbService, settingsService, encryptionService
 ) {
@@ -128,3 +130,4 @@ var lockService = function (
     return service;
 };
 
+lockService.$inject = ['$window', '$interval', '$state', 'dbService', 'settingsService', 'encryptionService'];

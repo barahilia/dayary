@@ -1,4 +1,4 @@
-var dropboxCtrl = function (
+export var dropboxCtrl = function (
     $scope, errorService, settingsService, syncService, dropboxService
 ) {
     $scope.isAuthenticated = dropboxService.isAuthenticated();
@@ -75,3 +75,5 @@ var dropboxCtrl = function (
             });
     };
 };
+
+dropboxCtrl.$inject = ['$scope', 'errorService', 'settingsService', 'syncService', 'dropboxService'];

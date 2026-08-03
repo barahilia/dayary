@@ -1,4 +1,6 @@
-var encryptionService = function () {
+import CryptoJS from 'crypto-js';
+
+export var encryptionService = function () {
     var service = {};
 
     var passphrase;

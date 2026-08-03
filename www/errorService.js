@@ -1,4 +1,4 @@
-var errorService = function () {
+export var errorService = function () {
     var service = {};
     
     var callback;

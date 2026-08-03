@@ -1,4 +1,4 @@
-var runApp = function (
+export var runApp = function (
     $rootScope, $state,
     lockService, dbService, settingsService
 ) {
@@ -28,3 +28,5 @@ var runApp = function (
         }
     });
 };
+
+runApp.$inject = ['$rootScope', '$state', 'lockService', 'dbService', 'settingsService'];

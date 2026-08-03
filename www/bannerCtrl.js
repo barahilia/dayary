@@ -1,4 +1,4 @@
-bannerCtrl = function ($scope, lockService, errorService) {
+export var bannerCtrl = function ($scope, lockService, errorService) {
 
     errorService.setCallback(function (error) {
         $scope.error = error;
@@ -20,3 +20,5 @@ bannerCtrl = function ($scope, lockService, errorService) {
         $scope.error = null;
     };
 };
+
+bannerCtrl.$inject = ['$scope', 'lockService', 'errorService'];

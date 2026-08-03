@@ -1,4 +1,4 @@
-var settingsService = function () {
+export var settingsService = function () {
 
     // TODO: consider removing this service; leave a constant only
     var service = {};

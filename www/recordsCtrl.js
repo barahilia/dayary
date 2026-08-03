@@ -1,4 +1,6 @@
-var recordsCtrl = function (
+import moment from 'moment';
+
+export var recordsCtrl = function (
     $scope, $state, dbService
 ) {
     $scope.records = [];
@@ -68,3 +70,5 @@ var recordsCtrl = function (
         loadMonth(dbService.getNextMonthlyRecords, last, true);
     };
 };
+
+recordsCtrl.$inject = ['$scope', '$state', 'dbService'];

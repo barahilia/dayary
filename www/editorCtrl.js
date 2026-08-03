@@ -1,4 +1,6 @@
-var editorCtrl = function (
+import moment from 'moment';
+
+export var editorCtrl = function (
     $scope, $timeout, $interval, $state,
     dbService, encryptionService, settingsService
 ) {
@@ -69,3 +71,4 @@ var editorCtrl = function (
     });
 };
 
+editorCtrl.$inject = ['$scope', '$timeout', '$interval', '$state', 'dbService', 'encryptionService', 'settingsService'];

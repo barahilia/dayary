@@ -1,4 +1,15 @@
-var configApp = function ($stateProvider, $urlRouterProvider) {
+// Templates are bundled as strings rather than fetched at runtime, so the
+// app has no template round-trips to make once it is loaded.
+import bannerHtml from './banner.html?raw';
+import lockHtml from './lock.html?raw';
+import settingsHtml from './settings.html?raw';
+import dropboxHtml from './dropbox.html?raw';
+import yearsHtml from './years.html?raw';
+import recordsHtml from './records.html?raw';
+import viewerHtml from './viewer.html?raw';
+import editorHtml from './editor.html?raw';
+
+export var configApp = function ($stateProvider, $urlRouterProvider) {
 
     $urlRouterProvider.otherwise('/');
 
@@ -7,7 +18,7 @@ var configApp = function ($stateProvider, $urlRouterProvider) {
             abstract: true,
             views: {
                 "banner": {
-                    templateUrl: "www/banner.html",
+                    template: bannerHtml,
                     controller: "bannerCtrl"
                 },
                 "": {
@@ -20,43 +31,44 @@ var configApp = function ($stateProvider, $urlRouterProvider) {
         .state("lock", {
             parent: "root",
             url: "/",
-            templateUrl: "www/lock.html",
+            template: lockHtml,
             controller: "lockCtrl"
         })
         .state("settings", {
             parent: "root",
             url: "/settings",
-            templateUrl: "www/settings.html",
+            template: settingsHtml,
             controller: "settingsCtrl"
         })
         .state("dropbox", {
             parent: "root",
             url: "/dropbox",
-            templateUrl: "www/dropbox.html",
+            template: dropboxHtml,
             controller: "dropboxCtrl"
         })
         .state("years", {
             parent: "root",
             url: "/years",
-            templateUrl: "www/years.html",
+            template: yearsHtml,
             controller: "yearsCtrl"
         })
         .state("records", {
             parent: "root",
             url: "/records",
-            templateUrl: "www/records.html",
+            template: recordsHtml,
             controller: "recordsCtrl"
         })
         .state("records.item", {
             url: "/:id",
-            templateUrl: "www/viewer.html",
+            template: viewerHtml,
             controller: "viewerCtrl"
         })
         .state("records.item.edit", {
             url: "/edit",
-            templateUrl: "www/editor.html",
+            template: editorHtml,
             controller: "editorCtrl"
         })
         ;
 };
 
+configApp.$inject = ['$stateProvider', '$urlRouterProvider'];

@@ -1,4 +1,6 @@
-var dbService = function ($q, errorService) {
+import moment from 'moment';
+
+export var dbService = function ($q, errorService) {
     var newDb;
 
     // TODO: add convenience functions: selectOne, selectAll, deleteOne, ...
@@ -27,7 +29,7 @@ var dbService = function ($q, errorService) {
     var simpleQuery = function (name, action, object) {
         var deferred = $q.defer();
 
-        modes = {
+        var modes = {
             get: 'readonly',
             getAll: 'readonly',
             add: 'readwrite',
@@ -391,3 +393,5 @@ var dbService = function ($q, errorService) {
 
     return service;
 };
+
+dbService.$inject = ['$q', 'errorService'];

@@ -2,7 +2,7 @@
 //       listent to the state change event; remember to remove listener
 //       at controller destroy
 
-scrollIfClass = function () {
+export var scrollIfClass = function () {
     return function (scope, element, attributes) {
         var scrollToClass = attributes.scrollIfClass;
 

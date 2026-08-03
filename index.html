@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html ng-app="app" manifest="site.manifest">
+<html ng-app="app">
 <head>
+    <meta charset="utf-8">
     <title>Dayary</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,49 +11,14 @@
     <link href="www/icons/apple-touch-icon-152x152.png" rel="apple-touch-icon" sizes="152x152" />
     <link href="www/icons/icon-192x192.png" rel="icon" sizes="192x192" />
 
-    <link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
-    <link href="bower_components/font-awesome/css/font-awesome.css" rel="stylesheet">
 
-    <link href="www/site.css" rel="stylesheet">
-
-
-    <script src="www/enforceHttps.js"></script>
-
-    <!-- TODO: consider using require.js - one for this and tests -->
-    <script src="bower_components/angular/angular.js"></script>
-    <script src="bower_components/ui-router/release/angular-ui-router.js"></script>
-    <script src="bower_components/cryptojslib/rollups/aes.js"></script>
-    <script src="bower_components/cryptojslib/rollups/sha256.js"></script>
-    <script src="bower_components/moment/moment.js"></script>
-
-    <script src="/node_modules/dropbox/dist/Dropbox-sdk.js"></script>
-
-
-    <script src="www/configApp.js"></script>
-    <script src="www/runApp.js"></script>
-    <script src="www/encryptionService.js"></script>
-    <script src="www/lockService.js"></script>
-    <script src="www/lockCtrl.js"></script>
-    <script src="www/bannerCtrl.js"></script>
-    <script src="www/errorService.js"></script>
-    <script src="www/settingsService.js"></script>
-    <script src="www/settingsCtrl.js"></script>
-    <script src="www/dropboxService.js"></script>
-    <script src="www/dropboxCtrl.js"></script>
-    <script src="www/syncService.js"></script>
-    <script src="www/dbService.js"></script>
-    <script src="www/yearsCtrl.js"></script>
-    <script src="www/recordsCtrl.js"></script>
-    <script src="www/scrollIfClass.js"></script>
-    <script src="www/viewerCtrl.js"></script>
-    <script src="www/editorCtrl.js"></script>
-    <script src="www/app.js"></script>
+    <script type="module" src="www/main.js"></script>
 </head>
 
 <body class="container">
-    <div >
+    <div>
         <div ui-view="banner"></div>
         <div class="row" ui-view></div>
     </div>
-<body>
+</body>
 </html>

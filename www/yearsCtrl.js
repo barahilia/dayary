@@ -1,4 +1,6 @@
-var yearsCtrl = function ($scope, dbService, errorService) {
+import moment from 'moment';
+
+export var yearsCtrl = function ($scope, dbService, errorService) {
 
     var initiateYear = function () {
         var months = [];
@@ -77,3 +79,5 @@ var yearsCtrl = function ($scope, dbService, errorService) {
             }
         });
 };
+
+yearsCtrl.$inject = ['$scope', 'dbService', 'errorService'];

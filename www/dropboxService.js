@@ -1,8 +1,10 @@
-dropboxService = function ($q, settingsService) {
+import { Dropbox, DropboxAuth } from 'dropbox';
+
+export var dropboxService = function ($q, settingsService) {
 
     var clientId = "4hxwutae96fhhbd";
 
-    var dbxAuth = new Dropbox.DropboxAuth({
+    var dbxAuth = new DropboxAuth({
         clientId: clientId,
         refreshToken: localStorage.dropboxRefreshToken
     });
@@ -18,7 +20,7 @@ dropboxService = function ($q, settingsService) {
     service.prepareDropbox = function () {
         return dbxAuth.checkAndRefreshAccessToken()
             .then(function () {
-                dropbox = new Dropbox.Dropbox({ auth: dbxAuth });
+                dropbox = new Dropbox({ auth: dbxAuth });
             });
     };
 
@@ -60,3 +62,5 @@ dropboxService = function ($q, settingsService) {
 
     return service;
 };
+
+dropboxService.$inject = ['$q', 'settingsService'];

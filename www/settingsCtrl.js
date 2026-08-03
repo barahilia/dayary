@@ -1,4 +1,4 @@
-var settingsCtrl = function (
+export var settingsCtrl = function (
     $scope,
     settingsService, lockService, dbService
 ) {
@@ -25,3 +25,5 @@ var settingsCtrl = function (
             });
     };
 };
+
+settingsCtrl.$inject = ['$scope', 'settingsService', 'lockService', 'dbService'];

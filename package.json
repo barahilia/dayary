@@ -2,12 +2,14 @@
   "name": "dayary",
   "version": "2.1.3",
   "description": "Diary tool in web app capable to sync with Dropbox",
-  "main": "server/main.js",
+  "type": "module",
   "scripts": {
-    "postinstall": "bower install",
-    "test": "./test/run-tests.sh",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo 'Open http://127.0.0.1:3000/test/jasmine.html while `npm start` runs' && exit 1",
     "checklistversion": "cat checklist.version",
-    "lint": "node node_modules/jshint/bin/jshint www"
+    "lint": "jshint www"
   },
   "author": {
     "name": "Ilia Barahovsky",
@@ -21,12 +23,19 @@
   "readme": "Please refer to the README.md",
   "readmeFilename": "README.md",
   "dependencies": {
-    "dropbox": "^10.31.0"
+    "angular": "1.4.14",
+    "angular-ui-router": "0.2.18",
+    "bootstrap": "3.3.7",
+    "crypto-js": "3.3.0",
+    "dropbox": "^10.31.0",
+    "font-awesome": "4.7.0",
+    "moment": "2.30.1"
   },
   "devDependencies": {
-    "jasmine-node": "^1.14.5",
-    "jasmine-reporters": "^2.0.7",
-    "jshint": "^2.8.0",
-    "phantomjs": "^1.9.18"
+    "angular-mocks": "1.4.14",
+    "jasmine-core": "^5.5.0",
+    "jshint": "^2.13.6",
+    "q": "^1.5.1",
+    "vite": "^5.4.11"
   }
 }

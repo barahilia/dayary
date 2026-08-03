@@ -1,4 +1,4 @@
-var viewerCtrl = function (
+export var viewerCtrl = function (
     $scope, $state,
     dbService, encryptionService, errorService
 ) {
@@ -29,3 +29,4 @@ var viewerCtrl = function (
     };
 };
 
+viewerCtrl.$inject = ['$scope', '$state', 'dbService', 'encryptionService', 'errorService'];
