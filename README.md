@@ -58,6 +58,12 @@ The main unit of work is dairy `record`:
     text: String, encrypted textual entry
 }
 ```
+Both datetimes are ISO 8601 strings with the local UTC offset, like
+`2026-08-08T11:35:57+03:00`. `created` is also the IndexedDB index key
+that monthly and yearly views range over, and such keys compare as
+plain strings - so the format must stay fixed width. The local offset
+keeps an entry on the day its author lived it.
+
 AES-256 algorithm is used for encryption. A passphrase is saved for
 the session time to decrypt existing and encrypt updated records.
 Decrypted text is only shown to the user. Database has only encrypted
