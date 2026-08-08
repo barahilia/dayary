@@ -47,6 +47,16 @@ The application to be served by any hosting, I chose for GitHub Pages. Assets
 are referenced by relative paths, so the build works both under the project
 path and at a domain root.
 
+Offline work is provided by a service worker, replacing the AppCache manifest
+that browsers no longer support. `www/sw.js` is copied to the build root by
+`tools/viteServiceWorker.js`, which fills in the list of files Vite has just
+emitted and a revision hashed from their content - so the cached set can never
+drift from the build the way a hand-written manifest did. The worker precaches
+the whole app on install and then serves it cache-first; requests to other
+origins, the Dropbox API above all, always go to the network. A new build has a
+new revision, hence a new cache, which installs and takes over immediately,
+dropping the previous one.
+
 ## Design
 
 The main unit of work is dairy `record`:
@@ -98,6 +108,10 @@ npm run build     # writes dist/
 npm run preview   # serves dist/
 npm run lint
 ```
+The service worker is only built into and registered by the production build -
+in development Vite serves modules that must not be cached. So offline work is
+to be checked under `npm run preview`, switching the browser or its dev tools
+to offline once the page has loaded.
 
 Tests are jasmine specs run in a real browser: with `npm start` running, open
 http://localhost:3000/test/jasmine.html. Several specs are currently failing

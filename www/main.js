@@ -3,4 +3,5 @@ import 'font-awesome/css/font-awesome.css';
 import './site.css';
 
 import './enforceHttps.js';
+import './registerServiceWorker.js';
 import './app.js';
