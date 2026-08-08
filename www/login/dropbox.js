@@ -14,7 +14,14 @@ var getCodeFromSearch = function () {
 };
 
 var clientId = "4hxwutae96fhhbd";
-var redirectUrl = 'http://localhost:3000/www/login/dropbox.html';
+
+// This script only ever runs on the login page itself, so its own URL is the
+// redirect URI - exact both under the GitHub Pages project path and locally.
+// Dropbox matches it verbatim, hence stripping any query string it added.
+var redirectUrl = window.location.origin + window.location.pathname;
+
+// The app root, three levels up from www/login/dropbox.html.
+var appUrl = redirectUrl.replace(/www\/login\/dropbox\.html$/, '');
 
 var dbxAuth = new DropboxAuth({ clientId: clientId });
 
@@ -29,7 +36,7 @@ if (hasRedirectedFromAuth) {
             //sessionStorage.dropboxAccessToken = response.result.access_token;
             localStorage.dropboxRefreshToken = response.result.refresh_token;
 
-            window.location.href = "/";
+            window.location.href = appUrl;
         });
 }
 else {
