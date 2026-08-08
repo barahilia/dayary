@@ -34,16 +34,18 @@ And here are what I needed from the dairy tool and haven't found in the existing
 
 The tool is an HTML 5 web app loaded by and running in a browser.
 [AngularJS](https://angularjs.org/) framework is used to build the presentation
-and business logic layers. [Web SQL](http://www.w3.org/TR/webdatabase/) serves
-for the local data layer. [Dropbox](https://www.dropbox.com) was chosen for
-external data storage in the cloud.
+and business logic layers.
+[IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
+serves for the local data layer. [Dropbox](https://www.dropbox.com) was chosen
+for external data storage in the cloud.
 
-It should be noted, that Web SQL is a deprecated specification, but it is fully
-supported by the target browsers - Chrome and Safari, - and by phantom.js used
-for headless testing.
+Sources are ES modules bundled by [Vite](https://vitejs.dev/), with all
+dependencies coming from npm. The view templates are bundled as strings rather
+than fetched at runtime.
 
-The application to be served by any hosting, I chose for GitHub Pages. The
-application should be cached by the browser and be available offline.
+The application to be served by any hosting, I chose for GitHub Pages. Assets
+are referenced by relative paths, so the build works both under the project
+path and at a domain root.
 
 ## Design
 
@@ -76,19 +78,31 @@ for faster upload and download.
 Start with:
 ```sh
 cd dayary
-# Consider adding: --omit=dev
 npm install
-python -m http.server --bind 127.0.0.1 3000
+npm start
 ```
-Then navigate to http://127.0.0.1:3000 in the browser. The choice of port,
+Then navigate to http://localhost:3000 in the browser. The choice of port,
 3000 is deliberate, as Dropbox will redirect back to this address after
-authentication.
+authentication - so the dev server refuses to start on any other port rather
+than quietly moving to a free one.
+
+To produce and check a production build:
+```sh
+npm run build     # writes dist/
+npm run preview   # serves dist/
+npm run lint
+```
+
+Tests are jasmine specs run in a real browser: with `npm start` running, open
+http://localhost:3000/test/jasmine.html. Several specs are currently failing
+on their own async setup - they call into the database before `init()` has
+resolved. Moving them to an automated runner is a separate upgrade task.
 
 ## Powered by
 
 The tool was built with the help of the following wonderful:
 * Services: GitHub (including GitHub Pages), Dropbox
-* Tools: Chrome, npm, bower, jshint
+* Tools: Chrome, npm, Vite, jshint
 * Frameworks: Angular.js, Jasmine.js, node.js
-* Libraries: bootstrap, font-awesome, ui-router, Moment.js, Underscore.js, dropbox.js, sqlite3, cryptojslib
+* Libraries: bootstrap, font-awesome, ui-router, Moment.js, dropbox.js, crypto-js
 
