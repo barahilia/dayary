@@ -1,4 +1,7 @@
-import moment from 'moment';
+import {
+    addMonths, endOfMonth, formatISO, getYear, isBefore, parseISO,
+    startOfMonth, subMonths
+} from 'date-fns';
 
 export var dbService = function ($q, errorService) {
     var newDb;
@@ -184,7 +187,7 @@ export var dbService = function ($q, errorService) {
                 if (result) {
                     // Support both the cursor and the direct get
                     result = result.value || result;
-                    return moment(result.created);
+                    return parseISO(result.created);
                 }
                 else {
                     return null;
@@ -202,8 +205,8 @@ export var dbService = function ($q, errorService) {
                 function (store) {
                     return store.index('created').getAll(
                         IDBKeyRange.bound(
-                            date.startOf('month').format(),
-                            date.endOf('month').format()
+                            formatISO(startOfMonth(date)),
+                            formatISO(endOfMonth(date))
                         )
                     );
                 }
@@ -221,12 +224,12 @@ export var dbService = function ($q, errorService) {
     service.getPreviousMonthlyRecords = function (recordId) {
         return getCreated(recordId)
             .then(function (date) {
-                date = date.endOf('month').subtract(1, 'month');
+                date = subMonths(endOfMonth(date), 1);
 
                 return queryIndexed(
                     'records',
                     function (store) {
-                        var query = IDBKeyRange.upperBound(date.format());
+                        var query = IDBKeyRange.upperBound(formatISO(date));
                         return store.index('created').openCursor(query, 'prev');
                     }
                 );
@@ -235,7 +238,7 @@ export var dbService = function ($q, errorService) {
                 var date = null;
 
                 if (result) {
-                    date = moment(result.value.created);
+                    date = parseISO(result.value.created);
                 }
 
                 return getMonthlyRecordsAtDate(date);
@@ -245,12 +248,12 @@ export var dbService = function ($q, errorService) {
     service.getNextMonthlyRecords = function (recordId) {
         return getCreated(recordId)
             .then(function (date) {
-                date = date.startOf('month').add(1, 'month');
+                date = addMonths(startOfMonth(date), 1);
 
                 return queryIndexed(
                     'records',
                     function (store) {
-                        var query = IDBKeyRange.lowerBound(date.format());
+                        var query = IDBKeyRange.lowerBound(formatISO(date));
                         return store.index('created').openCursor(query, 'next');
                     }
                 );
@@ -259,7 +262,7 @@ export var dbService = function ($q, errorService) {
                 var date = null;
 
                 if (result) {
-                    date = moment(result.value.created);
+                    date = parseISO(result.value.created);
                 }
 
                 return getMonthlyRecordsAtDate(date);
@@ -270,7 +273,7 @@ export var dbService = function ($q, errorService) {
         return service.getAllRecords()
             .then(function (records) {
                 var groups = records.reduce(function (result, record) {
-                    var year = moment(record.created).year();
+                    var year = getYear(parseISO(record.created));
                     (result[year] = result[year] || []).push(record);
                     return result;
                 }, {});
@@ -301,8 +304,8 @@ export var dbService = function ($q, errorService) {
             function (store) {
                 return store.index('created').getAll(
                     IDBKeyRange.bound(
-                        moment({ year: year }).format(),
-                        moment({ year: year + 1 }).format()
+                        formatISO(new Date(year, 0, 1)),
+                        formatISO(new Date(year + 1, 0, 1))
                     )
                 );
             }
@@ -343,7 +346,7 @@ export var dbService = function ($q, errorService) {
                 return service.addRecord(record);
             }
             else if (local.length === 1) {
-                if (moment(local[0].updated).isBefore(record.updated)) {
+                if (isBefore(parseISO(local[0].updated), parseISO(record.updated))) {
                     return service.updateRecord({
                         id: local[0].id,
                         created: local[0].created,
@@ -374,7 +377,7 @@ export var dbService = function ($q, errorService) {
             .then(function (result) {
                 return simpleQuery('sync', 'put', {
                     path: path,
-                    lastImport: moment().format(),
+                    lastImport: formatISO(new Date()),
                     lastExport: result ? result.lastExport : null
                 });
             });
@@ -386,7 +389,7 @@ export var dbService = function ($q, errorService) {
                 return simpleQuery('sync', 'put', {
                     path: path,
                     lastImport: result ? result.lastImport : null,
-                    lastExport: moment().format()
+                    lastExport: formatISO(new Date())
                 });
             });
     };

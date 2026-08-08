@@ -1,4 +1,4 @@
-import moment from 'moment';
+import { formatISO } from 'date-fns';
 
 export var recordsCtrl = function (
     $scope, $state, dbService
@@ -41,8 +41,8 @@ export var recordsCtrl = function (
 
     $scope.add = function () {
         var addition = {
-            created: moment().format(),
-            updated: moment().format(),
+            created: formatISO(new Date()),
+            updated: formatISO(new Date()),
             text: ""
         };
 

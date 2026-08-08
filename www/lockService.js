@@ -1,4 +1,4 @@
-import moment from 'moment';
+import { minutesToMilliseconds, secondsToMilliseconds } from 'date-fns';
 
 export var lockService = function (
     $window, $interval, $state,
@@ -36,7 +36,7 @@ export var lockService = function (
     };
 
     var updateUserAction = function () {
-        lastUserAction = moment();
+        lastUserAction = new Date();
     };
 
     $window.onclick = updateUserAction;
@@ -62,17 +62,17 @@ export var lockService = function (
                 lockTimeoutMin = 1;
             }
 
-            var lockTimeout = moment.duration(lockTimeoutMin, 'minutes');
+            var lockTimeout = minutesToMilliseconds(lockTimeoutMin);
 
             if (locked) {
                 return;
             }
 
-            if (moment().subtract(lockTimeout) > lastUserAction) {
+            if (Date.now() - lockTimeout > lastUserAction.getTime()) {
                 lock();
             }
         },
-        moment.duration(5, 'seconds').asMilliseconds()
+        secondsToMilliseconds(5)
     );
 
 

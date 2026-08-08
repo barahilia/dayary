@@ -1,4 +1,4 @@
-import moment from 'moment';
+import { isAfter, max, parseISO } from 'date-fns';
 
 export var syncService = function ($q, settingsService, dbService, dropboxService) {
 
@@ -13,8 +13,10 @@ export var syncService = function ($q, settingsService, dbService, dropboxServic
             // If in status and lastImport after the file was modified
             if (status[file.path_display] &&
                 status[file.path_display].lastImport &&
-                moment(status[file.path_display].lastImport)
-                    .isAfter(file.server_modified)) {
+                isAfter(
+                    parseISO(status[file.path_display].lastImport),
+                    parseISO(file.server_modified)
+                )) {
                 // Do nothing
                 return null;
             }
@@ -37,17 +39,15 @@ export var syncService = function ($q, settingsService, dbService, dropboxServic
             // copy: either because it was just exported, or because it
             // was just imported (e.g. a fresh device pulling everything
             // for the first time).
-            var lastSynced = pathStatus && (
-                pathStatus.lastExport && pathStatus.lastImport ?
-                    moment.max(
-                        moment(pathStatus.lastExport),
-                        moment(pathStatus.lastImport)
-                    ) :
-                    (pathStatus.lastExport || pathStatus.lastImport)
-            );
+            var syncedAt = pathStatus ?
+                [pathStatus.lastExport, pathStatus.lastImport]
+                    .filter(Boolean)
+                    .map(parseISO) :
+                [];
+            var lastSynced = syncedAt.length ? max(syncedAt) : null;
 
             // If lastSynced after the year was updated
-            if (lastSynced && moment(lastSynced).isAfter(updated)) {
+            if (lastSynced && isAfter(lastSynced, parseISO(updated))) {
                 // Do nothing
                 return null;
             }

@@ -1,4 +1,4 @@
-import moment from 'moment';
+import { format, getMonth, getYear, parseISO } from 'date-fns';
 
 export var yearsCtrl = function ($scope, dbService, errorService) {
 
@@ -17,9 +17,9 @@ export var yearsCtrl = function ($scope, dbService, errorService) {
         $scope.records = {};
 
         records.forEach(function (record) {
-            var created = moment(record.created),
-                year = created.year(),
-                month = created.month();
+            var created = parseISO(record.created),
+                year = getYear(created),
+                month = getMonth(created);
 
             var yearRecords = $scope.records[year] =
                 $scope.records[year] || initiateYear();
@@ -44,7 +44,10 @@ export var yearsCtrl = function ($scope, dbService, errorService) {
         });
     };
 
-    $scope.months = moment.months();
+    // January .. December
+    $scope.months = Array.from({length: 12}, function (_, month) {
+        return format(new Date(2000, month, 1), 'LLLL');
+    });
 
     $scope.selectYear = function (year) {
         $scope.selectedYear = year;

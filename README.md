@@ -104,5 +104,5 @@ The tool was built with the help of the following wonderful:
 * Services: GitHub (including GitHub Pages), Dropbox
 * Tools: Chrome, npm, Vite, jshint
 * Frameworks: Angular.js, Jasmine.js, node.js
-* Libraries: bootstrap, font-awesome, ui-router, Moment.js, dropbox.js, crypto-js
+* Libraries: bootstrap, font-awesome, ui-router, date-fns, dropbox.js, crypto-js
 

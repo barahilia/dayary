@@ -1,4 +1,4 @@
-import moment from 'moment';
+import { format, formatISO } from 'date-fns';
 
 export var editorCtrl = function (
     $scope, $timeout, $interval, $state,
@@ -9,7 +9,7 @@ export var editorCtrl = function (
     var saveRecord = function () {
         var record;
 
-        $scope.record.updated = moment().format();
+        $scope.record.updated = formatISO(new Date());
 
         record = {
             id: $scope.record.id,
@@ -21,7 +21,7 @@ export var editorCtrl = function (
         dbService.updateRecord(record)
             .then(function () {
                 $scope.textChanged = false;
-                $scope.saved = "saved on " + moment().format('hh:mm');
+                $scope.saved = "saved on " + format(new Date(), 'hh:mm');
 
                 // TODO: move to alert service
                 $timeout(
