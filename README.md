@@ -113,16 +113,33 @@ in development Vite serves modules that must not be cached. So offline work is
 to be checked under `npm run preview`, switching the browser or its dev tools
 to offline once the page has loaded.
 
-Tests are jasmine specs run in a real browser: with `npm start` running, open
-http://localhost:3000/test/jasmine.html. Several specs are currently failing
-on their own async setup - they call into the database before `init()` has
-resolved. Moving them to an automated runner is a separate upgrade task.
+Tests are jasmine specs run in a real browser. To run them automatically:
+```sh
+npm test
+```
+`tools/runTests.js` starts a Vite server of its own, opens `test/jasmine.html`
+in a headless Firefox over WebDriver, prints what the jasmine reporter put on
+the page and exits non-zero unless everything passed. It needs Firefox and
+`geckodriver` on the system - the Mozilla Firefox snap ships both. The real
+Firefox binary is located by probing the usual paths, because on a snap install
+`/usr/bin/firefox` is a shell wrapper that geckodriver refuses to launch; set
+`FIREFOX_BIN` to override the probe.
+
+The test server takes a port of its own rather than the 3000 that `npm start`
+uses, so the two can run side by side; tests need no Dropbox redirect. The same
+page can still be opened by hand at http://localhost:3000/test/jasmine.html
+with `npm start` running, and that remains the way to debug a single spec.
+
+Many specs are currently failing. Some call into the database before `init()`
+has resolved; the `sync db` ones disagree with the code about actual results.
+Fixing them is a separate upgrade task - the runner is deliberately landed with
+the suite red, so the baseline is visible rather than assumed.
 
 ## Powered by
 
 The tool was built with the help of the following wonderful:
 * Services: GitHub (including GitHub Pages), Dropbox
-* Tools: Chrome, npm, Vite, jshint
+* Tools: Chrome, Firefox, npm, Vite, jshint, selenium-webdriver
 * Frameworks: Angular.js, Jasmine.js, node.js
 * Libraries: bootstrap, font-awesome, ui-router, date-fns, dropbox.js, crypto-js
 
