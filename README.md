@@ -92,8 +92,11 @@ nothing authenticates the ciphertext - a wrong passphrase is noticed
 only by the plaintext failing to decode as UTF-8. Both are on the
 upgrade list.
 
-Views are organazed into states with **ui-router**. The main one
-shows a list of records and allows to read and edit a record.
+Views are organazed into states with **ui-router**, the maintained
+`@uirouter/angularjs` 1.x. The main state shows a list of records and
+allows to read and edit a record. The lock guard is a transition hook -
+`$transitions.onStart` returning a target state - since the 0.2.x
+`$stateChangeStart` event no longer exists.
 
 Backup and sync are done with Dropbox. Records are split to yearly
 chunks and saved to JSON files to allow for relatively small units

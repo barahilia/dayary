@@ -76,7 +76,25 @@
       node's own `createHash`, and a wrong passphrase still throws rather than
       returning empty. Verified by build + lint and by driving
       `encryptionService` in node; not browser-tested (tests are broken).
-- [ ] Upgrade `ui-router` 0.2.13 to a maintained version
+- [x] ~~Upgrade `ui-router` 0.2.13 to a maintained version~~ — done
+      2026-08-09. It was already 0.2.18, still under the deprecated
+      `angular-ui-router` name; now `@uirouter/angularjs` **1.1.2**, the
+      current release of the same project, which pulls `@uirouter/core`
+      6.1.2 in as a peer. Four code changes: `app.js` imports the new
+      package (it imports angular itself, so the load-order comment went
+      away); `configApp` takes `$urlServiceProvider` and calls
+      `rules.otherwise('/')` instead of the deprecated `$urlRouterProvider`;
+      `runApp`'s `$stateChangeStart` listener - the event is gone in 1.x -
+      became `$transitions.onStart` returning `$state.target("lock")` in
+      place of `preventDefault()` plus `$state.go`; and `<ui-view />` in the
+      root state's template got a closing tag. Verified by lint, build and a
+      throwaway WebDriver script run against both the dev server and the
+      production build: deep link while locked redirects to lock, unlock,
+      `ui-sref` navigation, nested `records.item.edit` views,
+      `ui-sref-active`, and lock-then-unlock returning to `#/records/2` with
+      its params. The suite is unchanged - with a fixed jasmine seed it
+      fails the same 23 of 39 specs before and after. The bundle grows from
+      334 kB to 409 kB (gzip 116 to 138).
 - [ ] Upgrade `dropbox` SDK from v10
 - [ ] Upgrade `bootstrap` 3
 - [ ] Decide: keep AngularJS 1.x pinned vs. migrate to a maintained

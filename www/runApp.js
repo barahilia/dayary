@@ -1,5 +1,5 @@
 export var runApp = function (
-    $rootScope, $state,
+    $transitions, $state,
     lockService, dbService, settingsService
 ) {
 
@@ -12,21 +12,22 @@ export var runApp = function (
             }
         });
 
-    $rootScope.$on('$stateChangeStart', function(e, to) {
-        lockService.previousState($state.current.name, $state.params);
+    // The 0.2.x $stateChangeStart event is gone in ui-router 1.x; a start
+    // hook takes its place. Returning a target state redirects the
+    // transition, replacing the old preventDefault() plus $state.go() pair.
+    $transitions.onStart({}, function (transition) {
+        lockService.previousState(
+            transition.from().name, transition.params('from')
+        );
 
-        if (to.name === "lock") {
+        if (transition.to().name === "lock") {
             return;
         }
 
         if (lockService.locked()) {
-            e.preventDefault();
-
-            if(!$state.is("lock")) {
-                $state.go("lock");
-            }
+            return $state.target("lock");
         }
     });
 };
 
-runApp.$inject = ['$rootScope', '$state', 'lockService', 'dbService', 'settingsService'];
+runApp.$inject = ['$transitions', '$state', 'lockService', 'dbService', 'settingsService'];

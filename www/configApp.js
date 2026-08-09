@@ -9,9 +9,9 @@ import recordsHtml from './records.html?raw';
 import viewerHtml from './viewer.html?raw';
 import editorHtml from './editor.html?raw';
 
-export var configApp = function ($stateProvider, $urlRouterProvider) {
+export var configApp = function ($stateProvider, $urlServiceProvider) {
 
-    $urlRouterProvider.otherwise('/');
+    $urlServiceProvider.rules.otherwise('/');
 
     $stateProvider
         .state("root", {
@@ -22,7 +22,7 @@ export var configApp = function ($stateProvider, $urlRouterProvider) {
                     controller: "bannerCtrl"
                 },
                 "": {
-                    template: "<ui-view />"
+                    template: "<ui-view></ui-view>"
                 }
             }
         })
@@ -71,4 +71,4 @@ export var configApp = function ($stateProvider, $urlRouterProvider) {
         ;
 };
 
-configApp.$inject = ['$stateProvider', '$urlRouterProvider'];
+configApp.$inject = ['$stateProvider', '$urlServiceProvider'];

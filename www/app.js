@@ -1,6 +1,5 @@
 import angular from 'angular';
-// Reads window.angular when it loads, so it has to come after the import above.
-import 'angular-ui-router';
+import '@uirouter/angularjs';
 
 import { configApp } from './configApp.js';
 import { runApp } from './runApp.js';
