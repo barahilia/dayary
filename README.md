@@ -82,6 +82,16 @@ against the incorrect and inconsistent passphrase. A workspace is
 locked after timeout and other conditions; this erases local copy of
 the passphrase.
 
+Encryption is **crypto-js**, in its OpenSSL compatible form: each record
+is a fresh random salt, an AES-256-CBC ciphertext and the `Salted__`
+header, all base64. The format is fixed by the records already stored
+locally and in Dropbox, so any future change to it has to keep reading
+the old one. Note the weak point of that format: the key comes from the
+passphrase through `EvpKDF`, which is MD5 with a single iteration, and
+nothing authenticates the ciphertext - a wrong passphrase is noticed
+only by the plaintext failing to decode as UTF-8. Both are on the
+upgrade list.
+
 Views are organazed into states with **ui-router**. The main one
 shows a list of records and allows to read and edit a record.
 

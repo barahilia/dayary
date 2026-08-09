@@ -52,13 +52,42 @@
       unchanged `test/jasmine.html` from a Vite server on its own port and
       drives it headless. Specs unchanged. Baseline at landing: 39 specs,
       22-23 failures (one is order-dependent, the suite runs randomized).
-- [ ] Replace `cryptojslib` with Web Crypto API or `crypto-js`
+- [x] ~~Replace `cryptojslib` with Web Crypto API or `crypto-js`~~ — done
+      2026-08-09. The bower `cryptojslib` was already gone with Bower itself;
+      what was left was npm `crypto-js` pinned at **3.3.0**, which carries two
+      advisories, one of them critical. The one that mattered here: 3.x builds
+      salts and IVs out of `Math.random()`, so every record's salt was
+      predictable. Bumped to **4.2.0**, the last release ever (the project is
+      discontinued and the package is marked deprecated on npm) - the bundle
+      now takes randomness from `crypto.getRandomValues` and contains no
+      `Math.random` at all. Web Crypto was rejected for now, see the task
+      below: it can neither read the existing ciphertext nor be called
+      synchronously, so it is a data migration, not a library swap. The 4.x
+      wire format is unchanged - OpenSSL `Salted__` + AES-256-CBC - and both
+      directions were verified in node: records encrypted by 3.3.0 decrypt
+      under 4.2.0 and vice versa (an old cached build on another device keeps
+      working), `computeHash` still returns the same SHA-256 as before and as
+      node's own `createHash`, and a wrong passphrase still throws rather than
+      returning empty. Verified by build + lint and by driving
+      `encryptionService` in node; not browser-tested (tests are broken).
 - [ ] Upgrade `ui-router` 0.2.13 to a maintained version
 - [ ] Upgrade `dropbox` SDK from v10
 - [ ] Upgrade `bootstrap` 3
 - [ ] Decide: keep AngularJS 1.x pinned vs. migrate to a maintained
       framework (separate, larger decision)
 - [ ] Fix all Jasmine tests; see README for details
+- [ ] Strengthen the key derivation, most likely by moving to Web Crypto.
+      `CryptoJS.AES.encrypt(text, passphrase)` derives the key with OpenSSL's
+      `EvpKDF`: **MD5, one iteration**. A passphrase is therefore about as
+      strong as a single hash of it, and crypto-js is unmaintained, so this
+      will not improve on its own. Web Crypto has PBKDF2 with a real iteration
+      count (or Argon2 via wasm) and AES-GCM, which authenticates - today a
+      wrong passphrase is detected only by the plaintext coming out as
+      non-UTF-8. The cost is what makes this its own task: Web Crypto is async,
+      so `encrypt`/`decrypt` become promises for every caller, and it has no
+      MD5, so old records cannot be read without keeping crypto-js or hand
+      rolling `EvpKDF`. Wants a versioned ciphertext prefix and a
+      re-encrypt-on-read migration, both of which touch stored data.
 - [ ] Consider replacing Jasmine itself. The WebDriver runner keeps the specs
       as they are, which was the point of it, but it leaves the suite on
       globals (`describe`, `inject`, `spyOn`), on `done` callbacks, and on

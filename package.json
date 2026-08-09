@@ -26,7 +26,7 @@
     "angular": "1.4.14",
     "angular-ui-router": "0.2.18",
     "bootstrap": "3.3.7",
-    "crypto-js": "3.3.0",
+    "crypto-js": "4.2.0",
     "date-fns": "^4.4.0",
     "dropbox": "^10.31.0",
     "font-awesome": "4.7.0"
