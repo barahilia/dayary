@@ -1,3 +1,9 @@
+# General guidelines
+- Add new tasks at the end, keep lines under 80 chars long, max 87.
+- Some tests are still broken; do not fix them until specific task comes.
+- Take the first open task.
+- See README.md for more context; update it if needed.
+
 # Upgrade Tasks
 
 - [x] ~~Rewrite `www/dbService.js` off Web SQL onto IndexedDB~~ — already
