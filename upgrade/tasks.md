@@ -97,6 +97,7 @@
       334 kB to 409 kB (gzip 116 to 138).
 - [ ] Upgrade `dropbox` SDK from v10
 - [ ] Upgrade `bootstrap` 3
+- [ ] Stop with the changes and upgrades; make sure everything works in browser
 - [ ] Decide: keep AngularJS 1.x pinned vs. migrate to a maintained
       framework (separate, larger decision)
 - [ ] Fix all Jasmine tests; see README for details
