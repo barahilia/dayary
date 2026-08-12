@@ -1,4 +1,10 @@
+import { isDevelopment } from './environment.js';
+
 export var bannerCtrl = function ($scope, lockService, errorService) {
+
+    // The template is bundled as a raw string, so it cannot see the module
+    // and gets the flag through the scope.
+    $scope.dev = isDevelopment;
 
     errorService.setCallback(function (error) {
         $scope.error = error;

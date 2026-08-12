@@ -255,3 +255,11 @@
       newDb.close(); };` - but the tab whose connection just closed cannot
       read or write any more, so decide what it should do: reload itself,
       or tell the user to.
+- [ ] Keep the version in a single place. It is written by hand in
+      `package.json` and again in `www/banner.html`, which is what the user
+      sees, so the two drift apart the moment one is bumped alone. Vite can
+      `define` a constant out of the package version at build time, but the
+      banner is bundled as a raw string (`?raw`) and gets no substitution, so
+      the value has to reach the template through the scope - `bannerCtrl`,
+      next to the `dev` flag it already passes. Decide also what the dev
+      server should show, where the build constant is equally available.

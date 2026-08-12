@@ -112,6 +112,20 @@ are flex children of `.row` in bootstrap 5, so the `row` class sits on the
 in `configApp` - rather than on a wrapper in `index.html`; the floats of
 bootstrap 3 did not mind an element in between.
 
+The development page is marked as such, since it is the same app as the
+production one and with both open in a browser they are indistinguishable -
+while their diaries are entirely separate, IndexedDB being per origin.
+`www/environment.js` recognizes it by the host, `localhost:3000`, which
+`strictPort` in `vite.config.js` holds fixed for the Dropbox redirect. On that
+page `www/devMarker.js` appends `dev` to the tab title, replaces the favicon
+with an inline SVG one in another colour, and puts a `dev` class on `<body>`,
+off which `site.css` tints the page background. The banner turns amber and
+writes `dev` next to the version, both from a flag `bannerCtrl` puts on the
+scope - the template is a bundled raw string and cannot read the module
+itself. Its colour is a swapped bootstrap class rather than a rule in
+`site.css`, the `bg-*-subtle` utilities being `!important`. A preview or a
+production build is not marked, being neither on that host.
+
 Backup and sync are done with Dropbox. Records are split to yearly
 chunks and saved to JSON files to allow for relatively small units
 for faster upload and download.
