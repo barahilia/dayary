@@ -98,6 +98,20 @@ allows to read and edit a record. The lock guard is a transition hook -
 `$transitions.onStart` returning a target state - since the 0.2.x
 `$stateChangeStart` event no longer exists.
 
+The look is **bootstrap** 5, its CSS only - no bootstrap JavaScript and no
+jQuery are loaded, as the app uses none of the JavaScript components. Coming
+from bootstrap 3 the class names moved: `pull-right` to `float-end`, `.close`
+to `.btn-close`, `.btn-block` to `.w-100`, `hidden-xs` and `visible-xs-block`
+to the `d-*` display utilities, and the pale `bg-success`/`bg-danger`
+highlights to `bg-success-subtle`/`bg-danger-subtle`, which is what 5.3 gives
+that role to. The grid prefixes shifted by one - `xs` to none, `sm` to `md`,
+`md` to `lg` - because bootstrap 5 has a breakpoint below the old `sm`; the
+shift keeps every layout switching at the same pixel width as before. Columns
+are flex children of `.row` in bootstrap 5, so the `row` class sits on the
+`<ui-view>` element that state templates are filled into - see the root state
+in `configApp` - rather than on a wrapper in `index.html`; the floats of
+bootstrap 3 did not mind an element in between.
+
 Backup and sync are done with Dropbox. Records are split to yearly
 chunks and saved to JSON files to allow for relatively small units
 for faster upload and download.

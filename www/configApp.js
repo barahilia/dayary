@@ -22,7 +22,13 @@ export var configApp = function ($stateProvider, $urlServiceProvider) {
                     controller: "bannerCtrl"
                 },
                 "": {
-                    template: "<ui-view></ui-view>"
+                    // The grid row lives here, on the element the state
+                    // templates are filled into, and not around it in
+                    // index.html: bootstrap 5 columns are flex children, so
+                    // they have to be the row's own children. Under the
+                    // floats of bootstrap 3 the extra ui-view in between
+                    // made no difference.
+                    template: '<ui-view class="row"></ui-view>'
                 }
             }
         })

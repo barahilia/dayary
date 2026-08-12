@@ -36,6 +36,6 @@ body {
     justify-content: space-between;
 }
 
-.bg-success .remove-record {
+.bg-success-subtle .remove-record {
     display: none;
 }

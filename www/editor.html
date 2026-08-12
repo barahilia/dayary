@@ -15,12 +15,12 @@
 
     <input type="text" ng-show="settingCreated" ng-model="record.created" />
 
-    <span class="bg-success"
+    <span class="bg-success-subtle"
           ng-show="saved">
         - {{saved | date : 'hh:mm:ss'}}
     </span>
 
-    <span class="bg-success pull-right">
+    <span class="bg-success-subtle float-end">
         {{record.text.length}} chars
     </span>
 </div>

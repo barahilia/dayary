@@ -1,26 +1,26 @@
-<div class="col-sm-3">
+<div class="col-md-3">
     <h2>Years</h2>
 
     <ul class="list-unstyled">
         <li ng-repeat="(year, data) in records"
-            ng-class="{ 'bg-success' : selectedYear == year }">
+            ng-class="{ 'bg-success-subtle' : selectedYear == year }">
 
             <a href="" ng-click="selectYear(year)">
                 {{year}}
             </a>
-            <span class="pull-right">
+            <span class="float-end">
                 {{data.count}}
             </span>
         </li>
     </ul>
 </div>
 
-<div class="col-sm-3">
+<div class="col-md-3">
     <h2>Months</h2>
 
     <ul class="list-unstyled">
         <li ng-repeat="(month, data) in records[selectedYear].months"
-            ng-class="{ 'bg-success' : selectedMonth == month }">
+            ng-class="{ 'bg-success-subtle' : selectedMonth == month }">
 
             <span ng-show="data.length > 0">
                 <a href="" ng-click="selectMonth(month)">
@@ -30,14 +30,14 @@
             <span ng-show="data.length === 0">
                 {{months[month]}}
             </span>
-            <span class="pull-right">
+            <span class="float-end">
                 {{data.length}}
             </span>
         </li>
     </ul>
 </div>
 
-<div class="col-sm-3">
+<div class="col-md-3">
     <h2>Days</h2>
 
     <ul class="list-unstyled">

@@ -124,7 +124,33 @@
       the real Dropbox API (no account credentials in this env). The suite
       is unchanged at 23 of 39 failing; the bundle grows 409.19 kB to
       410.72 kB (gzip 137.63 to 138.21).
-- [ ] Upgrade `bootstrap` 3
+- [x] ~~Upgrade `bootstrap` 3~~ — done 2026-08-12. 3.3.7 to **5.3.8**, the
+      current release; 4 was skipped as it is itself a legacy line now. Only
+      the CSS is used - the app loads no bootstrap JavaScript and no jQuery -
+      so this is a class rename plus one structural fix. Renames: `pull-right`
+      to `float-end`, `.close` to `.btn-close` (its own `&times;` glyph
+      dropped, the component draws one), `.btn-block` to `.w-100`,
+      `hidden-xs`/`visible-xs-block` to `d-none d-md-block`/`d-md-none`, and
+      `bg-success`/`bg-danger` to `bg-success-subtle`/`bg-danger-subtle`,
+      since plain `bg-success` in 5 is the solid brand green, not the pale
+      highlight it was in 3. That last one also touches `ui-sref-active`,
+      `scroll-if-class` and `ng-class` in the templates and the
+      `.remove-record` rule in `site.css`, all of which name the class as a
+      string. Grid prefixes moved up one step - `col-xs-*` to `col-*`,
+      `col-sm-*` to `col-md-*`, `col-md-*` to `col-lg-*` - so the breakpoints
+      stay at the pixel widths bootstrap 3 had. The structural fix: bootstrap
+      5 columns are flex children, so they have to be direct children of
+      `.row`; ui-router fills state templates into a `<ui-view>` element, so
+      the `row` class moved off the wrapper in `index.html` onto that
+      `<ui-view>` in the root state's template - without it every two column
+      view stacked. Verified by lint, build, and screenshots of every view
+      (lock, records, viewer, editor, years, settings, dropbox, error banner,
+      and the phone width banner menu) taken in headless Firefox before and
+      after, on the dev server and again on the built `dist/`: the pages come
+      out the same layout, with bootstrap 5's darker buttons and larger close
+      icon. The suite is unchanged at 23 of 39 failing. The CSS bundle grows
+      147.95 kB to 261.41 kB (gzip 27.34 to 38.57); the JS bundle is
+      untouched.
 - [ ] Stop with the changes and upgrades; make sure everything works in browser
 - [ ] Decide: keep AngularJS 1.x pinned vs. migrate to a maintained
       framework (separate, larger decision)
