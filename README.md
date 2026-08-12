@@ -172,12 +172,22 @@ with `npm start` running, and that remains the way to debug a single spec.
 
 The `db service` and `sync db` suites are sequences - each spec leaves the
 database in the state the next one expects - so `test/main.js` turns jasmine's
-spec randomization off. Both share the one IndexedDB database and empty it once
-at their start; `clear()` does not reset a store's key generator, so record ids
-carry over from the suite before and the specs remember the ids they are given
-rather than expecting 1 and 2. Note also that jasmine's `done` takes any
-argument as a failure, so a chain ending on a promise that resolves with a
-value needs `.then(function () { done(); })` and not `.then(done)`.
+spec randomization off. It also deletes the `db` database before anything runs.
+The suites do empty it themselves, but `clear()` never resets a store's key
+generator, and the record ids are part of what the specs pin down: `npm test`
+sees them start at 1 because every run gets a fresh browser profile, while a
+browser you reload the page in keeps the database and the ids climb. That
+delete drops whatever diary is stored on the origin the tests are served from,
+as emptying it always did - and it cannot proceed while another tab holds the
+database open, so close the app before running the suite by hand; the page says
+as much instead of waiting. Records in `db service` still take the ids that
+follow the suite before it, and it remembers them rather than assuming.
+
+Two jasmine habits to keep when writing specs here. `done` takes any argument
+as a failure, so a chain ending on a promise that resolves with a value needs
+`.then(function () { done(); })`, not `.then(done)`. And a rejection nothing
+handles surfaces only as a 5 s timeout naming no cause, which is why
+`test/main.js` reports Q's unhandled reasons after every spec.
 
 ## Powered by
 

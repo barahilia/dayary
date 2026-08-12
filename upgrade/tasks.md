@@ -181,6 +181,20 @@
         status key rather than undefined.
       - `lock-service-spec` unlocked through a `dbService` that suite never
         inits; it stubs `setHash`, being about the lock state alone.
+      Then a second round, for what only the browser showed: `npm test` opens
+      a fresh profile every run, but a page reloaded in a real browser keeps
+      the database, and the `sync db` ids - 1 to 5, written out - climb with
+      each run, since `clear()` leaves the key generator alone. Reproduced by
+      loading the page three times in one browser session: 7 specs fail on the
+      second load, one of them as a bare timeout, being a unique index
+      violation nobody handled. So `test/main.js` now deletes the database in
+      a root `beforeAll`, which also covers a leftover schema from an older
+      build, and reports Q's unhandled reasons in a root `afterEach`, so a
+      rejection names its spec instead of reading as a 5 s hang. An app tab on
+      the same origin blocks the delete - see the task below - and that is
+      reported at once rather than waited out. Verified: three loads in one
+      session green, `npm test` green, and the blocked case failing
+      immediately with the tab to close named on the page.
 - [ ] Strengthen the key derivation, most likely by moving to Web Crypto.
       `CryptoJS.AES.encrypt(text, passphrase)` derives the key with OpenSSL's
       `EvpKDF`: **MD5, one iteration**. A passphrase is therefore about as
@@ -227,3 +241,17 @@
         Dropbox actually returns today for a bad refresh token as against a
         bad access token - the `.tag` the code tests for may not be the one
         that arrives.
+- [ ] Close the database connection on `versionchange`. `dbService.init()`
+      opens `db` and holds the connection for the life of the page, with no
+      `onversionchange` handler on it and no `onblocked` on the open request.
+      So one tab of the app blocks every schema change for the others: the day
+      `init()` opens version 2, a tab still on version 1 keeps
+      `onupgradeneeded` from firing, and the new tab hangs - `open()` neither
+      succeeds nor errors, so `init()`'s promise never settles and the app
+      shows an empty diary rather than a message. The same wall is what the
+      test page meets today, which is how this surfaced: it deletes the
+      database before running and an app tab on the origin blocks that. The
+      common case is two lines - `newDb.onversionchange = function () {
+      newDb.close(); };` - but the tab whose connection just closed cannot
+      read or write any more, so decide what it should do: reload itself,
+      or tell the user to.
