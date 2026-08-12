@@ -102,6 +102,16 @@ Backup and sync are done with Dropbox. Records are split to yearly
 chunks and saved to JSON files to allow for relatively small units
 for faster upload and download.
 
+The Dropbox client is the official **dropbox** JS SDK, v10 - still the
+current major line. Login is OAuth 2 with PKCE on a page of its own,
+`www/login/dropbox.html`, which is also its own redirect URI; it keeps
+the code verifier in `sessionStorage` for the one hop to Dropbox and
+back, then stores the returned refresh token in `localStorage`. The app
+itself never sees a long lived access token - `prepareDropbox` trades
+the refresh token for a fresh one on every visit to the Dropbox view.
+Downloads come back as a `fileBlob`, which is why `readFile` goes
+through a `FileReader`.
+
 ## Development
 
 Start with:
@@ -110,6 +120,9 @@ cd dayary
 npm install
 npm start
 ```
+Node 22 or newer is needed - the Dropbox SDK now requires it, having
+dropped `node-fetch` for the platform `fetch`.
+
 Then navigate to http://localhost:3000 in the browser. The choice of port,
 3000 is deliberate, as Dropbox will redirect back to this address after
 authentication - so the dev server refuses to start on any other port rather

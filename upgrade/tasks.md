@@ -95,7 +95,35 @@
       its params. The suite is unchanged - with a fixed jasmine seed it
       fails the same 23 of 39 specs before and after. The bundle grows from
       334 kB to 409 kB (gzip 116 to 138).
-- [ ] Upgrade `dropbox` SDK from v10
+- [x] ~~Upgrade `dropbox` SDK from v10~~ — done 2026-08-12, and it stays on
+      v10: there is no newer major. The `latest` tag is **10.45.0** and the
+      only other tag, `alpha`, points at the much older 4.1.0-alpha. So the
+      upgrade was `^10.31.0`, resolving to 10.41.0, pinned to **10.45.0**,
+      the same exact-version style as the other dependencies. The line had
+      been dormant since 2022 and resumed releasing in July 2026; what came
+      with it: `node-fetch` is gone in favour of the platform `fetch` (the
+      SDK now declares `engines.node >= 22`, so package.json declares it
+      too), `res.buffer()` became `res.arrayBuffer()`, the browser and node
+      PKCE paths merged onto Web Crypto, and requests take an optional last
+      `options` argument for `signal`/`timeout`/`extraHeaders`. There is
+      also a new `downloadFile`, but it is node-only and unused here. No
+      code change: all four calls the app makes - `filesListFolder`,
+      `filesDownload`, `filesUpload`, `usersGetCurrentAccount` - plus the
+      auth flow keep their signatures, and downloads still arrive as
+      `fileBlob` in a browser. Verified by lint, build, and two harnesses:
+      one in node recording every HTTP request the SDK emits for those
+      calls, which comes out byte identical between 10.41.0 and 10.45.0
+      (URL, method, headers, body), and one driving the real
+      `dropboxService.js` in headless Firefox against a stubbed `fetch` -
+      token refresh, account info, listing, `readFile` through the
+      `FileReader`/`fileBlob` path, `writeFile` with its overwrite mode,
+      the bearer header on every request, and the login page's PKCE:
+      128-char RFC 7636 verifier, challenge equal to
+      base64url(sha256(verifier)), and the code-for-refresh-token
+      exchange. All 14 checks pass on both versions. Not tested against
+      the real Dropbox API (no account credentials in this env). The suite
+      is unchanged at 23 of 39 failing; the bundle grows 409.19 kB to
+      410.72 kB (gzip 137.63 to 138.21).
 - [ ] Upgrade `bootstrap` 3
 - [ ] Stop with the changes and upgrades; make sure everything works in browser
 - [ ] Decide: keep AngularJS 1.x pinned vs. migrate to a maintained
@@ -121,3 +149,29 @@
       have become promises anyway - at that point the move to Vitest is a much
       smaller step than it is today. Not urgent: jasmine 5 is maintained.
       Other options: Vitest, Playwright, Puppeteer.
+- [ ] Review and handle expired Dropbox access properly. `dropboxCtrl` reacts
+      to an `expired_access_token` tag by calling `dropboxService.expire()` -
+      a method that does not exist, so the handler itself throws a
+      `TypeError` and the user sees nothing useful. It is a leftover: back
+      when the app stored a long lived access token, `expire()` cleared
+      `localStorage.dropboxAuthToken`; the move to refresh tokens
+      (`59c2b99`, 2022) deleted the method and left the call behind. Decide
+      what the app should actually do now. Points to cover:
+      - the refresh token in `localStorage` is the real credential, and it
+        also expires or gets revoked - the user unlinks the app, changes the
+        password, or simply does not open the app for long enough. Then
+        `checkAndRefreshAccessToken` in `prepareDropbox` is what fails, not
+        the individual call, and `dropboxCtrl` reports it as a raw JSON
+        blob through `errorService`.
+      - `isAuthenticated` only asks whether the key is present in
+        `localStorage`, never whether it still works, so the view offers
+        "Get data" and "Auto sync" against a dead token.
+      - recovery should clear the stale refresh token and put the user back
+        on the Login button in `dropbox.html`, ideally without losing the
+        sync that was in flight.
+      - `syncService` goes through the same service, so a token that dies
+        mid sync has to surface there too, not only on the Dropbox view.
+      - decide whether re-login can be silent, and confirm which errors
+        Dropbox actually returns today for a bad refresh token as against a
+        bad access token - the `.tag` the code tests for may not be the one
+        that arrives.
