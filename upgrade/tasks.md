@@ -154,7 +154,33 @@
 - [ ] Stop with the changes and upgrades; make sure everything works in browser
 - [ ] Decide: keep AngularJS 1.x pinned vs. migrate to a maintained
       framework (separate, larger decision)
-- [ ] Fix all Jasmine tests; see README for details
+- [x] ~~Fix all Jasmine tests; see README for details~~ — done 2026-08-12.
+      39 specs, 0 failures, three runs in a row. No production code changed:
+      every failure was a spec still describing Web SQL behaviour or the
+      jasmine 5 semantics. Four causes.
+      - Jasmine 5 randomizes specs by default, and the `db service` and
+        `sync db` suites are sequences over a single database, so a shuffle
+        alone accounted for one failure that moved between runs. `test/main.js`
+        now calls `configure({ random: false })`.
+      - `done` takes any argument as a failure, so `cleanDb().then(done)` in
+        both db suites failed the first spec of each - and, since a failing
+        `beforeEach` skips the spec body, denied the following specs the state
+        they expect. Now `.then(function () { done(); })`.
+      - `db-service-spec` called `cleanDb()` before `init()` had resolved, so
+        `newDb` was undefined and every spec threw; it inits first now. Its
+        expectations were Web SQL's too: `rowsAffected` for a write, where
+        IndexedDB resolves with the key; numbers read back as `'1.0'` strings;
+        records without `text`, which `getAll()` cannot do; and a failing
+        update of a missing row, where `put()` upserts - the renamed spec now
+        states that. Ids are no longer assumed to be 1 and 2, as `clear()`
+        leaves the key generator running.
+      - `sync db` compared the exported JSON as text, but key order follows
+        how each record was stored - a synced record ends up with `id` last -
+        so it parses the argument now. Same `text` field fix in the record
+        expectations, and `exportYear`/`importFile` resolve with the sync
+        status key rather than undefined.
+      - `lock-service-spec` unlocked through a `dbService` that suite never
+        inits; it stubs `setHash`, being about the lock state alone.
 - [ ] Strengthen the key derivation, most likely by moving to Web Crypto.
       `CryptoJS.AES.encrypt(text, passphrase)` derives the key with OpenSSL's
       `EvpKDF`: **MD5, one iteration**. A passphrase is therefore about as

@@ -170,10 +170,14 @@ uses, so the two can run side by side; tests need no Dropbox redirect. The same
 page can still be opened by hand at http://localhost:3000/test/jasmine.html
 with `npm start` running, and that remains the way to debug a single spec.
 
-Many specs are currently failing. Some call into the database before `init()`
-has resolved; the `sync db` ones disagree with the code about actual results.
-Fixing them is a separate upgrade task - the runner is deliberately landed with
-the suite red, so the baseline is visible rather than assumed.
+The `db service` and `sync db` suites are sequences - each spec leaves the
+database in the state the next one expects - so `test/main.js` turns jasmine's
+spec randomization off. Both share the one IndexedDB database and empty it once
+at their start; `clear()` does not reset a store's key generator, so record ids
+carry over from the suite before and the specs remember the ids they are given
+rather than expecting 1 and 2. Note also that jasmine's `done` takes any
+argument as a failure, so a chain ending on a promise that resolves with a
+value needs `.then(function () { done(); })` and not `.then(done)`.
 
 ## Powered by
 

@@ -14,6 +14,16 @@ describe("sync db", function () {
         }
     ));
 
+    // The exported JSON carries whatever key order a record happens to have
+    // in the store, so compare the data written and not its text.
+    var writtenFile = function () {
+        var args = dropbox.writeFile.calls.mostRecent().args;
+
+        return { path: args[0], records: JSON.parse(args[1]) };
+    };
+
+    // Like the db suite, this one is a sequence over a single database:
+    // empty it once and let each spec build on what the previous left.
     beforeEach(function (done) {
         db.init().then(function () {
             if (initialized) {
@@ -21,21 +31,25 @@ describe("sync db", function () {
             }
             else {
                 initialized = true;
-                db.cleanDb().then(done);
+                // done() takes any argument as a failure, and cleanDb
+                // resolves with the results of its clear requests.
+                db.cleanDb().then(function () { done(); });
             }
         });
     });
 
     it("should export empty year", function (done) {
+        var path = "/backups/dayary/2000.json";
+
         spyOn(dropbox, "writeFile").and.returnValue( Q(null) );
 
         service.exportYear("2000")
             .then(function (data) {
-                expect(data).toBeUndefined();
+                // Resolves with the key of the written sync status.
+                expect(data).toBe(path);
             })
             .then(db.getSyncStatus)
             .then(function (data) {
-                var path = "/backups/dayary/2000.json";
                 expect(Object.keys(data)).toEqual([path]);
                 expect(data[path].lastImport).toBeNull();
                 expect(data[path].lastExport).toBeDefined();
@@ -50,7 +64,7 @@ describe("sync db", function () {
 
         service.importFile(file)
             .then(function (data) {
-                expect(data).toBeUndefined();
+                expect(data).toBe(file);
             })
             .then(db.getSyncStatus)
             .then(function (data) {
@@ -76,14 +90,15 @@ describe("sync db", function () {
 
         service.importFile(file)
             .then(function (data) {
-                expect(data).toBeUndefined();
+                expect(data).toBe(file);
             })
             .then(db.getAllRecords)
             .then(function (data) {
                 expect(data).toEqual( [ {
                     id: 1,
                     created: "2015-05-01",
-                    updated: "2015-05-01"
+                    updated: "2015-05-01",
+                    text: ""
                 } ] );
                 done();
             });
@@ -95,17 +110,10 @@ describe("sync db", function () {
             '{"created": "2015-05-02", "updated": "2015-05-01", "text": ""},' +
             '{"created": "2015-05-03", "updated": "2015-05-01", "text": ""}' +
             ']';
-        var backupRecords = '[' +
-            '{"id":1,"created":"2015-05-01",' +
-             '"updated":"2015-05-01","text":""},' +
-            '{"id":2,"created":"2015-05-02",' +
-             '"updated":"2015-05-01","text":""},' +
-            '{"id":3,"created":"2015-05-03",' +
-             '"updated":"2015-05-01","text":""}]';
-        var recordsMetadata = [
-            { id: 1, created: '2015-05-01', updated: '2015-05-01' },
-            { id: 2, created: '2015-05-02', updated: '2015-05-01' },
-            { id: 3, created: '2015-05-03', updated: '2015-05-01' }
+        var dbRecords = [
+            { id: 1, created: '2015-05-01', updated: '2015-05-01', text: "" },
+            { id: 2, created: '2015-05-02', updated: '2015-05-01', text: "" },
+            { id: 3, created: '2015-05-03', updated: '2015-05-01', text: "" }
         ];
 
         spyOn(dropbox, "listFiles").and.returnValue(
@@ -118,24 +126,24 @@ describe("sync db", function () {
             .then(function () {
                 expect(dropbox.listFiles).toHaveBeenCalled();
                 expect(dropbox.readFile).toHaveBeenCalledWith(file);
-                expect(dropbox.writeFile).toHaveBeenCalledWith(
-                    '/backups/dayary/2015.json',
-                    backupRecords
-                )
+                expect(writtenFile()).toEqual({
+                    path: '/backups/dayary/2015.json',
+                    records: dbRecords
+                });
             })
             .then(db.getAllRecords)
             .then(function (data) {
-                expect(data).toEqual(recordsMetadata);
+                expect(data).toEqual(dbRecords);
             })
             .then(done);
     });
 
     it("should do nothing with old files", function (done) {
         var file = "data.file";
-        var recordsMetadata = [
-            { id: 1, created: '2015-05-01', updated: '2015-05-01' },
-            { id: 2, created: '2015-05-02', updated: '2015-05-01' },
-            { id: 3, created: '2015-05-03', updated: '2015-05-01' }
+        var dbRecords = [
+            { id: 1, created: '2015-05-01', updated: '2015-05-01', text: "" },
+            { id: 2, created: '2015-05-02', updated: '2015-05-01', text: "" },
+            { id: 3, created: '2015-05-03', updated: '2015-05-01', text: "" }
         ];
 
         spyOn(dropbox, "listFiles").and.returnValue(
@@ -152,7 +160,7 @@ describe("sync db", function () {
             })
             .then(db.getAllRecords)
             .then(function (data) {
-                expect(data).toEqual(recordsMetadata);
+                expect(data).toEqual(dbRecords);
             })
             .then(done);
     });
@@ -220,10 +228,10 @@ describe("sync db", function () {
             .then(function () {
                 expect(dropbox.listFiles).toHaveBeenCalled();
                 expect(dropbox.readFile.calls.any()).toBeFalsy();
-                expect(dropbox.writeFile).toHaveBeenCalledWith(
-                    '/backups/dayary/2015.json',
-                    JSON.stringify(dbRecords)
-                );
+                expect(writtenFile()).toEqual({
+                    path: '/backups/dayary/2015.json',
+                    records: dbRecords
+                });
             })
             .then(done);
     });
@@ -234,11 +242,13 @@ describe("sync db", function () {
             { id: 1, created: '2015-05-04', updated: '2015-05-06', text: "" },
             { id: 2, created: '2015-05-04', updated: '2015-05-05', text: "" }
         ];
-        var dbRecordsMetadata = [
-            { id: 1, created: '2015-05-01', updated: '2015-05-02' },
-            { id: 2, created: '2015-05-02', updated: '2015-05-01' },
-            { id: 3, created: '2015-05-03', updated: '9999-05-01' },
-            { id: 4, created: '2015-05-04', updated: '2015-05-06' }
+        var dbRecords = [
+            { id: 1, created: '2015-05-01', updated: '2015-05-02',
+              text: "newer" },
+            { id: 2, created: '2015-05-02', updated: '2015-05-01', text: "" },
+            { id: 3, created: '2015-05-03', updated: '9999-05-01',
+              text: "recently updated" },
+            { id: 4, created: '2015-05-04', updated: '2015-05-06', text: "" }
         ];
 
         spyOn(dropbox, "listFiles").and.returnValue(
@@ -256,7 +266,7 @@ describe("sync db", function () {
             })
             .then(db.getAllRecords)
             .then(function (data) {
-                expect(data).toEqual(dbRecordsMetadata);
+                expect(data).toEqual(dbRecords);
             })
             .then(done);
     });
@@ -270,12 +280,14 @@ describe("sync db", function () {
             { id: 1, created: '2015-05-05', updated: '2015-05-05', text: "" },
             { id: 2, created: '2015-05-05', updated: '2015-05-06', text: "" }
         ];
-        var dbRecordsMetadata = [
-            { id: 1, created: '2015-05-01', updated: '2015-05-02' },
-            { id: 2, created: '2015-05-02', updated: '2015-05-01' },
-            { id: 3, created: '2015-05-03', updated: '9999-05-01' },
-            { id: 4, created: '2015-05-04', updated: '2015-05-06' },
-            { id: 5, created: '2015-05-05', updated: '2015-05-06' }
+        var dbRecords = [
+            { id: 1, created: '2015-05-01', updated: '2015-05-02',
+              text: "newer" },
+            { id: 2, created: '2015-05-02', updated: '2015-05-01', text: "" },
+            { id: 3, created: '2015-05-03', updated: '9999-05-01',
+              text: "recently updated" },
+            { id: 4, created: '2015-05-04', updated: '2015-05-06', text: "" },
+            { id: 5, created: '2015-05-05', updated: '2015-05-06', text: "" }
         ];
 
         spyOn(dropbox, "listFiles").and.returnValue( Q(files) );
@@ -292,7 +304,7 @@ describe("sync db", function () {
             })
             .then(db.getAllRecords)
             .then(function (data) {
-                expect(data).toEqual(dbRecordsMetadata);
+                expect(data).toEqual(dbRecords);
             })
             .then(done);
     });

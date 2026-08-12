@@ -3,8 +3,13 @@ describe("lock service", function () {
 
     beforeEach(module('app'));
 
-    beforeEach(inject(function (lockService) {
+    beforeEach(inject(function (lockService, dbService) {
         service = lockService;
+
+        // Unlocking persists the passphrase hash. This suite is about the
+        // lock state alone and never calls dbService.init(), so keep the
+        // database out of it.
+        spyOn(dbService, 'setHash');
     }));
 
     it("should start locked", function () {
