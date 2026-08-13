@@ -263,3 +263,19 @@
       the value has to reach the template through the scope - `bannerCtrl`,
       next to the `dev` flag it already passes. Decide also what the dev
       server should show, where the build constant is equally available.
+- [ ] Replace `font-awesome` 4.7.0. It is unmaintained - 4.7.0 is from October
+      2016 and the project moved on to Font Awesome 5/6 under a different
+      package and a different licence - and its `fontawesome-webfont.woff2`
+      ships a bad `glyf` bounding box, which Firefox reports on every load:
+      "downloadable font: glyf: Glyph bbox was incorrect; adjusting (glyph
+      691)". Harmless in itself, the font renders fine once Firefox recomputes
+      the box, but it is a dead dependency serving five icons: `fa-spinner`
+      with `fa-spin` (viewer, settings x2, dropbox x3), `fa-chevron-left` and
+      `fa-chevron-right` and `fa-plus` (records), `fa-bars` (banner).
+      `bootstrap-icons` covers all five - `bi-arrow-repeat`,
+      `bi-chevron-left`/`right`, `bi-plus`, `bi-list` - and is the natural
+      match now that bootstrap is 5.3.8, though it has no animation helper, so
+      `fa-spin` needs a keyframes rule in `site.css`. Inline SVG is the other
+      option and would drop the web font altogether. Note `sw.js` precaches
+      the `?v=4.7.0` font URLs through `ignoreSearch`; check what that list
+      turns into.
