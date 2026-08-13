@@ -1,5 +1,11 @@
-* `npm version <type>`
+* `npm version <type> --no-git-tag-version`
 
 That is the whole list. package.json is the only place the version is
 written; `define` in vite.config.js hands it to the app, and the service
 worker cache name is a hash of the built files, not the version.
+
+The flag is there because the tag belongs to the deploy rather than to the
+bump. `upgrade/production.md` tags the release in step 4, once the backup
+and the rollback point are in hand; without the flag `npm version` would
+tag straight away, putting `v<version>` on a commit that has been through
+none of that - and a tag already pushed is the awkward one to take back.
