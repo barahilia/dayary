@@ -177,8 +177,9 @@ cd dayary
 npm install
 npm start
 ```
-Node 22 or newer is needed - the Dropbox SDK now requires it, having
-dropped `node-fetch` for the platform `fetch`.
+Node 22.12 or newer is needed. The Dropbox SDK requires Node 22, having
+dropped `node-fetch` for the platform `fetch`; Vite raises the bar to the
+22.12 point release.
 
 Then navigate to http://localhost:3000 in the browser. The choice of port,
 3000 is deliberate, as Dropbox will redirect back to this address after
