@@ -1,10 +1,11 @@
-import { isDevelopment } from './environment.js';
+import { isDevelopment, version } from './environment.js';
 
 export var bannerCtrl = function ($scope, lockService, errorService) {
 
     // The template is bundled as a raw string, so it cannot see the module
-    // and gets the flag through the scope.
+    // and gets the flag and the version through the scope.
     $scope.dev = isDevelopment;
+    $scope.version = version;
 
     errorService.setCallback(function (error) {
         $scope.error = error;

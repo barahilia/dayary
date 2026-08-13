@@ -142,6 +142,19 @@ the development page by its host, `localhost:3000`, the port `strictPort` in
 `vite.config.js` holds fixed for the Dropbox redirect. A preview or a
 production build is marked in neither way.
 
+The version next to it is written by hand in one place, `package.json`.
+`vite.config.js` reads it from there and `define`s it as `__APP_VERSION__`,
+which `www/environment.js` exports and `bannerCtrl` puts on the scope beside
+the dev flag - the template being a raw string, it can no more read the
+constant than it can the module. Vite's `define` reaches the dev server too,
+by a different route: the substitution itself happens only in a build, and in
+development the value arrives as a global the injected Vite client sets before
+any of the app's modules run. So the dev page shows the same version as the
+site, with `dev` after it. Releasing is `npm version <type>` and nothing else,
+which is all `checklist.version` has left in it; the service worker's cache
+name is a hash of the built files rather than the version, so it changes on
+its own.
+
 Backup and sync are done with Dropbox. Records are split to yearly
 chunks and saved to JSON files to allow for relatively small units
 for faster upload and download.

@@ -255,14 +255,24 @@
       newDb.close(); };` - but the tab whose connection just closed cannot
       read or write any more, so decide what it should do: reload itself,
       or tell the user to.
-- [ ] Keep the version in a single place. It is written by hand in
-      `package.json` and again in `www/banner.html`, which is what the user
-      sees, so the two drift apart the moment one is bumped alone. Vite can
-      `define` a constant out of the package version at build time, but the
-      banner is bundled as a raw string (`?raw`) and gets no substitution, so
-      the value has to reach the template through the scope - `bannerCtrl`,
-      next to the `dev` flag it already passes. Decide also what the dev
-      server should show, where the build constant is equally available.
+- [x] ~~Keep the version in a single place~~ — done 2026-08-13, and the
+      version went to **3.0.0** with it. `package.json` is now the only place
+      it is written: `vite.config.js` reads it and `define`s
+      `__APP_VERSION__`, `www/environment.js` exports it beside
+      `isDevelopment`, and `bannerCtrl` puts it on the scope next to the `dev`
+      flag, the banner reading `v{{version}}` - the template is a raw string
+      and can no more see the constant than the module. The dev server shows
+      the same version, and that is not the `define` substitution: Vite runs
+      it only in a build (`if (!ssr && !isBuild) return` in `vite:define`),
+      while in development the value arrives as a global that the injected
+      Vite client sets, in `/@vite/env`, before any app module runs. Either
+      way `environment.js` reads one name, so `.jshintrc` declares it a
+      global. `checklist.version` is down to `npm version <type>`: the manual
+      banner edit is gone and the `site.manifest` it also listed went with
+      AppCache. Verified by lint, build, `npm test` (39 specs, 0 failures),
+      and reading the banner in headless Firefox off both a dev server and
+      `npm run preview` - `v3.0.0` in both, with the ` dev` suffix on
+      `localhost:3000` as before.
 - [ ] Replace `font-awesome` 4.7.0. It is unmaintained - 4.7.0 is from October
       2016 and the project moved on to Font Awesome 5/6 under a different
       package and a different licence - and its `fontawesome-webfont.woff2`

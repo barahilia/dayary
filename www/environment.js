@@ -5,3 +5,7 @@
 export var developmentHost = "localhost:3000";
 
 export var isDevelopment = window.location.host === developmentHost;
+
+// Written by hand in package.json alone; `define` in vite.config.js
+// substitutes it here, for the dev server as much as for a build.
+export var version = __APP_VERSION__;
