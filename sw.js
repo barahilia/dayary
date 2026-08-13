@@ -5,8 +5,8 @@
 // build root, filling in the two placeholders below with the names of the
 // files Vite has just emitted and with a revision derived from their content.
 
-var VERSION = "21f06a39ff1445d5";
-var PRECACHE = ["./","./assets/apple-touch-icon-152x152-VYLGuUYt.png","./assets/auth-CcLcC2Qh.js","./assets/dropboxLogin-BhPurWpl.js","./assets/favicon-BMIDwjwg.ico","./assets/fontawesome-webfont-B-jkhYfk.woff2","./assets/fontawesome-webfont-CDK5bt4p.woff","./assets/fontawesome-webfont-CQDK8MU3.ttf","./assets/fontawesome-webfont-D13rzr4g.svg","./assets/fontawesome-webfont-G5YE5S7X.eot","./assets/icon-192x192-CWgR4zdy.png","./assets/main-CTrFtv1H.css","./assets/main-wrMhi77f.js","./index.html","./www/login/dropbox.html"];
+var VERSION = "d312eaa002cd915a";
+var PRECACHE = ["./","./assets/Dropbox-sdk.min-D-xgJ5QG.js","./assets/apple-touch-icon-152x152-VYLGuUYt.png","./assets/dropboxLogin-DYb6VBQ9.js","./assets/favicon-BMIDwjwg.ico","./assets/fontawesome-webfont-B-jkhYfk.woff2","./assets/fontawesome-webfont-CDK5bt4p.woff","./assets/fontawesome-webfont-CQDK8MU3.ttf","./assets/fontawesome-webfont-D13rzr4g.svg","./assets/fontawesome-webfont-G5YE5S7X.eot","./assets/icon-192x192-CWgR4zdy.png","./assets/main-BlE_raFq.js","./assets/main-CNVsw6c6.css","./index.html","./www/login/dropbox.html"];
 
 // URLs are relative to this script, which sits at the app root - so the same
 // build works under the GitHub Pages project path and at a domain root, just
