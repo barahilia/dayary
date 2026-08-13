@@ -7,7 +7,7 @@ body {
    from www/devMarker.js. The banner takes its own colour from a bootstrap
    class the template picks, those being !important and not overridable here. */
 body.dev {
-    background-color: var(--bs-light);
+    background-color: #EEEEEE;
 }
 
 #banner {

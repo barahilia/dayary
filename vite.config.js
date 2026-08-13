@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite';
 
 import { serviceWorker } from './tools/viteServiceWorker.js';
+import { devMarker } from './tools/viteDevMarker.js';
 
 export default defineConfig({
-    plugins: [serviceWorker()],
+    plugins: [serviceWorker(), devMarker()],
 
     // Relative asset URLs, so the build works both under the GitHub Pages
     // project path (/dayary/) and at a domain root.

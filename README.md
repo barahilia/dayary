@@ -114,17 +114,33 @@ bootstrap 3 did not mind an element in between.
 
 The development page is marked as such, since it is the same app as the
 production one and with both open in a browser they are indistinguishable -
-while their diaries are entirely separate, IndexedDB being per origin.
-`www/environment.js` recognizes it by the host, `localhost:3000`, which
-`strictPort` in `vite.config.js` holds fixed for the Dropbox redirect. On that
-page `www/devMarker.js` appends `dev` to the tab title, replaces the favicon
-with an inline SVG one in another colour, and puts a `dev` class on `<body>`,
-off which `site.css` tints the page background. The banner turns amber and
-writes `dev` next to the version, both from a flag `bannerCtrl` puts on the
-scope - the template is a bundled raw string and cannot read the module
-itself. Its colour is a swapped bootstrap class rather than a rule in
-`site.css`, the `bg-*-subtle` utilities being `!important`. A preview or a
-production build is not marked, being neither on that host.
+while their diaries are entirely separate, IndexedDB being per origin, so an
+entry written into the wrong one is quietly lost.
+
+`tools/viteDevMarker.js` marks it, being a `apply: 'serve'` plugin and so
+running for the dev server and never for a build. It appends `dev` to the tab
+title, drops every icon `index.html` declares and puts an amber one it serves
+at `/dev-favicon.svg` in their place, and adds a `dev` class to `<body>`, off
+which `site.css` greys the page background. Only `index.html` is transformed,
+leaving the Dropbox login and the test pages alone.
+
+Marking the page from the server, rather than having the app do it to itself
+at load, is what the favicon costs. A browser starts fetching the icons a page
+declares while it parses it and picks among all of them; a script that removes
+those links afterwards and adds its own is racing the icon loader, and firefox
+flapped between the new icon, the aborted old one - `NS_BINDING_ABORTED` on
+`favicon.ico` - and the default `/favicon.ico` it falls back to when a page
+declares none. HTML that names the right icon to begin with has nothing to
+race. The icon carries an explicit width and height too: a `viewBox` alone
+gives no intrinsic size, and a favicon of no size is rasterized
+inconsistently.
+
+The banner turns amber and writes `dev` next to the version, both from a flag
+`bannerCtrl` puts on the scope - the template is a bundled raw string and
+cannot read a module itself. That flag is `www/environment.js`, which knows
+the development page by its host, `localhost:3000`, the port `strictPort` in
+`vite.config.js` holds fixed for the Dropbox redirect. A preview or a
+production build is marked in neither way.
 
 Backup and sync are done with Dropbox. Records are split to yearly
 chunks and saved to JSON files to allow for relatively small units
