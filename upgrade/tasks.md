@@ -151,7 +151,24 @@
       icon. The suite is unchanged at 23 of 39 failing. The CSS bundle grows
       147.95 kB to 261.41 kB (gzip 27.34 to 38.57); the JS bundle is
       untouched.
-- [ ] Stop with the changes and upgrades; make sure everything works in browser
+- [x] ~~Stop with the changes and upgrades; make sure everything works in
+      browser~~ — done 2026-08-13. The app was exercised by hand on the dev
+      server at `localhost:3000`, the Dropbox flow included: that was the one
+      path every upgrade so far had only reached through a stubbed `fetch`,
+      the SDK bump being verified against recorded requests rather than the
+      real API. Nothing needed changing, so the branch stands as it is and
+      3.0.0 goes out. What is left for production is not a code question but
+      a deployment one, and it turns out `gh-pages` cannot take a merge from
+      `master` any more: it still holds the pre-Vite source tree, while what
+      has to be served now is the contents of `dist/`, which is gitignored.
+      `upgrade/production.md` carries the release runbook - build, tag,
+      publish from a worktree that wipes the old tree first, verify, and the
+      rollback, which needs a service worker kill switch rather than a plain
+      force push. Checked against the deployed 2.1.3 before writing it: the
+      IndexedDB name, version, stores and `created` index are identical, so
+      existing diaries survive; the ciphertext format, the Dropbox redirect
+      URI and the refresh token in `localStorage` all carry over; hash
+      routing means no rewrite rules; and there is no `CNAME` to preserve.
 - [ ] Decide: keep AngularJS 1.x pinned vs. migrate to a maintained
       framework (separate, larger decision)
 - [x] ~~Fix all Jasmine tests; see README for details~~ — done 2026-08-12.
