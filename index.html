@@ -1,57 +1,26 @@
 <!DOCTYPE html>
-<html ng-app="app" manifest="site.manifest">
+<html ng-app="app">
 <head>
+    <meta charset="utf-8">
     <title>Dayary</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
-    <link href="www/favicon.ico" rel="shortcut icon">
-    <link href="www/icons/apple-touch-icon-152x152.png" rel="apple-touch-icon" sizes="152x152" />
-    <link href="www/icons/icon-192x192.png" rel="icon" sizes="192x192" />
-
-    <link href="external/css/bootstrap.css" rel="stylesheet">
-    <link href="external/css/font-awesome.css" rel="stylesheet">
-
-    <link href="www/site.css" rel="stylesheet">
+    <link href="./assets/favicon-BMIDwjwg.ico" rel="shortcut icon">
+    <link href="./assets/apple-touch-icon-152x152-VYLGuUYt.png" rel="apple-touch-icon" sizes="152x152" />
+    <link href="./assets/icon-192x192-CWgR4zdy.png" rel="icon" sizes="192x192" />
 
 
-    <script src="www/enforceHttps.js"></script>
-
-    <!-- TODO: consider using require.js - one for this and tests -->
-    <script src="external/js/underscore.js"></script>
-    <script src="external/js/angular.js"></script>
-    <script src="external/js/angular-ui-router.js"></script>
-    <script src="external/js/aes.js"></script>
-    <script src="external/js/sha256.js"></script>
-    <script src="external/js/moment.js"></script>
-    <script src="external/js/Dropbox-sdk.min.js"></script>
-
-    <script src="www/configApp.js"></script>
-    <script src="www/runApp.js"></script>
-    <script src="www/encryptionService.js"></script>
-    <script src="www/lockService.js"></script>
-    <script src="www/lockCtrl.js"></script>
-    <script src="www/bannerCtrl.js"></script>
-    <script src="www/errorService.js"></script>
-    <script src="www/settingsService.js"></script>
-    <script src="www/settingsCtrl.js"></script>
-    <script src="www/dropboxService.js"></script>
-    <script src="www/dropboxCtrl.js"></script>
-    <script src="www/syncService.js"></script>
-    <script src="www/dbService.js"></script>
-    <script src="www/yearsCtrl.js"></script>
-    <script src="www/recordsCtrl.js"></script>
-    <script src="www/scrollIfClass.js"></script>
-    <script src="www/viewerCtrl.js"></script>
-    <script src="www/editorCtrl.js"></script>
-    <script src="www/app.js"></script>
+  <script type="module" crossorigin src="./assets/main-wrMhi77f.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/auth-CcLcC2Qh.js">
+  <link rel="stylesheet" crossorigin href="./assets/main-CTrFtv1H.css">
 </head>
 
 <body class="container">
-    <div >
+    <div>
         <div ui-view="banner"></div>
-        <div class="row" ui-view></div>
+        <div ui-view></div>
     </div>
-<body>
+</body>
 </html>
