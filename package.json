@@ -27,7 +27,7 @@
   "readmeFilename": "README.md",
   "dependencies": {
     "@uirouter/angularjs": "1.1.2",
-    "angular": "1.4.14",
+    "angular": "1.8.3",
     "bootstrap": "5.3.8",
     "crypto-js": "4.2.0",
     "date-fns": "^4.4.0",
