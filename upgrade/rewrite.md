@@ -127,12 +127,15 @@ These are not open questions. Any proposal must satisfy them:
 - **Existing diaries must survive.** There is real data in browsers and in
   Dropbox, in the shapes described above. State how it is read, migrated or
   converted; a plan that silently strands it is not acceptable.
-- **Mobile is a first-class target, not a scaled-down desktop view.** A phone
-  is where a good part of the writing happens. Every area of the app has to
+- **Phone and desktop are both first-class, from one codebase and one
+  design.** A good part of the writing happens on a phone: every area has to
   be usable one-handed on a small screen - reading, navigating between years
-  and months, and above all writing an entry with a soft keyboard up. The
-  app must also install to the home screen and run from there like any other
-  app on the device.
+  and months, and above all writing an entry with a soft keyboard up. Just as
+  much of it happens at a desk: a wide screen has to be used, not filled with
+  a phone layout stretched across it. Neither is the baseline the other is
+  squeezed or padded out of, and a tablet in between must land somewhere
+  sensible without a design of its own. The app must also install to the home
+  screen and run from there like any other app on the device.
 - **Browsers: current Firefox and current Chrome, on desktop and on Android.**
   Those two are what gets supported and tested. Other modern browsers are
   welcome to work and none of them is a design input - do not spend
