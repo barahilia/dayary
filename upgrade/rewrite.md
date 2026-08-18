@@ -127,6 +127,17 @@ These are not open questions. Any proposal must satisfy them:
 - **Existing diaries must survive.** There is real data in browsers and in
   Dropbox, in the shapes described above. State how it is read, migrated or
   converted; a plan that silently strands it is not acceptable.
+- **Mobile is a first-class target, not a scaled-down desktop view.** A phone
+  is where a good part of the writing happens. Every area of the app has to
+  be usable one-handed on a small screen - reading, navigating between years
+  and months, and above all writing an entry with a soft keyboard up. The
+  app must also install to the home screen and run from there like any other
+  app on the device.
+- **Browsers: current Firefox and current Chrome, on desktop and on Android.**
+  Those two are what gets supported and tested. Other modern browsers are
+  welcome to work and none of them is a design input - do not spend
+  complexity, polyfills or format compromises on anything outside those two,
+  and say so explicitly if a recommendation is cheaper because of it.
 
 ## Out of scope
 
@@ -151,14 +162,18 @@ so and name what would break the tie.
   with a modern KDF, and how existing records are handled either way.
 - **Offline and installability** - service worker strategy, whether to lean
   on a framework's PWA tooling or keep hand-written control, and how cache
-  versioning stays tied to the build.
+  versioning stays tied to the build. Installability means a real one: a web
+  app manifest, icons, standalone display, and the app launching from an
+  Android home screen with no network at all.
 - **Dropbox integration** - SDK choice, the OAuth flow that works without a
   server, where tokens live, how the diary directory is chosen and
   remembered, and what the sync model is: file granularity, change
   detection, conflict resolution, and what happens when two devices edit
   while offline.
-- **Styling** - CSS framework or none, icons, theming, and how the app
-  behaves on a phone as well as a desktop.
+- **Styling and layout** - CSS framework or none, icons, theming, and the
+  responsive strategy: how one layout serves a phone and a desktop, what the
+  navigation collapses into on a narrow screen, touch target sizes, and what
+  the editor does when a soft keyboard takes half the viewport.
 - **Testing** - what runs in a real browser, what runs headless, and how
   crypto and sync are covered.
 - **Deployment** - how a build reaches the static host, versioning, and how
