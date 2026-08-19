@@ -9,6 +9,7 @@ import { lockCtrl } from './lockCtrl.js';
 import { bannerCtrl } from './bannerCtrl.js';
 import { errorService } from './errorService.js';
 import { settingsService } from './settingsService.js';
+import { deviceService } from './deviceService.js';
 import { settingsCtrl } from './settingsCtrl.js';
 import { dropboxService } from './dropboxService.js';
 import { dropboxCtrl } from './dropboxCtrl.js';
@@ -29,6 +30,7 @@ angular.module("app", ['ui.router'])
     .controller("bannerCtrl", bannerCtrl)
     .factory("errorService", errorService)
     .factory("settingsService", settingsService)
+    .factory("deviceService", deviceService)
     .controller("settingsCtrl", settingsCtrl)
     .factory("dropboxService", dropboxService)
     .controller("dropboxCtrl", dropboxCtrl)

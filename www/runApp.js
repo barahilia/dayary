@@ -1,6 +1,6 @@
 export var runApp = function (
     $transitions, $state,
-    lockService, dbService, settingsService
+    lockService, dbService, settingsService, deviceService
 ) {
 
     dbService.init()
@@ -10,6 +10,20 @@ export var runApp = function (
             if (Object.keys(settings).length > 0) {
                 settingsService.init(settings);
             }
+
+            if (settingsService.settings.device) {
+                return null;
+            }
+
+            // Nothing in a browser names the machine, so the first run
+            // guesses and saves the guess: records are stamped with it, so it
+            // has to hold still across loads. The user renames it in Settings.
+            return deviceService.detect()
+                .then(function (device) {
+                    settingsService.settings.device = device;
+
+                    return dbService.setSettings({ device: device });
+                });
         });
 
     // The 0.2.x $stateChangeStart event is gone in ui-router 1.x; a start
@@ -30,4 +44,4 @@ export var runApp = function (
     });
 };
 
-runApp.$inject = ['$transitions', '$state', 'lockService', 'dbService', 'settingsService'];
+runApp.$inject = ['$transitions', '$state', 'lockService', 'dbService', 'settingsService', 'deviceService'];

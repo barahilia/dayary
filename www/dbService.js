@@ -347,12 +347,24 @@ export var dbService = function ($q, errorService) {
             }
             else if (local.length === 1) {
                 if (isBefore(parseISO(local[0].updated), parseISO(record.updated))) {
-                    return service.updateRecord({
+                    var merged = {
                         id: local[0].id,
                         created: local[0].created,
                         updated: record.updated,
                         text: record.text
-                    });
+                    };
+
+                    // Both copies are the same record, so both should name
+                    // the device it was written on; keep the local answer and
+                    // take the incoming one only where there is none, which
+                    // backfills records made before the field existed.
+                    var device = local[0].device || record.device;
+
+                    if (device) {
+                        merged.device = device;
+                    }
+
+                    return service.updateRecord(merged);
                 }
             }
             else {

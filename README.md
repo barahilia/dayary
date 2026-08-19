@@ -66,6 +66,7 @@ The main unit of work is dairy `record`:
     created: Datetime, creation time and visual and sync identificator
     updated: Datetime, last update time, to sync the latest udpate
     text: String, encrypted textual entry
+    device: String, where the record was written; optional
 }
 ```
 Both datetimes are ISO 8601 strings with the local UTC offset, like
@@ -73,6 +74,22 @@ Both datetimes are ISO 8601 strings with the local UTC offset, like
 that monthly and yearly views range over, and such keys compare as
 plain strings - so the format must stay fixed width. The local offset
 keeps an entry on the day its author lived it.
+
+`device` is stamped once, when the record is written, and no later edit
+or sync touches it - it answers where an entry was made, not where it
+was last opened. Records written before the field existed simply have
+none, and the viewer then says nothing about it. The name itself is a
+setting, so it is one per browser profile rather than per record; the
+first run guesses it and the user renames it in Settings. Note it is
+stored and exported in clear text: only `text` is encrypted.
+
+Nothing in a browser names the machine it runs on - `location.hostname`
+is the server, identical everywhere - so the guess in
+`www/deviceService.js` comes from the user agent: the platform and the
+browser, as "Linux Firefox", plus the phone's own model where Chromium's
+client hints give one, as "Pixel 8 Chrome". That names a browser profile
+and not a device, which is where a diary lives anyway, each profile
+having its own IndexedDB.
 
 AES-256 algorithm is used for encryption. A passphrase is saved for
 the session time to decrypt existing and encrypt updated records.

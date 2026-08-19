@@ -308,4 +308,70 @@ describe("sync db", function () {
             })
             .then(done);
     });
+
+    it("should import the device a record was written on", function (done) {
+        var file = "data.file";
+        var records = '[{' +
+            '"created": "2015-05-06", "updated": "2015-05-06",' +
+            ' "text": "", "device": "Laptop"' +
+            '}]';
+
+        spyOn(dropbox, "readFile").and.returnValue( Q(records) );
+
+        service.importFile(file)
+            .then(function () {
+                return db.getRecord(6);
+            })
+            .then(function (record) {
+                expect(record).toEqual({
+                    id: 6, created: "2015-05-06", updated: "2015-05-06",
+                    text: "", device: "Laptop"
+                });
+                done();
+            });
+    });
+
+    it("should keep that device when another one updates it", function (done) {
+        var file = "data.file";
+        var records = '[{' +
+            '"created": "2015-05-06", "updated": "2015-05-07",' +
+            ' "text": "newer", "device": "Phone"' +
+            '}]';
+
+        spyOn(dropbox, "readFile").and.returnValue( Q(records) );
+
+        service.importFile(file)
+            .then(function () {
+                return db.getRecord(6);
+            })
+            .then(function (record) {
+                expect(record).toEqual({
+                    id: 6, created: "2015-05-06", updated: "2015-05-07",
+                    text: "newer", device: "Laptop"
+                });
+                done();
+            });
+    });
+
+    it("should take the device of a record having none", function (done) {
+        var file = "data.file";
+        var records = '[{' +
+            '"created": "2015-05-05", "updated": "2015-05-08",' +
+            ' "text": "newer", "device": "Phone"' +
+            '}]';
+
+        spyOn(dropbox, "readFile").and.returnValue( Q(records) );
+
+        service.importFile(file)
+            .then(function () {
+                return db.getRecord(5);
+            })
+            .then(function (record) {
+                expect(record).toEqual({
+                    id: 5, created: "2015-05-05", updated: "2015-05-08",
+                    text: "newer", device: "Phone"
+                });
+                done();
+            });
+    });
 });

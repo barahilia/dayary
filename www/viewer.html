@@ -25,6 +25,9 @@
     </div>
 
     <span class="float-end">
+        <span ng-show="record.device">
+            written on {{record.device}} -
+        </span>
         last updated on
         {{record.updated | date : 'EEEE, dd.MM.y, HH:mm'}}
     </span>

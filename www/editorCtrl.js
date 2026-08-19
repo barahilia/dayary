@@ -16,6 +16,15 @@ export var editorCtrl = function (
             created: $scope.record.created,
             updated: $scope.record.updated
         };
+
+        // A save rebuilds the record field by field, so the device it was
+        // written on has to be carried over or it would be dropped here on
+        // the first edit. Records from before the field have none, and stay
+        // that way rather than claiming the device editing them now.
+        if ($scope.record.device) {
+            record.device = $scope.record.device;
+        }
+
         record.text = encryptionService.encrypt($scope.record.text);
 
         dbService.updateRecord(record)

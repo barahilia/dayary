@@ -306,3 +306,38 @@
       option and would drop the web font altogether. Note `sw.js` precaches
       the `?v=4.7.0` font URLs through `ignoreSearch`; check what that list
       turns into.
+- [x] ~~Record which device an entry was written on~~ — done 2026-08-19.
+      A `device` string on the record, stamped once at creation and never
+      touched again: `editorCtrl` rebuilds a record field by field on every
+      save and `dbService.syncRecord` does the same when merging a newer
+      copy, so both had to carry it over explicitly or the first edit or
+      sync would have dropped it. The merge keeps the local answer and takes
+      the incoming one only where there is none, which backfills records made
+      before the field. No schema change - the store is schemaless and the
+      field is not indexed, so the database stays at version 1 - and records
+      without it stay without it, the viewer showing "written on X - last
+      updated on ..." only when there is an X. The value is unencrypted, in
+      the database as in the Dropbox export, which is a deliberate choice:
+      only `text` is secret.
+      The name comes from `www/deviceService.js`. No browser gives away the
+      machine it runs on - `location.hostname` is the server - so it reads
+      the user agent: platform plus browser ("Linux Firefox"), the Chromium
+      client hints where they exist, and their `model` for the one case a
+      browser comes near a real device name ("Pixel 8 Chrome"). It names a
+      browser profile rather than a machine, which is where the diary lives
+      anyway. `runApp` seeds it into settings on the first run - it has to
+      hold still across loads - and Settings has a "Device name" field.
+      One thing this uncovered: `settingsService.init` replaced the whole
+      settings object with what was stored, so every setting added from here
+      on would read as undefined for anyone who already had a diary. It
+      merges over the defaults now.
+      Verified by lint, build and `npm test` (42 specs, 0 failures - three
+      new ones in `sync-db-spec` for the merge), by driving `deviceService`
+      in node over recorded user agents from eight browser/platform pairs
+      with and without client hints, and by 20 checks against the real app in
+      headless Firefox: first run seeds and persists a name, a new record
+      carries it, the viewer shows it, an edit does not drop it, a rename in
+      Settings survives a reload and only later records take it - and, on
+      the upgrade path, a diary whose settings predate the field gets a name
+      without losing its other settings, while its records keep no device
+      through both viewing and editing.

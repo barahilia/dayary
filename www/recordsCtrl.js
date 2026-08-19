@@ -1,7 +1,7 @@
 import { formatISO } from 'date-fns';
 
 export var recordsCtrl = function (
-    $scope, $state, dbService
+    $scope, $state, dbService, settingsService
 ) {
     $scope.records = [];
 
@@ -43,7 +43,10 @@ export var recordsCtrl = function (
         var addition = {
             created: formatISO(new Date()),
             updated: formatISO(new Date()),
-            text: ""
+            text: "",
+            // Where the record is written, stamped once and never again:
+            // editing it elsewhere leaves this alone.
+            device: settingsService.settings.device
         };
 
         dbService.addRecord(addition)
@@ -71,4 +74,4 @@ export var recordsCtrl = function (
     };
 };
 
-recordsCtrl.$inject = ['$scope', '$state', 'dbService'];
+recordsCtrl.$inject = ['$scope', '$state', 'dbService', 'settingsService'];
