@@ -10,7 +10,13 @@ export var settingsService = function () {
         dropboxFolder: "/backups/dayary",
         // Filled in on the first run from what the user agent tells about
         // itself; see deviceService.
-        device: ""
+        device: "",
+        // The single year the sync is limited to. Empty means all of them,
+        // which is what the sync did before the choice existed and what a
+        // complete sync goes back to. Kept here rather than asked for every
+        // time: a device that only ever writes this year's entries has no
+        // reason to walk the whole diary on each sync.
+        syncYear: ""
     };
 
     service.settings = Object.assign({}, defaults);

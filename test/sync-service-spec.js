@@ -62,6 +62,44 @@ describe("sync service", function () {
         expect(res).toEqual(["b", "c"]);
     });
 
+    it("should import the single year file only", function () {
+        var res = service.filesToImport(
+            [
+                {path_display: "/backups/dayary/2000.json"},
+                {path_display: "/backups/dayary/2001.json"}
+            ],
+            {},
+            "2001"
+        );
+
+        expect(res).toEqual(["/backups/dayary/2001.json"]);
+    });
+
+    it("should import nothing for a year missing in the cloud", function () {
+        var res = service.filesToImport(
+            [{path_display: "/backups/dayary/2000.json"}],
+            {},
+            "2001"
+        );
+
+        expect(res).toEqual([]);
+    });
+
+    it("should not import the single year file when up to date", function () {
+        var res = service.filesToImport(
+            [
+                {
+                    path_display: "/backups/dayary/2001.json",
+                    server_modified: "2015-01-01"
+                }
+            ],
+            {"/backups/dayary/2001.json": {lastImport: "2015-02-02"}},
+            "2001"
+        );
+
+        expect(res).toEqual([]);
+    });
+
     it("should export nothing for no years", function () {
         var res = service.yearsToExport([], {});
         expect(res).toEqual([]);
@@ -115,6 +153,39 @@ describe("sync service", function () {
         );
 
         expect(res).toEqual(["2001", "2002"]);
+    });
+
+    it("should export the single year only", function () {
+        var res = service.yearsToExport(
+            [
+                {year: "2000", updated: "2015-01-01"},
+                {year: "2001", updated: "2015-01-01"}
+            ],
+            {},
+            "2001"
+        );
+
+        expect(res).toEqual(["2001"]);
+    });
+
+    it("should export nothing for a year with no records", function () {
+        var res = service.yearsToExport(
+            [{year: "2000", updated: "2015-01-01"}],
+            {},
+            "2001"
+        );
+
+        expect(res).toEqual([]);
+    });
+
+    it("should not export the single year when up to date", function () {
+        var res = service.yearsToExport(
+            [{year: "2001", updated: "2015-01-01"}],
+            {'/backups/dayary/2001.json': {lastExport: "2015-02-02"}},
+            "2001"
+        );
+
+        expect(res).toEqual([]);
     });
 
     it("should not re-export a year just imported and unchanged since", function () {

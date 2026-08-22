@@ -1,5 +1,6 @@
 export var dropboxCtrl = function (
-    $scope, errorService, settingsService, syncService, dropboxService
+    $scope, errorService, settingsService, syncService, dropboxService,
+    dbService
 ) {
     $scope.isAuthenticated = dropboxService.isAuthenticated();
     $scope.isReady = false;
@@ -19,6 +20,30 @@ export var dropboxCtrl = function (
     }
 
     $scope.dropboxUser = "N/A";
+
+    // The sync covers a single year or the whole diary, and the choice holds
+    // until it is changed: whatever is picked here goes to the settings and
+    // is what the next sync does. The year offered by default is the current
+    // one - the only year a running diary keeps writing to - while an empty
+    // setting, as on a device that never chose, means a complete sync.
+    $scope.singleYear = !! settingsService.settings.syncYear;
+    $scope.syncYear = settingsService.settings.syncYear ||
+        String(new Date().getFullYear());
+
+    var saveSyncYear = function () {
+        var year = "";
+
+        if ($scope.singleYear) {
+            // The number input hands over a number, and the year travels as
+            // a string: it names a file and is compared against the years
+            // the records are grouped by, which are object keys.
+            year = String($scope.syncYear);
+        }
+
+        settingsService.settings.syncYear = year;
+
+        return dbService.setSettings({ syncYear: year });
+    };
 
     $scope.getData = function () {
         dropboxService.accountInfo()
@@ -63,7 +88,8 @@ export var dropboxCtrl = function (
     $scope.autoSync = function () {
         $scope.syncing = true;
 
-        syncService.sync()
+        saveSyncYear()
+            .then(syncService.sync)
             .then(function () {
                 $scope.syncing = false;
                 console.log("Auto sync finished successfully");
@@ -76,4 +102,4 @@ export var dropboxCtrl = function (
     };
 };
 
-dropboxCtrl.$inject = ['$scope', 'errorService', 'settingsService', 'syncService', 'dropboxService'];
+dropboxCtrl.$inject = ['$scope', 'errorService', 'settingsService', 'syncService', 'dropboxService', 'dbService'];

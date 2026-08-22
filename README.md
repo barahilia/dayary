@@ -176,6 +176,14 @@ Backup and sync are done with Dropbox. Records are split to yearly
 chunks and saved to JSON files to allow for relatively small units
 for faster upload and download.
 
+The sync covers every year by default. The Dropbox view also offers to
+limit it to a single year - the current one unless another is typed in -
+which is the year a running diary keeps writing to, so the other files
+are neither downloaded nor uploaded. The choice is kept in the settings,
+as `syncYear`, and holds for the following syncs on that device until the
+checkbox is cleared and a complete sync is chosen again; an empty setting
+means all the years.
+
 The Dropbox client is the official **dropbox** JS SDK, v10 - still the
 current major line. Login is OAuth 2 with PKCE on a page of its own,
 `www/login/dropbox.html`, which is also its own redirect URI; it keeps

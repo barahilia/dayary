@@ -8,8 +8,27 @@ export var syncService = function ($q, settingsService, dbService, dropboxServic
         return settingsService.settings.dropboxFolder + '/' + year + '.json';
     };
 
-    service.filesToImport = function (cloudFiles, status) {
-        var actions = cloudFiles.map(function (file) {
+    // The year the sync is limited to, or null for all of them. The setting
+    // is read at every sync rather than captured once, so choosing a
+    // complete sync takes effect on the next run without a reload.
+    service.syncYear = function () {
+        var year = settingsService.settings.syncYear;
+
+        return year ? String(year) : null;
+    };
+
+    // `year` is optional; without it every file is considered, as before the
+    // single year choice existed. The filtering happens here, ahead of the
+    // status comparison, so a year left out is left out whatever its status
+    // says - its file is not read and its local copy is not touched.
+    service.filesToImport = function (cloudFiles, status, year) {
+        var files = year ?
+            cloudFiles.filter(function (file) {
+                return file.path_display === yearToFile(year);
+            }) :
+            cloudFiles;
+
+        var actions = files.map(function (file) {
             // If in status and lastImport after the file was modified
             if (status[file.path_display] &&
                 status[file.path_display].lastImport &&
@@ -29,8 +48,15 @@ export var syncService = function ($q, settingsService, dbService, dropboxServic
         return actions.filter(Boolean);
     };
 
-    service.yearsToExport = function (yearsUpdated, status) {
-        var actions = yearsUpdated.map(function (yearUpdated) {
+    // `onlyYear` is optional, as the year in filesToImport.
+    service.yearsToExport = function (yearsUpdated, status, onlyYear) {
+        var years = onlyYear ?
+            yearsUpdated.filter(function (yearUpdated) {
+                return String(yearUpdated.year) === onlyYear;
+            }) :
+            yearsUpdated;
+
+        var actions = years.map(function (yearUpdated) {
             var year = yearUpdated.year;
             var updated = yearUpdated.updated;
             var pathStatus = status[yearToFile(year)];
@@ -93,7 +119,7 @@ export var syncService = function ($q, settingsService, dbService, dropboxServic
             var status = data[1];
 
             return $q.all(
-                service.yearsToExport(yearStatuses, status)
+                service.yearsToExport(yearStatuses, status, service.syncYear())
                     .map(service.exportYear)
             );
         });
@@ -132,7 +158,9 @@ export var syncService = function ($q, settingsService, dbService, dropboxServic
             var cloudFiles = data[0];
             var status = data[1];
 
-            return service.filesToImport(cloudFiles, status).reduce(
+            return service.filesToImport(
+                cloudFiles, status, service.syncYear()
+            ).reduce(
                 function (previous, path) {
                     return previous.then(function () {
                         return service.importFile(path);

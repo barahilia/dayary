@@ -341,3 +341,19 @@
       the upgrade path, a diary whose settings predate the field gets a name
       without losing its other settings, while its records keep no device
       through both viewing and editing.
+- [ ] Sync a single year only. Written, not verified yet - the app was not
+      run and the tests were not run. A `syncYear` setting names the one year
+      the sync is limited to, empty meaning all of them, which is what the
+      sync did before and what a complete sync goes back to.
+      `syncService.filesToImport` and `yearsToExport` take the year as an
+      optional third argument and filter ahead of the status comparison, so a
+      year left out is left out whatever its status says; both callers read
+      the setting at every sync through `syncService.syncYear()`, so a change
+      takes effect without a reload. The Dropbox view holds the choice - a
+      checkbox plus a year, defaulting to the current one - and `autoSync`
+      saves it to the settings before syncing, which is what makes it hold
+      for the following syncs. No schema change; a diary whose settings
+      predate the field reads it as empty and keeps syncing every year.
+      To verify: lint, build, `npm test`, and the app in a browser - a single
+      year sync touching one file only, the choice surviving a reload, and
+      clearing the checkbox going back to a complete sync.
