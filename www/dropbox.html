@@ -44,22 +44,20 @@
 
         <div>
             <div>
-                <input type="checkbox" id="singleYear"
-                       ng-model="singleYear">
-                <label for="singleYear">Sync a single year:</label>
-                <input type="number" ng-model="syncYear"
-                       ng-disabled="!singleYear">
-            </div>
-
-            <div ng-hide="singleYear">
-                All the years are synced.
+                <span ng-show="settings.syncYear">
+                    Syncing the year {{settings.syncYear}} only.
+                </span>
+                <span ng-hide="settings.syncYear">
+                    Syncing all the years.
+                </span>
+                Change it in Settings.
             </div>
 
             <br />
 
             <button class="btn btn-success"
                     ng-click="autoSync()"
-                    ng-disabled="syncing || (singleYear && !syncYear)">
+                    ng-disabled="syncing">
                 Auto sync
             </button>
 

@@ -1,6 +1,5 @@
 export var dropboxCtrl = function (
-    $scope, errorService, settingsService, syncService, dropboxService,
-    dbService
+    $scope, errorService, settingsService, syncService, dropboxService
 ) {
     $scope.isAuthenticated = dropboxService.isAuthenticated();
     $scope.isReady = false;
@@ -21,33 +20,10 @@ export var dropboxCtrl = function (
 
     $scope.dropboxUser = "N/A";
 
-    // The sync covers a single year or the whole diary, and the choice holds
-    // until it is changed: whatever is picked here goes to the settings and
-    // is what the next sync does. The year offered by default is the current
-    // one - the only year a running diary keeps writing to - while an empty
-    // setting, as on a device that never chose, means a complete sync.
-    //
-    // The number input holds a number and shows nothing at all for a string,
-    // while the year travels as a string once it leaves here: it names a file
-    // and is compared against the years the records are grouped by, which are
-    // object keys. So it is a number on the scope and a string everywhere
-    // else.
-    $scope.singleYear = !! settingsService.settings.syncYear;
-    $scope.syncYear = settingsService.settings.syncYear ?
-        Number(settingsService.settings.syncYear) :
-        new Date().getFullYear();
-
-    var saveSyncYear = function () {
-        var year = "";
-
-        if ($scope.singleYear) {
-            year = String($scope.syncYear);
-        }
-
-        settingsService.settings.syncYear = year;
-
-        return dbService.setSettings({ syncYear: year });
-    };
+    // The live settings, not a copy: the view says which years the sync
+    // covers - `syncYear`, empty for all of them - and the choice is made in
+    // Settings, so a change there has to show here without a reload.
+    $scope.settings = settingsService.settings;
 
     $scope.getData = function () {
         dropboxService.accountInfo()
@@ -92,8 +68,7 @@ export var dropboxCtrl = function (
     $scope.autoSync = function () {
         $scope.syncing = true;
 
-        saveSyncYear()
-            .then(syncService.sync)
+        syncService.sync()
             .then(function () {
                 $scope.syncing = false;
                 console.log("Auto sync finished successfully");
@@ -106,4 +81,4 @@ export var dropboxCtrl = function (
     };
 };
 
-dropboxCtrl.$inject = ['$scope', 'errorService', 'settingsService', 'syncService', 'dropboxService', 'dbService'];
+dropboxCtrl.$inject = ['$scope', 'errorService', 'settingsService', 'syncService', 'dropboxService'];

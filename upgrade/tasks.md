@@ -349,9 +349,14 @@
       year left out is left out whatever its status says - its file is
       neither read nor written; both callers read the setting at every sync
       through `syncService.syncYear()`, so a change takes effect without a
-      reload. The Dropbox view holds the choice - a checkbox plus a year,
-      offering the current one - and `autoSync` saves it to the settings
-      before syncing, which is what makes it hold for the following syncs.
+      reload. Settings holds the choice - a checkbox plus a year, offering
+      the current one - saved by its own Save with the rest of the settings,
+      which is what makes it hold for the following syncs; the two controls
+      are folded back into the one setting on save, so an edit left unsaved
+      changes nothing. The Dropbox view only says which years the next sync
+      covers, off the live settings object, so a change in Settings shows
+      there without a reload. It started out in the Dropbox view, saved by
+      `autoSync` - moved on request 2026-08-23.
       No schema change; a diary whose settings predate the field reads it as
       empty and keeps syncing every year.
       The year is a number on the scope and a string everywhere else. That
@@ -361,12 +366,13 @@
       came up dead with it. Caught only by driving the view; nothing in the
       services or the specs sees it.
       Verified by lint, build and `npm test` (48 specs, 0 failures - six new
-      ones in `sync-service-spec` for the filtering), and by 32 checks
+      ones in `sync-service-spec` for the filtering), and by 37 checks
       against the real app in headless Firefox with the Dropbox client
       stubbed and everything else the app's own: a complete sync reading and
-      writing every year, a single year sync touching one file only, the
-      choice reaching the database and coming back after a reload - in the
-      view as much as in the sync - a chosen year with nothing on either side
-      passing quietly, clearing the checkbox going back to a complete sync,
-      and a diary whose stored settings predate the field syncing every year
-      and keeping its other settings.
+      writing every year, an unsaved choice leaving the sync alone, a single
+      year sync touching one file only, the choice reaching the database and
+      coming back after a reload - in both views as much as in the sync - a
+      chosen year with nothing on either side passing quietly, Save refused
+      while the box is on and the year blank, clearing the box going back to
+      a complete sync, and a diary whose stored settings predate the field
+      syncing every year and keeping its other settings.
