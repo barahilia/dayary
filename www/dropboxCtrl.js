@@ -26,17 +26,21 @@ export var dropboxCtrl = function (
     // is what the next sync does. The year offered by default is the current
     // one - the only year a running diary keeps writing to - while an empty
     // setting, as on a device that never chose, means a complete sync.
+    //
+    // The number input holds a number and shows nothing at all for a string,
+    // while the year travels as a string once it leaves here: it names a file
+    // and is compared against the years the records are grouped by, which are
+    // object keys. So it is a number on the scope and a string everywhere
+    // else.
     $scope.singleYear = !! settingsService.settings.syncYear;
-    $scope.syncYear = settingsService.settings.syncYear ||
-        String(new Date().getFullYear());
+    $scope.syncYear = settingsService.settings.syncYear ?
+        Number(settingsService.settings.syncYear) :
+        new Date().getFullYear();
 
     var saveSyncYear = function () {
         var year = "";
 
         if ($scope.singleYear) {
-            // The number input hands over a number, and the year travels as
-            // a string: it names a file and is compared against the years
-            // the records are grouped by, which are object keys.
             year = String($scope.syncYear);
         }
 

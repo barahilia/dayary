@@ -341,19 +341,32 @@
       the upgrade path, a diary whose settings predate the field gets a name
       without losing its other settings, while its records keep no device
       through both viewing and editing.
-- [ ] Sync a single year only. Written, not verified yet - the app was not
-      run and the tests were not run. A `syncYear` setting names the one year
-      the sync is limited to, empty meaning all of them, which is what the
-      sync did before and what a complete sync goes back to.
-      `syncService.filesToImport` and `yearsToExport` take the year as an
+- [x] ~~Sync a single year only~~ - done 2026-08-22. A `syncYear` setting
+      names the one year the sync is limited to, empty meaning all of them,
+      which is what the sync did before and what a complete sync goes back
+      to. `syncService.filesToImport` and `yearsToExport` take the year as an
       optional third argument and filter ahead of the status comparison, so a
-      year left out is left out whatever its status says; both callers read
-      the setting at every sync through `syncService.syncYear()`, so a change
-      takes effect without a reload. The Dropbox view holds the choice - a
-      checkbox plus a year, defaulting to the current one - and `autoSync`
-      saves it to the settings before syncing, which is what makes it hold
-      for the following syncs. No schema change; a diary whose settings
-      predate the field reads it as empty and keeps syncing every year.
-      To verify: lint, build, `npm test`, and the app in a browser - a single
-      year sync touching one file only, the choice surviving a reload, and
-      clearing the checkbox going back to a complete sync.
+      year left out is left out whatever its status says - its file is
+      neither read nor written; both callers read the setting at every sync
+      through `syncService.syncYear()`, so a change takes effect without a
+      reload. The Dropbox view holds the choice - a checkbox plus a year,
+      offering the current one - and `autoSync` saves it to the settings
+      before syncing, which is what makes it hold for the following syncs.
+      No schema change; a diary whose settings predate the field reads it as
+      empty and keeps syncing every year.
+      The year is a number on the scope and a string everywhere else. That
+      cost a round: `<input type="number">` rejects a string model with
+      `ngModel:numfmt` and renders *empty*, so the field came up blank with
+      the checkbox on - and the button, disabled while the year is blank,
+      came up dead with it. Caught only by driving the view; nothing in the
+      services or the specs sees it.
+      Verified by lint, build and `npm test` (48 specs, 0 failures - six new
+      ones in `sync-service-spec` for the filtering), and by 32 checks
+      against the real app in headless Firefox with the Dropbox client
+      stubbed and everything else the app's own: a complete sync reading and
+      writing every year, a single year sync touching one file only, the
+      choice reaching the database and coming back after a reload - in the
+      view as much as in the sync - a chosen year with nothing on either side
+      passing quietly, clearing the checkbox going back to a complete sync,
+      and a diary whose stored settings predate the field syncing every year
+      and keeping its other settings.
