@@ -4,7 +4,19 @@
         <div class="banner-id h1">Dayary</div>
         <div class="banner-id">
             <div>day by day</div>
-            <div>v{{version}}<span ng-show="dev"> dev</span></div>
+            <div>
+                v{{version}}<span ng-show="dev"> dev</span>
+
+                <span class="fa fa-spinner fa-spin"
+                      ng-show="dropboxPreparing()"
+                      title="Preparing Dropbox service">
+                </span>
+
+                <span class="fa fa-dropbox"
+                      ng-show="dropboxReady()"
+                      title="Dropbox service ready">
+                </span>
+            </div>
         </div>
     </div>
 

@@ -7,12 +7,12 @@
     </a>
 </div>
 
-<div ng-show="isAuthenticated && !isReady">
+<div ng-show="isAuthenticated && !isReady()">
     Preparing Dropbox service...
     <span class="fa fa-spinner fa-spin">
 </div>
 
-<div ng-show="isReady">
+<div ng-show="isReady()">
     <div>
         <button class="btn btn-success" ng-click="getData()">
             Get data

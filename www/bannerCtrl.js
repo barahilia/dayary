@@ -1,6 +1,8 @@
 import { isDevelopment, version } from './environment.js';
 
-export var bannerCtrl = function ($scope, lockService, errorService) {
+export var bannerCtrl = function (
+    $scope, lockService, errorService, dropboxService
+) {
 
     // The template is bundled as a raw string, so it cannot see the module
     // and gets the flag and the version through the scope.
@@ -17,6 +19,12 @@ export var bannerCtrl = function ($scope, lockService, errorService) {
 
     $scope.locked = lockService.locked;
 
+    // A small sign for the background token refresh the app starts on its
+    // own - spinning while it runs, a Dropbox mark once the service can be
+    // used, and nothing at all before it starts or after it fails.
+    $scope.dropboxPreparing = dropboxService.isPreparing;
+    $scope.dropboxReady = dropboxService.isReady;
+
     $scope.showMenu = false;
 
     $scope.toggleMenu = function () {
@@ -28,4 +36,4 @@ export var bannerCtrl = function ($scope, lockService, errorService) {
     };
 };
 
-bannerCtrl.$inject = ['$scope', 'lockService', 'errorService'];
+bannerCtrl.$inject = ['$scope', 'lockService', 'errorService', 'dropboxService'];

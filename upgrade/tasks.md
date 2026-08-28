@@ -376,3 +376,34 @@
       while the box is on and the year blank, clearing the box going back to
       a complete sync, and a diary whose stored settings predate the field
       syncing every year and keeping its other settings.
+- [x] ~~Refresh the Dropbox access token in the background~~ - done
+      2026-08-28. The Dropbox view used to open on "Preparing Dropbox
+      service..." and hold the buttons back until the token refresh returned.
+      `runApp` now starts that refresh itself, 7 seconds after load and
+      whichever page is open, so by the time the view is asked for the wait
+      is usually over. The progress moved from `dropboxCtrl` into
+      `dropboxService` - `isPreparing()` and `isReady()` - since two places
+      show it now; the view binds to the service instead of its own flag.
+      `prepareDropbox` keeps the in-flight promise and hands it to later
+      callers, so the view joins the background refresh rather than starting
+      a second one, and drops it once settled, so a call after the token
+      expires refreshes again - on a still valid token the SDK makes no
+      request at all. It resolves through `$q` and not the SDK's native
+      promise, so the flags reach the templates in the digest they change in,
+      and a re-check of a ready service leaves `isPreparing()` off, keeping
+      the banner still.
+      The banner carries the sign, next to the version: a spinner while the
+      refresh runs, the Dropbox mark when the service is ready, nothing
+      before it starts, without a login, or after a failure. A background
+      failure - no network being the usual one - only goes to the console:
+      the Dropbox view reports it when the user actually asks for Dropbox,
+      as it did before.
+      Verified by lint, build and `npm test` (48 specs, 0 failures), and by
+      26 checks against the real app in headless Firefox with the Dropbox
+      HTTP calls stubbed and everything else the app's own: no sign and no
+      request without a login, the spinner giving way to the mark on a
+      successful refresh, the view opened afterwards showing its buttons at
+      once with no second request and reading the account off the prepared
+      client, the view opened during the refresh waiting and then filling in
+      on the same single request, and a failing refresh leaving the banner
+      empty, logging to the console, and reporting itself on the view.

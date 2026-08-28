@@ -2,13 +2,14 @@ export var dropboxCtrl = function (
     $scope, errorService, settingsService, syncService, dropboxService
 ) {
     $scope.isAuthenticated = dropboxService.isAuthenticated();
-    $scope.isReady = false;
+
+    // The service knows whether it is ready: the app prepares it in the
+    // background on load, so by the time this page opens the wait is usually
+    // over already and the buttons show up at once.
+    $scope.isReady = dropboxService.isReady;
 
     if ($scope.isAuthenticated) {
         dropboxService.prepareDropbox()
-            .then(function () {
-                $scope.isReady = true;
-            })
             .catch(function (message) {
                 message = JSON.stringify(message).substring(0, 100);
                 errorService.reportError("Dropbox prepare: " + message);

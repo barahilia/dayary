@@ -1,6 +1,8 @@
+import { secondsToMilliseconds } from 'date-fns';
+
 export var runApp = function (
-    $transitions, $state,
-    lockService, dbService, settingsService, deviceService
+    $transitions, $state, $timeout,
+    lockService, dbService, settingsService, deviceService, dropboxService
 ) {
 
     dbService.init()
@@ -26,6 +28,24 @@ export var runApp = function (
                 });
         });
 
+    // Refreshing the Dropbox access token is a network round trip, and the
+    // Dropbox page used to make the user wait for it. Doing it once here, a
+    // few seconds in, leaves the page ready whenever it is opened. It is a
+    // background job: the banner shows a small sign for it, and a failure -
+    // no network being the usual one - only goes to the console, the page
+    // itself reporting it when the user actually asks for Dropbox.
+    if (dropboxService.isAuthenticated()) {
+        $timeout(
+            function () {
+                dropboxService.prepareDropbox()
+                    .catch(function (message) {
+                        console.log("Background Dropbox prepare failed", message);
+                    });
+            },
+            secondsToMilliseconds(7)
+        );
+    }
+
     // The 0.2.x $stateChangeStart event is gone in ui-router 1.x; a start
     // hook takes its place. Returning a target state redirects the
     // transition, replacing the old preventDefault() plus $state.go() pair.
@@ -44,4 +64,4 @@ export var runApp = function (
     });
 };
 
-runApp.$inject = ['$transitions', '$state', 'lockService', 'dbService', 'settingsService', 'deviceService'];
+runApp.$inject = ['$transitions', '$state', '$timeout', 'lockService', 'dbService', 'settingsService', 'deviceService', 'dropboxService'];

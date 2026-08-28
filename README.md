@@ -191,9 +191,17 @@ current major line. Login is OAuth 2 with PKCE on a page of its own,
 the code verifier in `sessionStorage` for the one hop to Dropbox and
 back, then stores the returned refresh token in `localStorage`. The app
 itself never sees a long lived access token - `prepareDropbox` trades
-the refresh token for a fresh one on every visit to the Dropbox view.
-Downloads come back as a `fileBlob`, which is why `readFile` goes
-through a `FileReader`.
+the refresh token for a fresh one, which takes a network round trip.
+`runApp` starts that trade in the background a few seconds after the app
+loads, whichever page is open, so the Dropbox view usually finds the
+service ready instead of making the user wait for it; the view asks for
+it as well, joining the same refresh when one is still in flight.
+`dropboxService` keeps the progress, and the banner shows it in small: a
+spinner while the refresh runs, the Dropbox mark once the service can be
+used, and nothing when there is no login or the refresh failed - a
+failure in the background only goes to the console, the Dropbox view
+being the place that reports it. Downloads come back as a `fileBlob`,
+which is why `readFile` goes through a `FileReader`.
 
 ## Development
 
